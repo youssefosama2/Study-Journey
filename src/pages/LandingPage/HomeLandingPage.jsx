@@ -34,6 +34,10 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "./Home-Landing-Page.css";
+import howSectionImage from "../../assets/how-section.webp";
+import howSectionPhoneImage from "../../assets/how-section-phone.webp";
+import aboutStudyImage from "../../assets/about-study.webp";
+import ctaSectionImage from "../../assets/cta-sec.webp";
 const features = [
   {
     icon: <FaBookOpen />,
@@ -304,13 +308,13 @@ export default function HomeLandingPage() {
       <section className="how-section" id="how">
         <div className="how-img-desktop">
           <img
-            src="/assets/how-section.webp"
+            src={howSectionImage}
             alt="كيف تعمل Study Journey"
           />
         </div>
         <div className="how-img-mobile">
           <img
-            src="/assets/how-section-phone.webp"
+            src={howSectionPhoneImage}
             alt="كيف تعمل Study Journey على الهاتف"
           />
         </div>
@@ -415,7 +419,7 @@ export default function HomeLandingPage() {
             >
               <div className="about-image">
                 <img
-                  src="/assets/about-study.webp"
+                  src={aboutStudyImage}
                   alt="Study Journey"
                 />
               </div>
@@ -482,7 +486,7 @@ export default function HomeLandingPage() {
             <div className="cta-decoration cta-decoration-2"></div>
             <div className="cta-target">
               <img
-                src="/assets/cta-sec.webp"
+                src={ctaSectionImage}
                 width={130}
                 alt=""
               />
