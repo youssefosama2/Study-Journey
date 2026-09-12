@@ -304,13 +304,13 @@ export default function HomeLandingPage() {
       <section className="how-section" id="how">
         <div className="how-img-desktop">
           <img
-            src="/src/assets/how-section.webp"
+            src="/assets/how-section.webp"
             alt="كيف تعمل Study Journey"
           />
         </div>
         <div className="how-img-mobile">
           <img
-            src="/src/assets/how-section-phone.webp"
+            src="/assets/how-section-phone.webp"
             alt="كيف تعمل Study Journey على الهاتف"
           />
         </div>
@@ -415,7 +415,7 @@ export default function HomeLandingPage() {
             >
               <div className="about-image">
                 <img
-                  src="/src/assets/about-study.webp"
+                  src="/assets/about-study.webp"
                   alt="Study Journey"
                 />
               </div>
@@ -482,7 +482,7 @@ export default function HomeLandingPage() {
             <div className="cta-decoration cta-decoration-2"></div>
             <div className="cta-target">
               <img
-                src="/src/assets/cta-sec.webp"
+                src="/assets/cta-sec.webp"
                 width={130}
                 alt=""
               />
