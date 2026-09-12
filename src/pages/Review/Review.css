@@ -1,0 +1,1074 @@
+/* =========================================================
+   REVIEW PAGE
+========================================================= */
+.review-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 18px 28px 35px;
+  background: #f8faff;
+  color: #17213d;
+  box-sizing: border-box;
+  font-family: "Cairo", sans-serif;
+  direction: rtl;
+}
+/* =========================================================
+   TOP CONTROLS
+========================================================= */
+.review-page .review-top-controls {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.review-page .review-select,
+.review-page .review-filter-button {
+  min-width: 140px;
+  height: 39px;
+  padding: 0 16px;
+  border: 1px solid #e8ebf3;
+  border-radius: 9px;
+  background: #fff;
+  color: #50596d;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: 0.2s ease;
+}
+.review-page .review-select svg {
+  font-size: 10px;
+}
+.review-page .review-filter-button:hover,
+.review-page .review-select:hover {
+  color: #4a62d7;
+  border-color: #cbd3ed;
+}
+/* =========================================================
+   STATISTICS
+========================================================= */
+.review-page .review-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.review-page .review-stat-card {
+  min-height: 116px;
+  padding: 17px;
+  background: #fff;
+  border: 1px solid #edf0f6;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 18px rgba(30, 48, 90, 0.035);
+}
+.review-page .review-stat-icon {
+  width: 45px;
+  height: 45px;
+  min-width: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.review-page .review-stat-card.purple .review-stat-icon {
+  color: #8c4fd2;
+  background: #f0e8ff;
+}
+.review-page .review-stat-card.orange .review-stat-icon {
+  color: #dda02e;
+  background: #fff2d9;
+}
+.review-page .review-stat-card.blue .review-stat-icon {
+  color: #4f6fe0;
+  background: #e8efff;
+}
+.review-page .review-stat-card.green .review-stat-icon {
+  color: #3ab17e;
+  background: #e5f8ef;
+}
+.review-page .review-stat-content {
+  min-width: 0;
+}
+.review-page .review-stat-content h3 {
+  margin: 0 0 4px;
+  color: #363f53;
+  font-size: 12px;
+  font-weight: 700;
+}
+.review-page .review-stat-content strong {
+  display: block;
+  color: #17213d;
+  font-size: 25px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+.review-page .review-stat-content span {
+  display: block;
+  margin-top: 4px;
+  color: #747d90;
+  font-size: 10px;
+}
+.review-page .review-stat-content small {
+  display: block;
+  margin-top: 4px;
+  color: #42a979;
+  font-size: 9px;
+}
+/* =========================================================
+   MAIN DASHBOARD
+========================================================= */
+.review-page .review-dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 285px;
+  gap: 14px;
+  align-items: start;
+}
+.review-page .review-main-column {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.review-page .review-sidebar {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+/* =========================================================
+   COMMON CARDS
+========================================================= */
+.review-page .smart-review-card,
+.review-page .review-progress-card,
+.review-page .subject-progress-card,
+.review-page .review-list-card,
+.review-page .calendar-card,
+.review-page .review-tips-card,
+.review-page .achievements-card {
+  background: #fff;
+  border: 1px solid #edf0f6;
+  border-radius: 13px;
+  box-shadow: 0 4px 18px rgba(30, 48, 90, 0.03);
+}
+/* =========================================================
+   SMART REVIEW
+========================================================= */
+.review-page .smart-review-card {
+  padding: 18px;
+}
+.review-page .section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 13px;
+}
+.review-page .section-heading h2,
+.review-page .card-title-row h2 {
+  margin: 0;
+  color: #1b2540;
+  font-size: 15px;
+  font-weight: 800;
+}
+.review-page .section-heading p {
+  margin: 4px 0 0;
+  color: #7d8596;
+  font-size: 10px;
+}
+.review-page .section-heading-icon {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.review-page .section-heading-icon.purple {
+  color: #8b4bd3;
+  background: #f0e8ff;
+}
+.review-page .smart-review-list {
+  display: flex;
+  flex-direction: column;
+}
+.review-page .smart-review-item {
+  min-height: 57px;
+  padding: 7px 0;
+  border-bottom: 1px solid #f1f3f7;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.review-page .smart-review-item:last-child {
+  border-bottom: 0;
+}
+.review-page .smart-review-icon,
+.review-page .review-item-icon {
+  width: 37px;
+  height: 37px;
+  min-width: 37px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.review-page .physics {
+  background: #eaf1ff;
+  color: #526dd9;
+}
+.review-page .chemistry {
+  background: #e7f8f0;
+  color: #40ad7d;
+}
+.review-page .math {
+  background: #f0e9ff;
+  color: #7b4bd0;
+}
+.review-page .arabic {
+  background: #fff0df;
+  color: #dfa13b;
+}
+.review-page .smart-review-info {
+  flex: 1;
+  min-width: 0;
+}
+.review-page .smart-review-info h3 {
+  margin: 0;
+  color: #283148;
+  font-size: 11px;
+  font-weight: 800;
+}
+.review-page .smart-review-info span {
+  display: block;
+  margin-top: 3px;
+  color: #7c8494;
+  font-size: 9px;
+}
+.review-page .smart-review-date {
+  min-width: 78px;
+  text-align: center;
+  font-size: 9px;
+  color: #dca536;
+}
+.review-page .smart-review-date.today {
+  color: #4aad82;
+}
+.review-page .smart-review-date small {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 4px;
+  color: #4f586b;
+  font-size: 8px;
+}
+.review-page .full-plan-button,
+.review-page .calendar-full-button {
+  width: 100%;
+  height: 34px;
+  margin-top: 10px;
+  border: 0;
+  border-radius: 8px;
+  background: #f6f7fc;
+  color: #4861c9;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+/* =========================================================
+   MIDDLE CARDS
+========================================================= */
+.review-page .review-middle-grid {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 14px;
+}
+.review-page .review-progress-card,
+.review-page .subject-progress-card {
+  min-height: 215px;
+  padding: 17px;
+}
+.review-page .card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.review-page .card-title-row > svg {
+  color: #8a4bd0;
+  font-size: 16px;
+}
+/* =========================================================
+   DONUT
+========================================================= */
+.review-page .review-donut {
+  width: 130px;
+  height: 130px;
+  margin: 14px auto;
+  border-radius: 50%;
+  background: conic-gradient(
+    #3367db 0deg 216deg,
+    #38aa7b 216deg 281deg,
+    #f0a62e 281deg 324deg,
+    #7e45cf 324deg 360deg
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.review-page .review-donut-inner {
+  width: 98px;
+  height: 98px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.review-page .review-donut-inner strong {
+  color: #1b2743;
+  font-size: 20px;
+}
+.review-page .review-donut-inner span {
+  color: #777f91;
+  font-size: 9px;
+}
+.review-page .review-progress-legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px 18px;
+}
+.review-page .review-progress-legend div {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #737b8c;
+  font-size: 9px;
+}
+.review-page .review-progress-legend strong {
+  margin-right: auto;
+  color: #263149;
+}
+.review-page .legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.review-page .legend-dot.excellent {
+  background: #3269df;
+}
+.review-page .legend-dot.good {
+  background: #37ad7b;
+}
+.review-page .legend-dot.medium {
+  background: #efa62f;
+}
+.review-page .legend-dot.weak {
+  background: #8246cf;
+}
+.review-page .help-link {
+  width: 100%;
+  margin-top: 12px;
+  border: 0;
+  background: transparent;
+  color: #4862c9;
+  font-family: inherit;
+  font-size: 9px;
+  cursor: pointer;
+}
+/* =========================================================
+   SUBJECT BARS
+========================================================= */
+.review-page .subject-bars {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.review-page .subject-bar {
+  display: grid;
+  grid-template-columns: 48px 1fr 30px;
+  align-items: center;
+  gap: 7px;
+  font-size: 9px;
+}
+.review-page .subject-bar > span {
+  color: #5e6678;
+}
+.review-page .subject-bar strong {
+  color: #283149;
+  font-size: 9px;
+  text-align: left;
+}
+.review-page .bar-track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #edf0f4;
+}
+.review-page .bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+.review-page .bar-fill.green {
+  background: #35ae7b;
+}
+.review-page .bar-fill.blue {
+  background: #456be0;
+}
+.review-page .bar-fill.orange {
+  background: #eea631;
+}
+.review-page .bar-fill.purple {
+  background: #8149ce;
+}
+.review-page .bar-fill.red {
+  background: #dc5961;
+}
+.review-page .subject-details-link {
+  width: 100%;
+  margin-top: 14px;
+  padding-top: 10px;
+  border: 0;
+  border-top: 1px solid #f0f2f6;
+  background: transparent;
+  color: #4c65c8;
+  font-family: inherit;
+  font-size: 9px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+/* =========================================================
+   REVIEW LIST
+========================================================= */
+.review-page .review-list-card {
+  padding: 16px;
+}
+.review-page .review-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 5px;
+}
+.review-page .review-tabs {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.review-page .review-tabs button {
+  padding: 8px 12px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #7b8394;
+  font-family: inherit;
+  font-size: 9px;
+  cursor: pointer;
+}
+.review-page .review-tabs button.active {
+  color: #405ec8;
+  border-bottom-color: #405ec8;
+}
+.review-page .review-item {
+  min-height: 65px;
+  border-bottom: 1px solid #f0f2f6;
+}
+.review-page .review-item:last-child {
+  border-bottom: 0;
+}
+.review-page .review-item-content {
+  min-height: 65px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.review-page .review-more {
+  display: none;
+}
+.review-page .review-item-info {
+  flex: 1;
+  min-width: 0;
+}
+.review-page .review-item-info h3 {
+  margin: 0;
+  color: #263047;
+  font-size: 11px;
+  font-weight: 800;
+}
+.review-page .review-item-info span {
+  display: block;
+  margin-top: 3px;
+  color: #7c8494;
+  font-size: 9px;
+}
+.review-page .review-item-status {
+  min-width: 72px;
+  text-align: center;
+  color: #dca439;
+  font-size: 9px;
+}
+.review-page .review-item-status.today {
+  color: #40aa7c;
+}
+.review-page .review-item-status.late {
+  color: #db5961;
+}
+.review-page .review-item-status small {
+  display: block;
+  margin-top: 3px;
+  color: #687184;
+  font-size: 8px;
+}
+.review-page .review-action {
+  width: 78px;
+  height: 30px;
+  border: 1px solid #e5e8f1;
+  border-radius: 7px;
+  background: #f8f9fd;
+  color: #4b61bd;
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.review-page .review-action.today {
+  background: #eef7f2;
+  border-color: #d9eee3;
+  color: #35a475;
+}
+.review-page .review-action.late {
+  background: #fff0f1;
+  border-color: #f7dfe2;
+  color: #d65b64;
+}
+.review-page .show-all-reviews {
+  width: 100%;
+  height: 32px;
+  margin-top: 8px;
+  border: 0;
+  background: transparent;
+  color: #4962c5;
+  font-family: inherit;
+  font-size: 9px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+/* =========================================================
+   CALENDAR
+========================================================= */
+.review-page .calendar-card {
+  padding: 15px;
+}
+.review-page .calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.review-page .calendar-header h2 {
+  margin: 0;
+  color: #222c45;
+  font-size: 14px;
+  font-weight: 800;
+}
+.review-page .calendar-header button {
+  width: 25px;
+  height: 25px;
+  border: 0;
+  background: transparent;
+  color: #71798b;
+  cursor: pointer;
+}
+.review-page .calendar-week,
+.review-page .calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+}
+.review-page .calendar-week {
+  margin-top: 15px;
+  margin-bottom: 8px;
+}
+.review-page .calendar-week span {
+  color: #727b8d;
+  font-size: 8px;
+}
+.review-page .calendar-grid {
+  row-gap: 5px;
+}
+.review-page .calendar-grid span {
+  width: 25px;
+  height: 25px;
+  margin: auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #394258;
+  font-size: 9px;
+}
+.review-page .calendar-grid span.muted {
+  color: #b9bec8;
+}
+.review-page .calendar-grid span.reviewed {
+  background: #dff5e9;
+  color: #269b6b;
+  font-weight: 700;
+}
+.review-page .calendar-grid span.selected {
+  background: #3863dd;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(56, 99, 221, 0.25);
+}
+.review-page .calendar-legend {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f2f6;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.review-page .calendar-legend span {
+  color: #737b8c;
+  font-size: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.review-page .calendar-legend i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.review-page .legend-review {
+  background: #3bae7c;
+}
+.review-page .legend-planned {
+  background: #efb34d;
+}
+.review-page .legend-empty {
+  background: #9fa5b1;
+}
+/* =========================================================
+   TIPS
+========================================================= */
+.review-page .review-tips-card {
+  padding: 16px;
+  background: #fbfaff;
+}
+.review-page .tips-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.review-page .tips-heading svg {
+  color: #e8a52e;
+}
+.review-page .tips-heading h2 {
+  margin: 0;
+  color: #263047;
+  font-size: 12px;
+}
+.review-page .review-tips-card ul {
+  margin: 13px 0;
+  padding: 0 17px 0 0;
+}
+.review-page .review-tips-card li {
+  margin-bottom: 8px;
+  color: #6e7687;
+  font-size: 9px;
+  line-height: 1.8;
+}
+.review-page .review-tips-card button,
+.review-page .achievements-card > button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #4d65c6;
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+}
+/* =========================================================
+   ACHIEVEMENTS
+========================================================= */
+.review-page .achievements-card {
+  padding: 16px;
+}
+.review-page .achievement-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f2f6;
+}
+.review-page .achievement-icon {
+  width: 31px;
+  height: 31px;
+  min-width: 31px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.review-page .achievement-icon.green {
+  background: #e6f7ed;
+  color: #37aa78;
+}
+.review-page .achievement-icon.blue {
+  background: #e8efff;
+  color: #5070db;
+}
+.review-page .achievement-icon.gold {
+  background: #fff3d8;
+  color: #dfa432;
+}
+.review-page .achievement-item > div:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.review-page .achievement-item strong {
+  display: block;
+  color: #2a334a;
+  font-size: 9px;
+}
+.review-page .achievement-item span {
+  display: block;
+  margin-top: 2px;
+  color: #7c8495;
+  font-size: 8px;
+}
+.review-page .achievement-item > svg {
+  color: #3bae7b;
+  font-size: 11px;
+}
+.review-page .achievement-item.locked > svg {
+  color: #9ba2ae;
+}
+.review-page .achievement-progress {
+  margin: 14px 0 11px;
+}
+.review-page .achievement-progress > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.review-page .achievement-progress span {
+  color: #263048;
+  font-size: 9px;
+}
+.review-page .achievement-progress small {
+  color: #7c8495;
+  font-size: 8px;
+}
+.review-page .achievement-progress-track {
+  height: 5px;
+  margin-top: 7px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #edf0f4;
+}
+.review-page .achievement-progress-track span {
+  display: block;
+  height: 100%;
+  background: #4773dc;
+  border-radius: inherit;
+}
+/* =========================================================
+   REVIEW TOOLS
+========================================================= */
+.review-page .review-tools {
+  padding-top: 2px;
+}
+.review-page .review-tools > h2 {
+  margin: 0 0 10px;
+  color: #202a43;
+  font-size: 14px;
+  font-weight: 800;
+}
+.review-page .review-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.review-page .tool-card {
+  min-height: 120px;
+  padding: 13px;
+  border: 1px solid #edf0f6;
+  border-radius: 11px;
+  background: #fff;
+  text-align: center;
+}
+.review-page .tool-card > svg {
+  font-size: 20px;
+}
+.review-page .tool-card h3 {
+  margin: 7px 0 3px;
+  color: #273149;
+  font-size: 10px;
+}
+.review-page .tool-card p {
+  margin: 0 0 9px;
+  color: #7b8393;
+  font-size: 8px;
+}
+.review-page .tool-card button {
+  width: 100%;
+  height: 27px;
+  border: 0;
+  border-radius: 6px;
+  background: #f4f6fb;
+  color: #4c61bd;
+  font-family: inherit;
+  font-size: 8px;
+  cursor: pointer;
+}
+.review-page .tool-card.maps {
+  background: #fbf8ff;
+}
+.review-page .tool-card.maps > svg {
+  color: #8a50d2;
+}
+.review-page .tool-card.notes {
+  background: #f8fbff;
+}
+.review-page .tool-card.notes > svg {
+  color: #5275d9;
+}
+.review-page .tool-card.quizzes {
+  background: #f8fdf9;
+}
+.review-page .tool-card.quizzes > svg {
+  color: #39aa7a;
+}
+.review-page .tool-card.flashcards {
+  background: #fffaf2;
+}
+.review-page .tool-card.flashcards > svg {
+  color: #dda02d;
+}
+/* =========================================================
+   DARK MODE
+========================================================= */
+.dark-mode .review-page {
+  background: #101522;
+  color: #edf1f8;
+}
+.dark-mode .review-page .review-stat-card,
+.dark-mode .review-page .smart-review-card,
+.dark-mode .review-page .review-progress-card,
+.dark-mode .review-page .subject-progress-card,
+.dark-mode .review-page .review-list-card,
+.dark-mode .review-page .calendar-card,
+.dark-mode .review-page .review-tips-card,
+.dark-mode .review-page .achievements-card,
+.dark-mode .review-page .tool-card,
+.dark-mode .review-page .review-select,
+.dark-mode .review-page .review-filter-button {
+  background: #181f2d;
+  border-color: #293448;
+  box-shadow: none;
+}
+.dark-mode .review-page .review-stat-content h3,
+.dark-mode .review-page .review-stat-content strong,
+.dark-mode .review-page .section-heading h2,
+.dark-mode .review-page .card-title-row h2,
+.dark-mode .review-page .smart-review-info h3,
+.dark-mode .review-page .review-item-info h3,
+.dark-mode .review-page .calendar-header h2,
+.dark-mode .review-page .tips-heading h2,
+.dark-mode .review-page .achievement-item strong,
+.dark-mode .review-page .tool-card h3,
+.dark-mode .review-page .review-tools > h2 {
+  color: #edf1f8;
+}
+.dark-mode .review-page .review-stat-content span,
+.dark-mode .review-page .section-heading p,
+.dark-mode .review-page .smart-review-info span,
+.dark-mode .review-page .review-item-info span,
+.dark-mode .review-page .calendar-week span,
+.dark-mode .review-page .calendar-legend span,
+.dark-mode .review-page .review-tips-card li,
+.dark-mode .review-page .achievement-item span,
+.dark-mode .review-page .tool-card p {
+  color: #8993a5;
+}
+.dark-mode .review-page .smart-review-item,
+.dark-mode .review-page .review-item,
+.dark-mode .review-page .achievement-item,
+.dark-mode .review-page .calendar-legend {
+  border-color: #293448;
+}
+.dark-mode .review-page .review-donut-inner {
+  background: #181f2d;
+}
+.dark-mode .review-page .review-donut-inner strong,
+.dark-mode .review-page .review-progress-legend strong,
+.dark-mode .review-page .subject-bar strong,
+.dark-mode .review-page .calendar-grid span,
+.dark-mode .review-page .achievement-progress span {
+  color: #edf1f8;
+}
+.dark-mode .review-page .bar-track,
+.dark-mode .review-page .achievement-progress-track {
+  background: #2b3548;
+}
+.dark-mode .review-page .full-plan-button,
+.dark-mode .review-page .calendar-full-button,
+.dark-mode .review-page .review-action,
+.dark-mode .review-page .tool-card button {
+  background: #20293a;
+  color: #8799e7;
+  border-color: #303c52;
+}
+.dark-mode .review-page .review-tabs button {
+  color: #929caf;
+}
+.dark-mode .review-page .review-tabs button.active {
+  color: #8296ed;
+  border-color: #657ce1;
+}
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+@media (max-width: 1200px) {
+  .review-page .review-dashboard {
+    grid-template-columns: minmax(0, 1fr) 250px;
+  }
+  .review-page .review-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .review-page .review-tools-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 950px) {
+  .review-page {
+    padding: 16px 18px 30px;
+  }
+  .review-page .review-dashboard {
+    grid-template-columns: 1fr;
+  }
+  .review-page .review-sidebar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .review-page .calendar-card {
+    grid-row: span 2;
+  }
+}
+@media (max-width: 750px) {
+  .review-page .review-middle-grid {
+    grid-template-columns: 1fr;
+  }
+  .review-page .review-list-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .review-page .review-tabs {
+    overflow-x: auto;
+  }
+  .review-page .review-tabs button {
+    white-space: nowrap;
+  }
+  .review-page .review-item-content {
+    gap: 7px;
+  }
+  .review-page .review-item-status {
+    min-width: 60px;
+  }
+  .review-page .review-action {
+    width: 70px;
+  }
+  .review-page .review-sidebar {
+    grid-template-columns: 1fr;
+  }
+  .review-page .calendar-card {
+    grid-row: auto;
+  }
+}
+@media (max-width: 600px) {
+  .review-page {
+    padding: 12px;
+  }
+  .review-page .review-stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .review-page .review-stat-card {
+    min-height: 100px;
+  }
+  .review-page .smart-review-card,
+  .review-page .review-progress-card,
+  .review-page .subject-progress-card,
+  .review-page .review-list-card,
+  .review-page .calendar-card,
+  .review-page .review-tips-card,
+  .review-page .achievements-card {
+    padding: 13px;
+  }
+  .review-page .smart-review-date {
+    display: none;
+  }
+  .review-page .review-item-content {
+    position: relative;
+    padding: 8px 0;
+  }
+  .review-page .review-item-icon {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+  }
+  .review-page .review-item-info h3 {
+    font-size: 10px;
+  }
+  .review-page .review-item-status {
+    display: none;
+  }
+  .review-page .review-action {
+    width: 65px;
+    height: 28px;
+    font-size: 8px;
+  }
+  .review-page .review-tools-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 380px) {
+  .review-page .review-tools-grid {
+    grid-template-columns: 1fr;
+  }
+  .review-page .review-stat-content strong {
+    font-size: 23px;
+  }
+  .review-page .section-heading h2,
+  .review-page .card-title-row h2 {
+    font-size: 13px;
+  }
+  .review-page .smart-review-info h3 {
+    font-size: 10px;
+  }
+}

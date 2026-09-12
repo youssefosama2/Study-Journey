@@ -1,0 +1,1233 @@
+/* =========================================================
+   PAGE
+========================================================= */
+.focus-statistics-page {
+  min-height: 100vh;
+  background: var(--bg-primary, #f6f8fb);
+  direction: rtl;
+  color: var(--text-primary, #172033);
+}
+.focus-statistics-container {
+  width: min(1400px, 94%);
+  margin: 0 auto;
+  padding: 20px 0;
+}
+/* =========================================================
+   SPIN ANIMATION
+========================================================= */
+.spinning {
+  animation: focusStatisticsSpin 1s linear infinite;
+}
+@keyframes focusStatisticsSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* =========================================================
+   PERIOD
+========================================================= */
+.focus-statistics-period {
+  background: #fff;
+  border: 1px solid #e8ebf1;
+  border-radius: 18px;
+  padding: 14px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.focus-statistics-period-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 900;
+  color: #26344d;
+}
+.focus-statistics-period-title svg {
+  color: #667eea;
+}
+.focus-statistics-period-buttons {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.focus-statistics-period-buttons button {
+  border: 0;
+  background: transparent;
+  color: #7a8495;
+  border-radius: 10px;
+  padding: 9px 16px;
+  cursor: pointer;
+  font-weight: 800;
+  font-family: inherit;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+.focus-statistics-period-buttons button:hover {
+  background: #f2f3f8;
+  color: #667eea;
+}
+.focus-statistics-period-buttons button.active {
+  background: #667eea;
+  color: #fff;
+}
+/* =========================================================
+   ERROR
+========================================================= */
+.focus-statistics-error {
+  background: #fff3f3;
+  border: 1px solid #ffd4d4;
+  color: #c33;
+  border-radius: 16px;
+  padding: 15px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.focus-statistics-error button {
+  margin-right: auto;
+  border: 0;
+  background: #c33;
+  color: #fff;
+  padding: 8px 13px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: inherit;
+}
+/* =========================================================
+   LOADING
+========================================================= */
+.focus-statistics-loading {
+  min-height: 400px;
+  background: #fff;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  color: #657188;
+}
+.focus-statistics-loader {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 4px solid #e7eaf1;
+  border-top-color: #667eea;
+  animation: focusStatisticsSpin 0.8s linear infinite;
+}
+/* =========================================================
+   MAIN STATS
+========================================================= */
+.focus-statistics-main-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.focus-statistics-stat-card {
+  background: #fff;
+  border: 1px solid #e8ebf1;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-height: 125px;
+  box-sizing: border-box;
+}
+.focus-statistics-stat-card.primary {
+  background: linear-gradient(
+    135deg,
+    #667eea,
+    #5a67d8
+  );
+  color: #fff;
+  border-color: transparent;
+}
+.focus-statistics-stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+  background: #eef1ff;
+  color: #667eea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 21px;
+}
+.focus-statistics-stat-card.primary
+  .focus-statistics-stat-icon {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+.focus-statistics-stat-card > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.focus-statistics-stat-card span {
+  font-size: 12px;
+  color: #7b8597;
+  font-weight: 700;
+}
+.focus-statistics-stat-card.primary span {
+  color: rgba(255, 255, 255, 0.78);
+}
+.focus-statistics-stat-card strong {
+  font-size: 26px;
+  font-weight: 900;
+}
+.focus-statistics-stat-card small {
+  font-size: 11px;
+  color: #a0a8b7;
+}
+.focus-statistics-stat-card.primary small {
+  color: rgba(255, 255, 255, 0.65);
+}
+/* =========================================================
+   SMALL STATS
+========================================================= */
+.focus-statistics-secondary-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 22px;
+}
+.focus-statistics-small-card {
+  background: #fff;
+  border: 1px solid #e8ebf1;
+  border-radius: 17px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  box-sizing: border-box;
+}
+.focus-statistics-small-card > svg {
+  font-size: 21px;
+  color: #667eea;
+  flex-shrink: 0;
+}
+.focus-statistics-small-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.focus-statistics-small-card strong {
+  font-size: 20px;
+  font-weight: 900;
+}
+.focus-statistics-small-card span {
+  color: #8a93a4;
+  font-size: 12px;
+}
+/* =========================================================
+   BOX
+========================================================= */
+.focus-statistics-box {
+  background: #fff;
+  border: 1px solid #e8ebf1;
+  border-radius: 22px;
+  padding: 22px;
+  box-sizing: border-box;
+}
+.focus-statistics-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 22px;
+}
+.focus-statistics-box-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.focus-statistics-box-header h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 900;
+}
+.focus-statistics-box-header span {
+  color: #8a93a4;
+  font-size: 12px;
+}
+.focus-statistics-box-header > svg {
+  color: #667eea;
+  font-size: 21px;
+  flex-shrink: 0;
+}
+/* =========================================================
+   CHART GRID
+========================================================= */
+.focus-statistics-charts-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+/* =========================================================
+   WEEKLY CHART
+========================================================= */
+.focus-statistics-weekly-chart {
+  height: 270px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 13px;
+  padding-top: 25px;
+}
+.focus-statistics-day {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 7px;
+  min-width: 0;
+}
+.focus-statistics-day-value {
+  height: 20px;
+  font-size: 10px;
+  color: #667eea;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.focus-statistics-day-bar-wrapper {
+  width: min(45px, 100%);
+  flex: 1;
+  max-height: 190px;
+  border-radius: 10px;
+  background: #f2f4f8;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+.focus-statistics-day-bar {
+  width: 100%;
+  min-height: 3px;
+  border-radius: 10px;
+  background: #e1e5ed;
+  transition: height 0.3s ease;
+}
+.focus-statistics-day-bar.has-value {
+  background: #667eea;
+}
+.focus-statistics-day strong {
+  font-size: 11px;
+  color: #59657a;
+}
+.focus-statistics-day small {
+  color: #a0a7b4;
+  font-size: 9px;
+}
+/* =========================================================
+   GOALS
+========================================================= */
+.focus-statistics-goals-circle {
+  position: relative;
+  width: 190px;
+  height: 190px;
+  margin: 0 auto 22px;
+}
+.focus-statistics-goals-circle svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.focus-statistics-goals-track,
+.focus-statistics-goals-progress {
+  fill: none;
+  stroke-width: 13;
+}
+.focus-statistics-goals-track {
+  stroke: #edf0f5;
+}
+.focus-statistics-goals-progress {
+  stroke: #667eea;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease;
+}
+.focus-statistics-goals-circle > div {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 3px;
+}
+.focus-statistics-goals-circle strong {
+  font-size: 31px;
+  font-weight: 900;
+}
+.focus-statistics-goals-circle span {
+  color: #8a93a4;
+  font-size: 11px;
+}
+.focus-statistics-goal-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.focus-statistics-goal-summary > div {
+  background: #f8f9fb;
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.focus-statistics-goal-summary span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.focus-statistics-goal-summary .yes-dot {
+  background: #3dbb82;
+}
+.focus-statistics-goal-summary .partial-dot {
+  background: #e8a943;
+}
+.focus-statistics-goal-summary .no-dot {
+  background: #e55c67;
+}
+.focus-statistics-goal-summary strong {
+  font-size: 11px;
+}
+.focus-statistics-goal-summary b {
+  margin-right: auto;
+  font-size: 13px;
+}
+/* =========================================================
+   DISTRIBUTION
+========================================================= */
+.focus-statistics-distribution-box {
+  margin-bottom: 18px;
+}
+.focus-statistics-distribution {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 45px;
+  align-items: center;
+}
+.focus-statistics-distribution-circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.focus-statistics-donut {
+  position: relative;
+  width: 250px;
+  height: 250px;
+}
+.focus-statistics-donut-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.focus-statistics-donut-svg circle {
+  fill: none;
+  stroke-width: 28;
+  stroke-linecap: butt;
+}
+.focus-statistics-donut-center {
+  position: absolute;
+  inset: 28px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+}
+.focus-statistics-donut-center strong {
+  font-size: 23px;
+  font-weight: 900;
+}
+.focus-statistics-donut-center span {
+  color: #8b94a5;
+  font-size: 11px;
+}
+.focus-statistics-distribution-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.focus-statistics-distribution-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 15px;
+  align-items: center;
+}
+.focus-statistics-distribution-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.focus-statistics-distribution-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.focus-statistics-distribution-name strong {
+  font-size: 13px;
+}
+.focus-statistics-distribution-value {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.focus-statistics-distribution-value strong {
+  font-size: 13px;
+}
+.focus-statistics-distribution-value span {
+  color: #8d96a6;
+  font-size: 11px;
+}
+.focus-statistics-distribution-progress {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 7px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #f0f2f6;
+}
+.focus-statistics-distribution-progress > div {
+  height: 100%;
+  border-radius: inherit;
+}
+/* =========================================================
+   SEGMENTS
+========================================================= */
+.segment-0 {
+  background: #667eea;
+  stroke: #667eea !important;
+}
+.segment-1 {
+  background: #3dbb82;
+  stroke: #3dbb82 !important;
+}
+.segment-2 {
+  background: #a56de2;
+  stroke: #a56de2 !important;
+}
+.segment-3 {
+  background: #e7a53d;
+  stroke: #e7a53d !important;
+}
+.segment-4 {
+  background: #e05d77;
+  stroke: #e05d77 !important;
+}
+/* =========================================================
+   RECENT SESSIONS
+========================================================= */
+.recent-sessions-box {
+  margin-bottom: 18px;
+}
+.focus-statistics-sessions-list {
+  display: flex;
+  flex-direction: column;
+}
+.focus-statistics-session-row {
+  display: grid;
+  grid-template-columns: 45px 1fr 170px 100px 90px;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 5px;
+  border-bottom: 1px solid #edf0f4;
+}
+.focus-statistics-session-row:last-child {
+  border-bottom: 0;
+}
+.focus-statistics-session-status {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.focus-statistics-session-status.completed {
+  background: #e9f8f1;
+  color: #32a976;
+}
+.focus-statistics-session-status.active {
+  background: #eef1ff;
+  color: #667eea;
+}
+.focus-statistics-session-status.paused {
+  background: #fff5e7;
+  color: #d89b37;
+}
+.focus-statistics-session-status.cancelled,
+.focus-statistics-session-status.canceled {
+  background: #fff0f1;
+  color: #dc5d68;
+}
+.focus-statistics-session-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.focus-statistics-session-info strong {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.focus-statistics-session-info span {
+  font-size: 11px;
+  color: #929aaa;
+}
+.focus-statistics-session-result {
+  display: flex;
+  justify-content: flex-start;
+}
+.focus-statistics-result {
+  padding: 5px 9px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 800;
+}
+.focus-statistics-result.success {
+  background: #eaf8f1;
+  color: #2fa36e;
+}
+.focus-statistics-result.partial {
+  background: #fff5e5;
+  color: #c58c2f;
+}
+.focus-statistics-result.failed {
+  background: #fff0f1;
+  color: #d65865;
+}
+.focus-statistics-result.neutral {
+  background: #f0f2f5;
+  color: #7c8595;
+}
+.focus-statistics-session-duration {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.focus-statistics-session-duration strong {
+  font-size: 13px;
+}
+.focus-statistics-session-duration span {
+  color: #9ba2b0;
+  font-size: 10px;
+}
+.focus-statistics-session-date {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+}
+.focus-statistics-session-date strong {
+  font-size: 11px;
+}
+.focus-statistics-session-date span {
+  color: #9ba2b0;
+  font-size: 10px;
+}
+.focus-statistics-view-more {
+  width: 100%;
+  margin-top: 12px;
+  border: 0;
+  background: #f4f6fb;
+  color: #667eea;
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  font-weight: 800;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+.focus-statistics-view-more:hover {
+  background: #eef1ff;
+  color: #5967d9;
+}
+/* =========================================================
+   EMPTY
+========================================================= */
+.focus-statistics-empty {
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  text-align: center;
+  color: #9aa2b1;
+}
+.focus-statistics-empty > svg {
+  font-size: 35px;
+  color: #c7ccd6;
+}
+.focus-statistics-empty strong {
+  color: #606b7e;
+  font-size: 14px;
+}
+.focus-statistics-empty span {
+  font-size: 12px;
+}
+.focus-statistics-empty button {
+  margin-top: 5px;
+  border: 0;
+  background: #667eea;
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+}
+/* =========================================================
+   SUMMARY
+========================================================= */
+.focus-statistics-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.focus-statistics-summary-card {
+  background: #fff;
+  border: 1px solid #e8ebf1;
+  border-radius: 18px;
+  padding: 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  box-sizing: border-box;
+}
+.focus-statistics-summary-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: #eef1ff;
+  color: #667eea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.focus-statistics-summary-card h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+.focus-statistics-summary-card p {
+  margin: 0;
+  color: #8a93a3;
+  line-height: 1.8;
+  font-size: 11px;
+}
+.focus-statistics-summary-card p strong {
+  color: #4e5b72;
+}
+/* =========================================================
+   CTA
+========================================================= */
+.focus-statistics-cta {
+  background: linear-gradient(
+    135deg,
+    #667eea,
+    #5967d9
+  );
+  border-radius: 22px;
+  padding: 22px 25px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.focus-statistics-cta > div {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.focus-statistics-cta > div > svg {
+  font-size: 28px;
+}
+.focus-statistics-cta h2 {
+  margin: 0 0 5px;
+  font-size: 19px;
+}
+.focus-statistics-cta p {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+}
+.focus-statistics-cta button {
+  border: 0;
+  background: #fff;
+  color: #5967d9;
+  border-radius: 11px;
+  padding: 12px 18px;
+  cursor: pointer;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-family: inherit;
+}
+/* =========================================================
+   DARK MODE
+========================================================= */
+.dark-mode .focus-statistics-page {
+  background: #11141b;
+  color: #f1f3f7;
+}
+.dark-mode .focus-statistics-period {
+  background: #1a1e27;
+  border-color: #2c3140;
+}
+.dark-mode .focus-statistics-period-title {
+  color: #eef0f5;
+}
+.dark-mode .focus-statistics-period-title svg {
+  color: #8b83ff;
+}
+.dark-mode .focus-statistics-period-buttons button {
+  color: #969baa;
+}
+.dark-mode .focus-statistics-period-buttons button:hover {
+  background: #252a36;
+  color: #8b83ff;
+}
+.dark-mode .focus-statistics-period-buttons button.active {
+  background: #667eea;
+  color: #fff;
+}
+/* =========================================================
+   DARK MODE - ERROR
+========================================================= */
+.dark-mode .focus-statistics-error {
+  background: #2b1c20;
+  border-color: #563037;
+  color: #ff7a86;
+}
+.dark-mode .focus-statistics-error button {
+  background: #d44d5b;
+  color: #fff;
+}
+/* =========================================================
+   DARK MODE - LOADING
+========================================================= */
+.dark-mode .focus-statistics-loading {
+  background: #1a1e27;
+  color: #9298a7;
+}
+.dark-mode .focus-statistics-loader {
+  border-color: #303542;
+  border-top-color: #8b83ff;
+}
+/* =========================================================
+   DARK MODE - MAIN STATS
+========================================================= */
+.dark-mode .focus-statistics-stat-card {
+  background: #1a1e27;
+  border-color: #2c3140;
+}
+.dark-mode .focus-statistics-stat-card.primary {
+  background: linear-gradient(
+    135deg,
+    #667eea,
+    #5967d9
+  );
+  border-color: transparent;
+}
+.dark-mode .focus-statistics-stat-icon {
+  background: #292d42;
+  color: #8b83ff;
+}
+.dark-mode .focus-statistics-stat-card.primary
+  .focus-statistics-stat-icon {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+.dark-mode .focus-statistics-stat-card span {
+  color: #9298a8;
+}
+.dark-mode .focus-statistics-stat-card.primary span {
+  color: rgba(255, 255, 255, 0.78);
+}
+.dark-mode .focus-statistics-stat-card strong {
+  color: #f1f3f7;
+}
+.dark-mode .focus-statistics-stat-card.primary strong {
+  color: #fff;
+}
+.dark-mode .focus-statistics-stat-card small {
+  color: #777e8f;
+}
+.dark-mode .focus-statistics-stat-card.primary small {
+  color: rgba(255, 255, 255, 0.65);
+}
+/* =========================================================
+   DARK MODE - SMALL STATS
+========================================================= */
+.dark-mode .focus-statistics-small-card {
+  background: #1a1e27;
+  border-color: #2c3140;
+}
+.dark-mode .focus-statistics-small-card > svg {
+  color: #8b83ff;
+}
+.dark-mode .focus-statistics-small-card strong {
+  color: #f1f3f7;
+}
+.dark-mode .focus-statistics-small-card span {
+  color: #858b9b;
+}
+/* =========================================================
+   DARK MODE - BOX
+========================================================= */
+.dark-mode .focus-statistics-box {
+  background: #1a1e27;
+  border-color: #2c3140;
+}
+.dark-mode .focus-statistics-box-header h2 {
+  color: #eef0f5;
+}
+.dark-mode .focus-statistics-box-header span {
+  color: #858b9b;
+}
+.dark-mode .focus-statistics-box-header > svg {
+  color: #8b83ff;
+}
+/* =========================================================
+   DARK MODE - WEEKLY CHART
+========================================================= */
+.dark-mode .focus-statistics-day-value {
+  color: #8b83ff;
+}
+.dark-mode .focus-statistics-day-bar-wrapper {
+  background: #252a34;
+}
+.dark-mode .focus-statistics-day-bar {
+  background: #343946;
+}
+.dark-mode .focus-statistics-day-bar.has-value {
+  background: #667eea;
+}
+.dark-mode .focus-statistics-day strong {
+  color: #b4b9c5;
+}
+.dark-mode .focus-statistics-day small {
+  color: #777e8e;
+}
+/* =========================================================
+   DARK MODE - GOALS
+========================================================= */
+.dark-mode .focus-statistics-goals-track {
+  stroke: #303541;
+}
+.dark-mode .focus-statistics-goals-progress {
+  stroke: #667eea;
+}
+.dark-mode .focus-statistics-goals-circle strong {
+  color: #f1f3f7;
+}
+.dark-mode .focus-statistics-goals-circle span {
+  color: #858b9b;
+}
+.dark-mode .focus-statistics-goal-summary > div {
+  background: #232731;
+}
+.dark-mode .focus-statistics-goal-summary strong {
+  color: #c8ccd5;
+}
+.dark-mode .focus-statistics-goal-summary b {
+  color: #f0f2f6;
+}
+/* =========================================================
+   DARK MODE - DISTRIBUTION
+========================================================= */
+.dark-mode .focus-statistics-donut-center {
+  background: #1a1e27;
+}
+.dark-mode .focus-statistics-donut-center strong {
+  color: #f1f3f7;
+}
+.dark-mode .focus-statistics-donut-center span {
+  color: #858b9b;
+}
+.dark-mode .focus-statistics-distribution-name strong {
+  color: #d9dce4;
+}
+.dark-mode .focus-statistics-distribution-value strong {
+  color: #e9ebf0;
+}
+.dark-mode .focus-statistics-distribution-value span {
+  color: #858b9b;
+}
+.dark-mode .focus-statistics-distribution-progress {
+  background: #292e38;
+}
+/* =========================================================
+   DARK MODE - SESSIONS
+========================================================= */
+.dark-mode .focus-statistics-session-row {
+  border-color: #2b303b;
+}
+.dark-mode .focus-statistics-session-status.completed {
+  background: #1d332b;
+  color: #55c792;
+}
+.dark-mode .focus-statistics-session-status.active {
+  background: #292d42;
+  color: #8b83ff;
+}
+.dark-mode .focus-statistics-session-status.paused {
+  background: #352d20;
+  color: #e6ad52;
+}
+.dark-mode .focus-statistics-session-status.cancelled,
+.dark-mode .focus-statistics-session-status.canceled {
+  background: #342126;
+  color: #ed6875;
+}
+.dark-mode .focus-statistics-session-info strong {
+  color: #e7e9ef;
+}
+.dark-mode .focus-statistics-session-info span {
+  color: #858b9b;
+}
+.dark-mode .focus-statistics-result.success {
+  background: #1d332b;
+  color: #55c792;
+}
+.dark-mode .focus-statistics-result.partial {
+  background: #352d20;
+  color: #e6ad52;
+}
+.dark-mode .focus-statistics-result.failed {
+  background: #342126;
+  color: #ed6875;
+}
+.dark-mode .focus-statistics-result.neutral {
+  background: #292d35;
+  color: #969cab;
+}
+.dark-mode .focus-statistics-session-duration strong {
+  color: #e7e9ef;
+}
+.dark-mode .focus-statistics-session-duration span {
+  color: #858b9b;
+}
+.dark-mode .focus-statistics-session-date strong {
+  color: #d8dbe3;
+}
+.dark-mode .focus-statistics-session-date span {
+  color: #858b9b;
+}
+.dark-mode .focus-statistics-view-more {
+  background: #252a36;
+  color: #8b83ff;
+}
+.dark-mode .focus-statistics-view-more:hover {
+  background: #2d3142;
+  color: #9b94ff;
+}
+/* =========================================================
+   DARK MODE - EMPTY
+========================================================= */
+.dark-mode .focus-statistics-empty {
+  color: #777e8e;
+}
+.dark-mode .focus-statistics-empty > svg {
+  color: #4b515e;
+}
+.dark-mode .focus-statistics-empty strong {
+  color: #b9bdc7;
+}
+.dark-mode .focus-statistics-empty span {
+  color: #777e8e;
+}
+.dark-mode .focus-statistics-empty button {
+  background: #667eea;
+  color: #fff;
+}
+/* =========================================================
+   DARK MODE - SUMMARY
+========================================================= */
+.dark-mode .focus-statistics-summary-card {
+  background: #1a1e27;
+  border-color: #2c3140;
+}
+.dark-mode .focus-statistics-summary-icon {
+  background: #292d42;
+  color: #8b83ff;
+}
+.dark-mode .focus-statistics-summary-card h3 {
+  color: #e9ebf0;
+}
+.dark-mode .focus-statistics-summary-card p {
+  color: #858b9b;
+}
+.dark-mode .focus-statistics-summary-card p strong {
+  color: #c8ccd5;
+}
+/* =========================================================
+   DARK MODE - CTA
+========================================================= */
+.dark-mode .focus-statistics-cta {
+  background: linear-gradient(
+    135deg,
+    #667eea,
+    #5967d9
+  );
+}
+.dark-mode .focus-statistics-cta p {
+  color: rgba(255, 255, 255, 0.76);
+}
+.dark-mode .focus-statistics-cta button {
+  background: #ffffff;
+  color: #5967d9;
+}
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+@media (max-width: 1100px) {
+  .focus-statistics-main-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .focus-statistics-secondary-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .focus-statistics-charts-grid {
+    grid-template-columns: 1fr;
+  }
+  .focus-statistics-distribution {
+    grid-template-columns: 1fr;
+  }
+  .focus-statistics-distribution-circle {
+    margin-bottom: 10px;
+  }
+  .focus-statistics-session-row {
+    grid-template-columns:
+      45px
+      1fr
+      120px
+      90px;
+  }
+  .focus-statistics-session-result {
+    display: none;
+  }
+}
+/* =========================================================
+   TABLET / MOBILE
+========================================================= */
+@media (max-width: 700px) {
+  .focus-statistics-container {
+    width: 92%;
+    padding-top: 22px;
+  }
+  .focus-statistics-period {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .focus-statistics-period-buttons {
+    width: 100%;
+  }
+  .focus-statistics-period-buttons button {
+    flex: 1;
+    min-width: 70px;
+    padding: 8px 9px;
+    font-size: 11px;
+  }
+  .focus-statistics-main-stats {
+    grid-template-columns: 1fr;
+  }
+  .focus-statistics-secondary-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+  .focus-statistics-box {
+    padding: 17px;
+    border-radius: 18px;
+  }
+  .focus-statistics-weekly-chart {
+    gap: 5px;
+  }
+  .focus-statistics-day-value {
+    font-size: 8px;
+  }
+  .focus-statistics-day-bar-wrapper {
+    width: 28px;
+  }
+  .focus-statistics-distribution {
+    gap: 20px;
+  }
+  .focus-statistics-donut {
+    width: 210px;
+    height: 210px;
+  }
+  .focus-statistics-session-row {
+    grid-template-columns: 40px 1fr auto;
+    gap: 9px;
+  }
+  .focus-statistics-session-duration {
+    display: none;
+  }
+  .focus-statistics-session-date {
+    text-align: left;
+  }
+  .focus-statistics-summary-grid {
+    grid-template-columns: 1fr;
+  }
+  .focus-statistics-cta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .focus-statistics-cta button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+@media (max-width: 450px) {
+  .focus-statistics-secondary-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+  .focus-statistics-small-card {
+    padding: 12px;
+  }
+  .focus-statistics-small-card strong {
+    font-size: 17px;
+  }
+  .focus-statistics-small-card span {
+    font-size: 10px;
+  }
+}

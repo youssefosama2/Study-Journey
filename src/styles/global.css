@@ -1,0 +1,482 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+
+  background: var(--bg-primary);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+
+  min-height: 100vh;
+
+  background: var(--bg-primary);
+
+  color: var(--text-primary);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+#root {
+  min-height: 100vh;
+
+  background: var(--bg-primary);
+
+  color: var(--text-primary);
+}
+
+
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+.page-loading {
+  min-height: 65vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.page-loading-spinner {
+  width: 55px;
+  height: 55px;
+
+  margin-bottom: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 3px solid #e5e8f2;
+  border-top-color: #5b63d8;
+
+  border-radius: 50%;
+
+  color: #5b63d8;
+
+  animation: pageSpin 0.9s linear infinite;
+}
+
+.page-loading-spinner svg {
+  width: 20px;
+  height: 20px;
+}
+
+@keyframes pageSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   SWEET ALERT 2 - GLOBAL STYLE
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   الوضع العادي
+   --------------------------------------------------------- */
+
+.swal2-popup {
+  direction: rtl;
+  font-family: "Cairo", sans-serif !important;
+
+  border-radius: 20px !important;
+
+  padding: 2rem !important;
+
+  width: 420px !important;
+
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.15) !important;
+
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.swal2-title {
+  font-family: "Cairo", sans-serif !important;
+
+  font-size: 22px !important;
+
+  font-weight: 800 !important;
+
+  color: #1f2937 !important;
+
+  margin-bottom: 10px !important;
+}
+
+.swal2-html-container {
+  font-family: "Cairo", sans-serif !important;
+
+  font-size: 15px !important;
+
+  line-height: 1.9 !important;
+
+  color: #6b7280 !important;
+}
+
+/* ---------------------------------------------------------
+   الأزرار
+   --------------------------------------------------------- */
+
+.swal2-actions {
+  gap: 10px !important;
+
+  margin-top: 20px !important;
+}
+
+.swal2-confirm,
+.swal2-cancel {
+  font-family: "Cairo", sans-serif !important;
+
+  font-size: 14px !important;
+
+  font-weight: 700 !important;
+
+  border-radius: 12px !important;
+
+  padding: 11px 22px !important;
+
+  min-width: 120px;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease !important;
+}
+
+.swal2-confirm:hover,
+.swal2-cancel:hover {
+  transform: translateY(-2px);
+}
+
+.swal2-confirm:focus,
+.swal2-cancel:focus {
+  box-shadow: none !important;
+}
+
+/* ---------------------------------------------------------
+   زر التأكيد
+   --------------------------------------------------------- */
+
+.swal2-confirm {
+  background: #2563eb !important;
+
+  color: #fff !important;
+
+  box-shadow:
+    0 6px 15px rgba(37, 99, 235, 0.25) !important;
+}
+
+.swal2-confirm:hover {
+  opacity: 0.9;
+}
+
+/* ---------------------------------------------------------
+   زر الإلغاء
+   --------------------------------------------------------- */
+
+.swal2-cancel {
+  background: #e5e7eb !important;
+
+  color: #374151 !important;
+}
+
+.swal2-cancel:hover {
+  background: #d1d5db !important;
+}
+
+/* ---------------------------------------------------------
+   الأيقونات
+   --------------------------------------------------------- */
+
+.swal2-icon {
+  margin: 0 auto 15px !important;
+}
+
+.swal2-icon.swal2-success {
+  border-color: #22c55e !important;
+  color: #22c55e !important;
+}
+
+.swal2-icon.swal2-error {
+  border-color: #ef4444 !important;
+  color: #ef4444 !important;
+}
+
+.swal2-icon.swal2-warning {
+  border-color: #f59e0b !important;
+  color: #f59e0b !important;
+}
+
+.swal2-icon.swal2-info {
+  border-color: #3b82f6 !important;
+  color: #3b82f6 !important;
+}
+
+.swal2-icon.swal2-question {
+  border-color: #8b5cf6 !important;
+  color: #8b5cf6 !important;
+}
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+/*
+  مهم:
+  غيّر body.dark-mode إلى الكلاس الفعلي الموجود عندك
+  لو ThemeContext بيضيف كلاس مختلف على body.
+*/
+
+body.dark-mode .swal2-popup,
+.dark-mode .swal2-popup {
+  background: #111827 !important;
+
+  border: 1px solid #263244 !important;
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.55) !important;
+}
+
+body.dark-mode .swal2-title,
+.dark-mode .swal2-title {
+  color: #f9fafb !important;
+}
+
+body.dark-mode .swal2-html-container,
+.dark-mode .swal2-html-container {
+  color: #cbd5e1 !important;
+}
+
+/* ---------------------------------------------------------
+   Dark Mode - Confirm
+   --------------------------------------------------------- */
+
+body.dark-mode .swal2-confirm,
+.dark-mode .swal2-confirm {
+  background: #3b82f6 !important;
+
+  color: #ffffff !important;
+
+  box-shadow:
+    0 6px 18px rgba(59, 130, 246, 0.25) !important;
+}
+
+body.dark-mode .swal2-confirm:hover,
+.dark-mode .swal2-confirm:hover {
+  background: #2563eb !important;
+}
+
+/* ---------------------------------------------------------
+   Dark Mode - Cancel
+   --------------------------------------------------------- */
+
+body.dark-mode .swal2-cancel,
+.dark-mode .swal2-cancel {
+  background: #374151 !important;
+
+  color: #e5e7eb !important;
+}
+
+body.dark-mode .swal2-cancel:hover,
+.dark-mode .swal2-cancel:hover {
+  background: #4b5563 !important;
+}
+
+/* =========================================================
+   SweetAlert Input
+   ========================================================= */
+
+.swal2-input,
+.swal2-textarea,
+.swal2-select {
+  font-family: "Cairo", sans-serif !important;
+
+  direction: rtl;
+
+  border-radius: 12px !important;
+
+  border: 1px solid #d1d5db !important;
+
+  font-size: 14px !important;
+
+  box-shadow: none !important;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease !important;
+}
+
+.swal2-input:focus,
+.swal2-textarea:focus,
+.swal2-select:focus {
+  border-color: #3b82f6 !important;
+
+  box-shadow:
+    0 0 0 3px rgba(59, 130, 246, 0.12) !important;
+}
+.swal2-container,
+.swal2-popup {
+  z-index: 999999 !important;
+}
+/* Dark inputs */
+
+body.dark-mode .swal2-input,
+body.dark-mode .swal2-textarea,
+body.dark-mode .swal2-select,
+.dark-mode .swal2-input,
+.dark-mode .swal2-textarea,
+.dark-mode .swal2-select {
+  background: #1f2937 !important;
+
+  color: #f9fafb !important;
+
+  border-color: #374151 !important;
+}
+
+body.dark-mode .swal2-input::placeholder,
+body.dark-mode .swal2-textarea::placeholder,
+.dark-mode .swal2-input::placeholder,
+.dark-mode .swal2-textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+/* =========================================================
+   Validation Message
+   ========================================================= */
+
+.swal2-validation-message {
+  direction: rtl;
+
+  font-family: "Cairo", sans-serif !important;
+
+  border-radius: 10px !important;
+
+  font-size: 13px !important;
+}
+
+body.dark-mode .swal2-validation-message,
+.dark-mode .swal2-validation-message {
+  background: #3f1d1d !important;
+
+  color: #fecaca !important;
+}
+
+/* =========================================================
+   Footer
+   ========================================================= */
+
+.swal2-footer {
+  font-family: "Cairo", sans-serif !important;
+
+  color: #6b7280 !important;
+
+  border-top: 1px solid #e5e7eb !important;
+}
+
+body.dark-mode .swal2-footer,
+.dark-mode .swal2-footer {
+  color: #9ca3af !important;
+
+  border-top-color: #374151 !important;
+}
+
+/* =========================================================
+   Close Button
+   ========================================================= */
+
+.swal2-close {
+  color: #9ca3af !important;
+
+  font-size: 28px !important;
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease !important;
+}
+
+.swal2-close:hover {
+  color: #ef4444 !important;
+
+  transform: rotate(90deg);
+}
+
+/* =========================================================
+   Timer Progress
+   ========================================================= */
+
+.swal2-timer-progress-bar {
+  background: #3b82f6 !important;
+}
+
+/* =========================================================
+   Backdrop
+   ========================================================= */
+
+.swal2-container.swal2-backdrop-show {
+  background: rgba(15, 23, 42, 0.55) !important;
+}
+
+/* =========================================================
+   Mobile
+   ========================================================= */
+
+@media (max-width: 576px) {
+  .swal2-popup {
+    width: calc(100% - 30px) !important;
+
+    border-radius: 18px !important;
+
+    padding: 1.5rem !important;
+  }
+
+  .swal2-title {
+    font-size: 19px !important;
+  }
+
+  .swal2-html-container {
+    font-size: 14px !important;
+  }
+
+  .swal2-actions {
+    width: 100%;
+
+    flex-direction: column;
+
+    gap: 8px !important;
+  }
+
+  .swal2-confirm,
+  .swal2-cancel {
+    width: 100%;
+
+    margin: 0 !important;
+  }
+}
+@media (max-width: 768px) {
+  input,
+  textarea,
+  select {
+    box-sizing: border-box;
+    padding: 12px !important;
+  }
+
+  textarea {
+    padding: 12px 14px !important;
+  }
+}

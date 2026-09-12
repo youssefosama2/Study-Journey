@@ -1,0 +1,593 @@
+/* =========================================================
+   ACHIEVEMENT NOTIFICATIONS
+========================================================= */
+
+
+/* =========================================================
+   SWEET ALERT CONTAINER
+========================================================= */
+
+.achievement-toast-container {
+  position: fixed !important;
+
+  top: 20px !important;
+  left: 20px !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  width: auto !important;
+  height: auto !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  display: block !important;
+
+  z-index: 999999 !important;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   MAIN CARD
+========================================================= */
+
+.achievement-toast,
+.level-up-toast {
+  position: relative !important;
+
+  display: block !important;
+
+  width: 380px !important;
+
+  min-width: 0 !important;
+  max-width: calc(100vw - 40px) !important;
+
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  box-sizing: border-box !important;
+
+  overflow: hidden !important;
+
+  border-radius: 18px !important;
+
+  border: 1px solid #e5e7eb !important;
+
+  background: #ffffff !important;
+
+  color: #222222 !important;
+
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.14),
+    0 5px 15px rgba(0, 0, 0, 0.08) !important;
+
+  direction: rtl !important;
+
+  text-align: right !important;
+
+  pointer-events: auto;
+
+  animation: achievementToastIn 0.55s ease-out both;
+}
+
+
+/* =========================================================
+   RIGHT ACCENT
+========================================================= */
+
+.achievement-toast::before,
+.level-up-toast::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  right: 0;
+  bottom: 0;
+
+  width: 4px;
+
+  background: #6c5ce7;
+
+  z-index: 2;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.achievement-toast-content,
+.level-up-toast-content {
+  position: relative;
+
+  display: flex !important;
+
+  align-items: center !important;
+
+  width: 100% !important;
+
+  min-height: 104px !important;
+
+  height: auto !important;
+
+  padding: 17px 18px 17px 24px !important;
+
+  box-sizing: border-box !important;
+
+  gap: 13px;
+}
+
+
+/* =========================================================
+   ICON
+========================================================= */
+
+.achievement-toast-icon,
+.level-up-toast-icon {
+  flex: 0 0 58px !important;
+
+  width: 58px !important;
+  height: 58px !important;
+
+  min-width: 58px !important;
+  max-width: 58px !important;
+
+  min-height: 58px !important;
+  max-height: 58px !important;
+
+  display: flex !important;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 16px;
+
+  font-size: 30px;
+
+  background: #fff5d6;
+
+  box-sizing: border-box;
+
+  animation: achievementIconPop 0.6s ease-out 0.1s both;
+}
+
+
+/* =========================================================
+   INFO
+========================================================= */
+
+.achievement-toast-info,
+.level-up-toast-info {
+  flex: 1 1 auto !important;
+
+  width: auto !important;
+
+  min-width: 0 !important;
+
+  max-width: 100% !important;
+
+  text-align: right !important;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.achievement-toast-label,
+.level-up-toast-label {
+  margin: 0 0 3px 0 !important;
+
+  padding: 0 !important;
+
+  font-size: 11px !important;
+
+  line-height: 1.4 !important;
+
+  font-weight: 800 !important;
+
+  color: #6c5ce7 !important;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.achievement-toast-title,
+.level-up-toast-title {
+  margin: 0 0 4px 0 !important;
+
+  padding: 0 !important;
+
+  font-size: 16px !important;
+
+  line-height: 1.4 !important;
+
+  font-weight: 900 !important;
+
+  color: #222222 !important;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.achievement-toast-description,
+.level-up-toast-description {
+  margin: 0 0 7px 0 !important;
+  padding: 0 !important;
+
+  font-size: 11px !important;
+  line-height: 1.5 !important;
+  font-weight: 500 !important;
+  color: #777777 !important;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   POINTS
+========================================================= */
+
+.achievement-toast-points {
+  display: inline-flex !important;
+
+  align-items: center;
+  justify-content: center;
+
+  width: fit-content !important;
+
+  padding: 4px 9px !important;
+
+  margin: 0 !important;
+
+  border-radius: 999px;
+
+  background: #fff7df;
+
+  color: #e69a00;
+
+  font-size: 10px !important;
+
+  line-height: 1.4 !important;
+
+  font-weight: 900 !important;
+}
+
+
+/* =========================================================
+   LEVEL UP
+========================================================= */
+
+.level-up-toast {
+  border-color: rgba(108, 92, 231, 0.18) !important;
+}
+
+
+.level-up-toast::before {
+  background: #6c5ce7;
+}
+
+
+.level-up-toast-icon {
+  background: #eeeaff;
+
+  box-shadow:
+    0 6px 15px rgba(108, 92, 231, 0.12);
+
+  animation:
+    achievementIconPop 0.6s ease-out 0.1s both,
+    levelFloat 2.5s ease-in-out 1s infinite;
+}
+
+
+.level-up-toast-level {
+  margin: 0 0 2px 0 !important;
+
+  font-size: 19px !important;
+
+  line-height: 1.2 !important;
+
+  font-weight: 900 !important;
+
+  color: #6c5ce7 !important;
+}
+
+
+/* =========================================================
+   CLOSE
+========================================================= */
+
+.achievement-toast-close,
+.level-up-toast-close {
+  position: absolute !important;
+
+  top: 6px !important;
+  left: 7px !important;
+
+  width: 22px !important;
+  height: 22px !important;
+
+  min-width: 22px !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  display: flex !important;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 0 !important;
+
+  background: transparent !important;
+
+  color: #999999 !important;
+
+  font-size: 17px !important;
+
+  line-height: 1 !important;
+
+  opacity: 0.7;
+
+  z-index: 10;
+
+  transition: 0.2s ease;
+}
+
+
+.achievement-toast-close:hover,
+.level-up-toast-close:hover {
+  color: #333333 !important;
+
+  opacity: 1;
+
+  transform: rotate(90deg);
+}
+
+
+/* =========================================================
+   TIMER
+========================================================= */
+
+.achievement-toast-progress,
+.level-up-toast-progress {
+  position: absolute !important;
+
+  left: 0 !important;
+  bottom: 0 !important;
+
+  width: 100% !important;
+
+  height: 3px !important;
+
+  margin: 0 !important;
+
+  padding: 0 !important;
+
+  background: #6c5ce7 !important;
+}
+
+
+/* =========================================================
+   DARK MODE
+   ThemeContext adds .dark-mode to <html>
+========================================================= */
+
+html.dark-mode .achievement-toast,
+html.dark-mode .level-up-toast {
+  background: #1f1f23 !important;
+
+  color: #f5f5f5 !important;
+
+  border-color: #33333a !important;
+
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.45),
+    0 5px 18px rgba(0, 0, 0, 0.3) !important;
+}
+
+
+html.dark-mode .achievement-toast-title,
+html.dark-mode .level-up-toast-title {
+  color: #f5f5f5 !important;
+}
+
+
+html.dark-mode .achievement-toast-description,
+html.dark-mode .level-up-toast-description {
+  color: #a9a9b2 !important;
+}
+
+
+html.dark-mode .achievement-toast-icon {
+  background: #332d1c !important;
+}
+
+
+html.dark-mode .level-up-toast-icon {
+  background: #302a46 !important;
+}
+
+
+html.dark-mode .achievement-toast-points {
+  background: #332d1c !important;
+
+  color: #ffc44d !important;
+}
+
+
+html.dark-mode .achievement-toast-close,
+html.dark-mode .level-up-toast-close {
+  color: #777780 !important;
+}
+
+
+html.dark-mode .achievement-toast-close:hover,
+html.dark-mode .level-up-toast-close:hover {
+  color: #eeeeee !important;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes achievementToastIn {
+  0% {
+    opacity: 0;
+
+    transform:
+      translateX(-70px)
+      scale(0.92);
+  }
+
+  70% {
+    opacity: 1;
+
+    transform:
+      translateX(5px)
+      scale(1.01);
+  }
+
+  100% {
+    opacity: 1;
+
+    transform:
+      translateX(0)
+      scale(1);
+  }
+}
+
+
+@keyframes achievementIconPop {
+  0% {
+    opacity: 0;
+
+    transform:
+      scale(0.5)
+      rotate(-10deg);
+  }
+
+  70% {
+    opacity: 1;
+
+    transform:
+      scale(1.08)
+      rotate(3deg);
+  }
+
+  100% {
+    transform:
+      scale(1)
+      rotate(0);
+  }
+}
+
+
+@keyframes levelFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 576px) {
+  .achievement-toast-container {
+    top: 12px !important;
+
+    left: 10px !important;
+
+    right: 10px !important;
+
+    width: auto !important;
+  }
+
+  .achievement-toast,
+  .level-up-toast {
+    width: 100% !important;
+
+    max-width: 100% !important;
+  }
+
+  .achievement-toast-content,
+  .level-up-toast-content {
+    min-height: 88px !important;
+
+    padding: 14px 15px 14px 20px !important;
+
+    gap: 10px;
+  }
+
+  .achievement-toast-icon,
+  .level-up-toast-icon {
+    flex-basis: 50px !important;
+
+    width: 50px !important;
+    height: 50px !important;
+
+    min-width: 50px !important;
+    max-width: 50px !important;
+
+    min-height: 50px !important;
+    max-height: 50px !important;
+
+    font-size: 26px;
+  }
+
+  .achievement-toast-title,
+  .level-up-toast-title {
+    font-size: 14px !important;
+  }
+
+  .achievement-toast-description,
+  .level-up-toast-description {
+    font-size: 10px !important;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .achievement-toast,
+  .level-up-toast,
+  .achievement-toast-icon,
+  .level-up-toast-icon {
+    animation: none !important;
+  }
+}

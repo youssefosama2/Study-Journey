@@ -1,0 +1,2373 @@
+/* =====================================================
+   FOCUS SESSION PAGE
+===================================================== */
+.focus-session-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #f7f9fd;
+  color: #17213c;
+  padding-bottom: 35px;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+  direction: rtl;
+  box-sizing: border-box;
+}
+.focus-session-page *,
+.focus-session-page *::before,
+.focus-session-page *::after {
+  box-sizing: border-box;
+}
+.focus-session-page .focus-session-container {
+  width: 100%;
+  max-width: 1450px;
+  margin: 0 auto;
+  padding: 20px 30px 0;
+}
+/* =====================================================
+   MAIN GRID
+===================================================== */
+.focus-session-page .focus-session-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 20px;
+  align-items: stretch;
+}
+/* =====================================================
+   TIMER CARD
+===================================================== */
+.focus-session-page .focus-session-timer-card {
+  background: #fff;
+  border: 1px solid #e7eaf1;
+  border-radius: 20px;
+  min-height: 600px;
+  padding: 20px;
+  box-shadow: 0 5px 20px rgba(30, 45, 90, 0.035);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.focus-session-page .focus-session-timer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+.focus-session-page .focus-session-session-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  background: #eef1ff;
+  color: #3f59d7;
+  border-radius: 25px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.focus-session-page .focus-session-finish-session-btn {
+  height: 40px;
+  padding: 0 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid #e4e7ee;
+  border-radius: 10px;
+  color: #566075;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-finish-session-btn:hover {
+  border-color: #e35c68;
+  color: #e35c68;
+}
+/* =====================================================
+   TIMER CIRCLE
+===================================================== */
+.focus-session-page .focus-session-timer-wrapper {
+  width: min(460px, 100%);
+  aspect-ratio: 1;
+  margin: 5px auto 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.focus-session-page .focus-session-timer-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.focus-session-page .focus-session-timer-track {
+  fill: none;
+  stroke: #edf0f5;
+  stroke-width: 8;
+  stroke-dasharray: 2 7;
+  transition: stroke 0.3s ease;
+}
+.focus-session-page .focus-session-timer-progress {
+  fill: none;
+  stroke: #3c75e6;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition:
+    stroke-dashoffset 0.4s linear,
+    stroke 0.3s ease;
+}
+.focus-session-page .focus-session-timer-content {
+  position: relative;
+  z-index: 2;
+  width: 80%;
+  text-align: center;
+}
+.focus-session-page .focus-session-timer-content h1 {
+  margin: 0;
+  font-size: 29px;
+  font-weight: 800;
+  color: #17213c;
+}
+.focus-session-page .focus-session-timer-subtitle {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: #747d91;
+  line-height: 1.7;
+}
+.focus-session-page .focus-session-timer-time {
+  margin-top: 30px;
+  font-size: clamp(55px, 7vw, 82px);
+  line-height: 1;
+  letter-spacing: 2px;
+  font-weight: 800;
+  color: #172d68;
+  direction: ltr;
+  font-variant-numeric: tabular-nums;
+}
+.focus-session-page .focus-session-timer-label {
+  display: inline-flex;
+  margin-top: 14px;
+  padding: 8px 15px;
+  border-radius: 20px;
+  background: #f4f6fb;
+  color: #59637a;
+  font-size: 12px;
+}
+.focus-session-page .focus-session-session-number {
+  width: fit-content;
+  margin: 25px auto 0;
+  padding: 9px 17px;
+  border-radius: 20px;
+  background: #f4f6ff;
+  color: #5369be;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.focus-session-page .focus-session-session-number svg {
+  color: #3cae7d;
+}
+/* =====================================================
+   TIMER CONTROLS
+===================================================== */
+.focus-session-page .focus-session-timer-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 35px;
+  margin-top: -10px;
+}
+.focus-session-page .focus-session-timer-side-btn {
+  min-width: 130px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-timer-side-btn.cancel {
+  color: #d35c67;
+  border: 1px solid #f0d6d9;
+  background: #fffafa;
+}
+.focus-session-page .focus-session-timer-side-btn.cancel:hover {
+  background: #fff1f3;
+}
+.focus-session-page .focus-session-timer-side-btn.finish {
+  color: #43a77e;
+  border: 1px solid #d9eee5;
+  background: #f8fdfb;
+}
+.focus-session-page .focus-session-timer-side-btn.finish:hover {
+  background: #eefaf5;
+}
+.focus-session-page .focus-session-main-timer-btn {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 0;
+  background: #3159dc;
+  color: #fff;
+  font-size: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(49, 89, 220, 0.25);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+.focus-session-page .focus-session-main-timer-btn:hover {
+  transform: scale(1.05);
+}
+.focus-session-page .focus-session-main-timer-btn.pause {
+  background: #e49b31;
+}
+.focus-session-page .focus-session-timer-secondary-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+.focus-session-page .focus-session-timer-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border: 0;
+  background: transparent;
+  color: #788296;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-timer-reset-btn:hover {
+  background: #f3f5fa;
+  color: #4c62c3;
+}
+.focus-session-page .focus-session-timer-start-label {
+  text-align: center;
+  color: #727b8d;
+  font-size: 11px;
+  margin-top: 4px;
+}
+.focus-session-page .focus-session-timer-start-label.running {
+  color: #3cae7d;
+  font-weight: 700;
+}
+/* =====================================================
+   FINISHED MESSAGE
+===================================================== */
+.focus-session-page .focus-session-finished-message {
+  max-width: 520px;
+  margin: 15px auto 0;
+  padding: 12px 15px;
+  border: 1px solid #d8eee4;
+  border-radius: 12px;
+  background: #f3fbf7;
+  color: #31966d;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.focus-session-page .focus-session-finished-message > svg {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.focus-session-page .focus-session-finished-message div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.focus-session-page .focus-session-finished-message strong {
+  font-size: 12px;
+}
+.focus-session-page .focus-session-finished-message span {
+  color: #6f8e82;
+  font-size: 10px;
+  line-height: 1.6;
+}
+/* =====================================================
+   SETTINGS
+===================================================== */
+.focus-session-page .focus-session-session-settings {
+  background: #fff;
+  border: 1px solid #e7eaf1;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 5px 20px rgba(30, 45, 90, 0.035);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+.focus-session-page .focus-session-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 17px;
+  border-bottom: 1px solid #edf0f5;
+}
+.focus-session-page .focus-session-settings-header h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+}
+.focus-session-page .focus-session-settings-header svg {
+  color: #707b8f;
+}
+.focus-session-page .focus-session-settings-section {
+  margin-top: 20px;
+}
+.focus-session-page .focus-session-settings-section h3 {
+  margin: 0 0 11px;
+  font-size: 13px;
+  color: #3c4559;
+}
+/* =====================================================
+   SESSION TYPE
+===================================================== */
+.focus-session-page .focus-session-session-type-options {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.focus-session-page .focus-session-session-type-options button {
+  height: 48px;
+  border: 1px solid #e5e8ef;
+  border-radius: 10px;
+  background: #fff;
+  color: #5d6679;
+  font-family: inherit;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-session-type-options button:hover {
+  border-color: #a1ace0;
+}
+.focus-session-page .focus-session-session-type-options button.selected {
+  background: #f4f5ff;
+  border-color: #8191df;
+  color: #4c61c6;
+}
+/* =====================================================
+   TIME MODES
+===================================================== */
+.focus-session-page .focus-session-time-mode-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.focus-session-page .focus-session-time-mode-options button {
+  min-height: 88px;
+  background: #fff;
+  border: 1px solid #e5e8ef;
+  border-radius: 10px;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #5d6679;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-time-mode-options button:hover {
+  border-color: #a1ace0;
+}
+.focus-session-page .focus-session-time-mode-options button.selected {
+  background: #f4f6ff;
+  border-color: #8191df;
+  color: #4d61c8;
+}
+.focus-session-page .focus-session-time-mode-options strong {
+  font-size: 13px;
+}
+.focus-session-page .focus-session-time-mode-options span,
+.focus-session-page .focus-session-time-mode-options small {
+  font-size: 9px;
+}
+.focus-session-page .focus-session-custom-time-btn {
+  width: 100%;
+  height: 43px;
+  margin-top: 9px;
+  background: #fff;
+  border: 1px solid #e5e8ef;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 11px;
+  color: #535d71;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-custom-time-btn:hover {
+  border-color: #a1ace0;
+  color: #4d61c8;
+}
+.focus-session-page .focus-session-custom-time-btn svg {
+  font-size: 15px;
+}
+.focus-session-page .focus-session-custom-time-btn span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.focus-session-page .focus-session-custom-time-btn strong {
+  font-size: 12px;
+}
+.focus-session-page .focus-session-custom-time-btn small {
+  font-size: 9px;
+  color: #858c9c;
+}
+.focus-session-page .focus-session-custom-time-btn.selected {
+  background: #f4f6ff;
+  border-color: #8191df;
+  color: #4d61c8;
+}
+.focus-session-page .focus-session-custom-time-btn.selected small {
+  color: #7481b5;
+}
+/* =====================================================
+   GOAL
+===================================================== */
+.focus-session-page .focus-session-goal-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.focus-session-page .focus-session-goal-section-heading h3 {
+  margin-bottom: 11px;
+}
+.focus-session-page .focus-session-goal-edit-btn {
+  border: 0;
+  background: transparent;
+  color: #4d64c7;
+  font-family: inherit;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.focus-session-page .focus-session-goal-edit-btn:hover {
+  color: #3159dc;
+}
+.focus-session-page .focus-session-session-goal {
+  padding: 13px;
+  border-radius: 10px;
+  background: #f4f5ff;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.focus-session-page .focus-session-session-goal.clickable {
+  width: 100%;
+  border: 0;
+  text-align: right;
+  font-family: inherit;
+  cursor: pointer;
+  position: relative;
+}
+.focus-session-page .focus-session-goal-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #e7eaff;
+  color: #4b62cf;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 17px;
+}
+.focus-session-page .focus-session-session-goal strong {
+  display: block;
+  font-size: 11px;
+  line-height: 1.7;
+  color: #38425a;
+}
+.focus-session-page .focus-session-session-goal span {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  color: #81889a;
+}
+.focus-session-page .focus-session-goal-info {
+  min-width: 0;
+  flex: 1;
+}
+.focus-session-page .focus-session-goal-info strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.focus-session-page .focus-session-goal-arrow {
+  flex-shrink: 0;
+  color: #8790a3;
+  font-size: 11px;
+}
+/* =====================================================
+   FOCUS LEVEL
+===================================================== */
+.focus-session-page .focus-session-focus-levels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+.focus-session-page .focus-session-focus-level {
+  min-height: 66px;
+  border: 1px solid #e6e9ef;
+  background: #fff;
+  border-radius: 10px;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-focus-level:hover {
+  border-color: #a1ace0;
+}
+.focus-session-page .focus-session-focus-level svg {
+  font-size: 18px;
+}
+.focus-session-page .focus-session-focus-level span {
+  font-size: 9px;
+}
+.focus-session-page .focus-session-focus-level.low {
+  color: #d85b61;
+}
+.focus-session-page .focus-session-focus-level.medium {
+  color: #df9d32;
+}
+.focus-session-page .focus-session-focus-level.high {
+  color: #40a87c;
+}
+.focus-session-page .focus-session-focus-level.selected {
+  border-color: #8191df;
+  background: #f5f6ff;
+}
+/* =====================================================
+   BOTTOM GRID
+===================================================== */
+.focus-session-page .focus-session-bottom-grid {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.focus-session-page .focus-session-focus-box {
+  background: #fff;
+  border: 1px solid #e7eaf1;
+  border-radius: 18px;
+  box-shadow: 0 5px 20px rgba(30, 45, 90, 0.035);
+  overflow: hidden;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+.focus-session-page .focus-session-box-heading {
+  min-height: 55px;
+  padding: 0 20px;
+  border-bottom: 1px solid #edf0f5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.focus-session-page .focus-session-box-heading h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+}
+.focus-session-page .focus-session-box-heading > svg {
+  color: #69768e;
+}
+.focus-session-page .focus-session-celebration {
+  font-size: 23px;
+}
+/* =====================================================
+   TODAY STATS
+===================================================== */
+.focus-session-page .focus-session-today-stats {
+  padding-bottom: 18px;
+}
+.focus-session-page .focus-session-stats-circle {
+  width: 190px;
+  height: 190px;
+  margin: 15px auto 0;
+  position: relative;
+}
+.focus-session-page .focus-session-stats-circle svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.focus-session-page .focus-session-stats-circle-track,
+.focus-session-page .focus-session-stats-circle-progress {
+  fill: none;
+  stroke-width: 9;
+}
+.focus-session-page .focus-session-stats-circle-track {
+  stroke: #edf0f5;
+}
+.focus-session-page .focus-session-stats-circle-progress {
+  stroke: #3c75e6;
+  stroke-linecap: round;
+  stroke-dasharray: 317 452;
+}
+.focus-session-page .focus-session-stats-circle-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.focus-session-page .focus-session-stats-circle-content strong {
+  font-size: 17px;
+}
+.focus-session-page .focus-session-stats-circle-content span {
+  margin-top: 4px;
+  color: #858c9c;
+  font-size: 10px;
+}
+.focus-session-page .focus-session-stats-target {
+  padding: 0 30px;
+  position: relative;
+}
+.focus-session-page .focus-session-stats-target > span {
+  display: block;
+  text-align: center;
+  color: #858c9c;
+  font-size: 11px;
+}
+.focus-session-page .focus-session-target-progress {
+  height: 7px;
+  background: #edf0f5;
+  border-radius: 10px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+.focus-session-page .focus-session-target-progress div {
+  height: 100%;
+  border-radius: inherit;
+  background: #3e73df;
+}
+.focus-session-page .focus-session-stats-target > strong {
+  position: absolute;
+  left: 30px;
+  bottom: 0;
+  transform: translateY(25px);
+  font-size: 10px;
+  color: #69758c;
+}
+.focus-session-page .focus-session-mini-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 28px 20px 12px;
+}
+.focus-session-page .focus-session-mini-stats div {
+  min-height: 65px;
+  border: 1px solid #edf0f4;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.focus-session-page .focus-session-mini-stats strong {
+  font-size: 12px;
+}
+.focus-session-page .focus-session-mini-stats span {
+  color: #858c9b;
+  font-size: 9px;
+  margin-top: 4px;
+}
+.focus-session-page .focus-session-outline-btn {
+  width: calc(100% - 40px);
+  height: 40px;
+  margin: 0 20px;
+  border: 1px solid #e4e8f0;
+  background: #fff;
+  border-radius: 9px;
+  color: #4c64c5;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-outline-btn:hover {
+  background: #f6f7ff;
+}
+/* =====================================================
+   FEEDBACK
+===================================================== */
+.focus-session-page .focus-session-feedback-box.feedback-active {
+  border-color: #6ac79e;
+  box-shadow: 0 0 0 2px rgba(76, 187, 133, 0.08);
+}
+.focus-session-page .focus-session-feedback-content {
+  padding: 20px;
+  text-align: center;
+}
+.focus-session-page .focus-session-feedback-content h3 {
+  margin: 5px 0;
+  font-size: 16px;
+}
+.focus-session-page .focus-session-feedback-content > p {
+  margin: 0;
+  color: #858c9c;
+  font-size: 11px;
+}
+.focus-session-page .focus-session-feedback-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 18px;
+}
+.focus-session-page .focus-session-feedback-option {
+  height: 86px;
+  border: 1px solid #e7eaf0;
+  background: #fff;
+  border-radius: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-feedback-option:hover {
+  transform: translateY(-2px);
+}
+.focus-session-page .focus-session-feedback-option svg {
+  font-size: 24px;
+}
+.focus-session-page .focus-session-feedback-option span {
+  font-size: 11px;
+}
+.focus-session-page .focus-session-feedback-option.yes {
+  color: #40aa7d;
+  background: #f8fdfb;
+}
+.focus-session-page .focus-session-feedback-option.partial {
+  color: #df9e35;
+  background: #fffdf7;
+}
+.focus-session-page .focus-session-feedback-option.no {
+  color: #db6269;
+  background: #fffafa;
+}
+.focus-session-page .focus-session-feedback-option.active {
+  border-width: 2px;
+  transform: translateY(-2px);
+}
+.focus-session-page .focus-session-feedback-content textarea {
+  width: 100%;
+  min-height: 75px;
+  margin-top: 15px;
+  padding: 12px;
+  box-sizing: border-box;
+  resize: none;
+  border: 1px solid #e4e8ef;
+  border-radius: 10px;
+  outline: none;
+  background: #fff;
+  color: #26304a;
+  font-family: inherit;
+  font-size: 11px;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-feedback-content textarea:focus {
+  border-color: #8191df;
+}
+.focus-session-page .focus-session-save-feedback {
+  width: 100%;
+  height: 40px;
+  margin-top: 10px;
+  border: 0;
+  border-radius: 9px;
+  background: #3159dc;
+  color: #fff;
+  font-family: inherit;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-save-feedback:hover:not(:disabled) {
+  background: #274bc2;
+}
+.focus-session-page .focus-session-save-feedback:disabled {
+  background: #dfe2ed;
+  color: #737b8e;
+  cursor: not-allowed;
+}
+/* =====================================================
+   PREVIOUS SESSIONS
+===================================================== */
+.focus-session-page .focus-session-previous-list {
+  padding: 5px 20px;
+}
+.focus-session-page .focus-session-previous-session {
+  min-height: 72px;
+  border-bottom: 1px solid #edf0f4;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+.focus-session-page .focus-session-previous-status {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.focus-session-page .focus-session-previous-status.completed {
+  color: #3baa7b;
+  background: #eaf8f1;
+}
+.focus-session-page .focus-session-previous-status.partial {
+  border: 2px solid #e7a132;
+}
+.focus-session-page .focus-session-previous-status svg {
+  font-size: 15px;
+}
+.focus-session-page .focus-session-previous-info strong {
+  display: block;
+  font-size: 12px;
+}
+.focus-session-page .focus-session-previous-info span {
+  display: block;
+  margin-top: 4px;
+  color: #858c9c;
+  font-size: 10px;
+}
+.focus-session-page .focus-session-previous-time {
+  text-align: left;
+  direction: ltr;
+}
+.focus-session-page .focus-session-previous-time strong {
+  display: block;
+  font-size: 11px;
+}
+.focus-session-page .focus-session-previous-time span {
+  display: block;
+  margin-top: 4px;
+  color: #858c9c;
+  font-size: 9px;
+}
+.focus-session-page .focus-session-text-btn {
+  display: block;
+  margin: 10px auto 15px;
+  border: 0;
+  background: transparent;
+  color: #4d64c7;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+/* =====================================================
+   DISTRIBUTION
+===================================================== */
+.focus-session-page .focus-session-distribution-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 20px 5px;
+}
+.focus-session-page .focus-session-distribution-chart {
+  width: 190px;
+  height: 190px;
+  flex-shrink: 0;
+  position: relative;
+}
+.focus-session-page .focus-session-distribution-chart svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.focus-session-page .focus-session-distribution-bg,
+.focus-session-page .focus-session-distribution-segment {
+  fill: none;
+  stroke-width: 28;
+}
+.focus-session-page .focus-session-distribution-bg {
+  stroke: #edf0f5;
+}
+.focus-session-page .focus-session-distribution-segment {
+  stroke-linecap: butt;
+}
+.focus-session-page .focus-session-distribution-segment.blue {
+  stroke: #365ce0;
+}
+.focus-session-page .focus-session-distribution-segment.green {
+  stroke: #36ad7d;
+}
+.focus-session-page .focus-session-distribution-segment.purple {
+  stroke: #7c5bdb;
+}
+.focus-session-page .focus-session-distribution-segment.orange {
+  stroke: #e8a12e;
+}
+.focus-session-page .focus-session-distribution-chart > div {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.focus-session-page .focus-session-distribution-chart strong {
+  font-size: 15px;
+}
+.focus-session-page .focus-session-distribution-chart span {
+  margin-top: 4px;
+  color: #858c9c;
+  font-size: 9px;
+}
+.focus-session-page .focus-session-distribution-list {
+  flex: 1;
+  min-width: 0;
+}
+.focus-session-page .focus-session-distribution-row {
+  display: grid;
+  grid-template-columns: 9px 1fr auto auto;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 13px;
+  font-size: 11px;
+}
+.focus-session-page .focus-session-distribution-row strong {
+  font-size: 11px;
+}
+.focus-session-page
+  .focus-session-distribution-row
+  > span:not(.focus-session-distribution-dot) {
+  color: #555f73;
+}
+.focus-session-page .focus-session-distribution-row small {
+  color: #858c9c;
+}
+.focus-session-page .focus-session-distribution-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.focus-session-page .focus-session-distribution-dot.physics {
+  background: #365ce0;
+}
+.focus-session-page .focus-session-distribution-dot.chemistry {
+  background: #36ad7d;
+}
+.focus-session-page .focus-session-distribution-dot.arabic {
+  background: #7c5bdb;
+}
+.focus-session-page .focus-session-distribution-dot.biology {
+  background: #e8a12e;
+}
+/* =====================================================
+   TIP
+===================================================== */
+.focus-session-page .focus-session-tip {
+  min-height: 90px;
+  margin-top: 20px;
+  border: 1px solid #eee5c7;
+  border-radius: 16px;
+  background: #fffdf3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 28px;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+.focus-session-page .focus-session-tip-image {
+  width: 65px;
+  height: 65px;
+  border-radius: 14px;
+  background: #eef8ef;
+  color: #4ba66e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+}
+.focus-session-page .focus-session-tip-text {
+  flex: 1;
+  text-align: center;
+}
+.focus-session-page .focus-session-tip-text h2 {
+  margin: 0 0 5px;
+  font-size: 15px;
+}
+.focus-session-page .focus-session-tip-text p {
+  margin: 0;
+  color: #656d7d;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.focus-session-page .focus-session-tip-light {
+  width: 55px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e5a92e;
+  font-size: 30px;
+}
+/* =====================================================
+   GOAL OVERLAY
+===================================================== */
+.focus-session-page .focus-session-goal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(15, 20, 32, 0.58);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  direction: rtl;
+}
+/* =====================================================
+   GOAL MODAL
+===================================================== */
+.focus-session-page .focus-session-goal-modal {
+  width: min(850px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e5e9f1;
+  border-radius: 20px;
+  box-shadow: 0 20px 70px rgba(20, 30, 60, 0.2);
+  padding: 24px;
+  animation: focusSessionGoalModalIn 0.2s ease;
+}
+@keyframes focusSessionGoalModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+/* =====================================================
+   GOAL MODAL HEADER
+===================================================== */
+.focus-session-page .focus-session-goal-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #edf0f5;
+}
+.focus-session-page .focus-session-goal-modal-header h2 {
+  margin: 0;
+  color: #17213c;
+  font-size: 20px;
+  font-weight: 800;
+}
+.focus-session-page .focus-session-goal-modal-header p {
+  margin: 7px 0 0;
+  color: #858c9c;
+  font-size: 11px;
+}
+.focus-session-page .focus-session-goal-close-btn {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: 1px solid #e5e8ef;
+  border-radius: 9px;
+  background: #fff;
+  color: #717b8f;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-goal-close-btn:hover {
+  color: #d85d68;
+  border-color: #e7bfc4;
+  background: #fff7f8;
+}
+/* =====================================================
+   GOAL STEP
+===================================================== */
+.focus-session-page .focus-session-goal-step {
+  margin-top: 22px;
+}
+.focus-session-page .focus-session-goal-step-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 13px;
+}
+.focus-session-page .focus-session-goal-step-title > span {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #eef1ff;
+  color: #4d62ca;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+}
+.focus-session-page .focus-session-goal-step-title div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.focus-session-page .focus-session-goal-step-title strong {
+  color: #30394e;
+  font-size: 13px;
+}
+.focus-session-page .focus-session-goal-step-title small {
+  color: #858c9c;
+  font-size: 9px;
+}
+/* =====================================================
+   SUBJECTS
+===================================================== */
+.focus-session-page .focus-session-subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.focus-session-page .focus-session-subject-option {
+  min-height: 120px;
+  position: relative;
+  border: 1px solid #e4e8f0;
+  border-radius: 12px;
+  background: #fff;
+  padding: 14px 10px;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 5px;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-subject-option:hover {
+  border-color: #9ba8df;
+  transform: translateY(-2px);
+}
+.focus-session-page .focus-session-subject-option.selected {
+  border-color: #6477d4;
+  background: #f5f6ff;
+  box-shadow: 0 0 0 2px rgba(91, 109, 207, 0.08);
+}
+.focus-session-page .focus-session-subject-emoji {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #f4f6fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 3px;
+}
+.focus-session-page .focus-session-subject-option strong {
+  color: #30394e;
+  font-size: 12px;
+}
+.focus-session-page .focus-session-subject-option small {
+  color: #858c9c;
+  font-size: 8px;
+  line-height: 1.5;
+}
+.focus-session-page .focus-session-subject-check {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  color: #3eae7e;
+  font-size: 14px;
+}
+/* =====================================================
+   GOAL TYPES
+===================================================== */
+.focus-session-page .focus-session-goal-types-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.focus-session-page .focus-session-goal-type-option {
+  min-height: 75px;
+  position: relative;
+  border: 1px solid #e4e8ef;
+  border-radius: 11px;
+  background: #fff;
+  padding: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: right;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-goal-type-option:hover {
+  border-color: #9ba8df;
+}
+.focus-session-page .focus-session-goal-type-option.selected {
+  background: #f4f6ff;
+  border-color: #6477d4;
+}
+.focus-session-page .focus-session-goal-type-icon {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: #eef1ff;
+  color: #5368cd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.focus-session-page .focus-session-goal-type-option > div:nth-child(2) {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.focus-session-page .focus-session-goal-type-option strong {
+  color: #374057;
+  font-size: 11px;
+}
+.focus-session-page .focus-session-goal-type-option small {
+  color: #858c9c;
+  font-size: 8px;
+  line-height: 1.5;
+}
+.focus-session-page .focus-session-goal-type-check {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  color: #3eae7e;
+  font-size: 13px;
+}
+/* =====================================================
+   LESSONS
+===================================================== */
+.focus-session-page .focus-session-lessons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.focus-session-page .focus-session-lesson-option {
+  width: 100%;
+  min-height: 58px;
+  border: 1px solid #e5e8ef;
+  border-radius: 10px;
+  background: #fff;
+  padding: 9px 12px;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: right;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-lesson-option:hover {
+  border-color: #9ba8df;
+  background: #fafbff;
+}
+.focus-session-page .focus-session-lesson-option.selected {
+  border-color: #6477d4;
+  background: #f4f6ff;
+}
+.focus-session-page .focus-session-lesson-priority {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: #f0f2f8;
+  color: #59657e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+}
+.focus-session-page
+  .focus-session-lesson-option.selected
+  .focus-session-lesson-priority {
+  background: #dfe4ff;
+  color: #4d62ca;
+}
+.focus-session-page .focus-session-lesson-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.focus-session-page .focus-session-lesson-info strong {
+  color: #374057;
+  font-size: 11px;
+}
+.focus-session-page .focus-session-lesson-info span {
+  color: #8a91a0;
+  font-size: 9px;
+}
+.focus-session-page .focus-session-lesson-option > svg {
+  color: #929aab;
+  font-size: 10px;
+}
+/* =====================================================
+   UNITS
+===================================================== */
+.focus-session-page .focus-session-goal-select-label {
+  margin: 15px 0 8px;
+  color: #626c80;
+  font-size: 10px;
+  font-weight: 700;
+}
+.focus-session-page .focus-session-unit-label {
+  margin-top: 17px;
+}
+.focus-session-page .focus-session-units-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.focus-session-page .focus-session-unit-option {
+  min-height: 43px;
+  border: 1px solid #e4e8ef;
+  border-radius: 9px;
+  background: #fff;
+  color: #596378;
+  font-family: inherit;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-unit-option:hover {
+  border-color: #9ba8df;
+}
+.focus-session-page .focus-session-unit-option.selected {
+  background: #f4f6ff;
+  border-color: #6477d4;
+  color: #4d62ca;
+}
+.focus-session-page .focus-session-unit-option svg {
+  font-size: 12px;
+}
+/* =====================================================
+   QUESTION TARGETS
+===================================================== */
+.focus-session-page .focus-session-question-targets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+.focus-session-page .focus-session-question-target {
+  min-height: 70px;
+  border: 1px solid #e5e8ef;
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-align: right;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-question-target:hover {
+  border-color: #9ba8df;
+}
+.focus-session-page .focus-session-question-target.selected {
+  background: #f4f6ff;
+  border-color: #6477d4;
+}
+.focus-session-page .focus-session-question-target > svg {
+  width: 30px;
+  height: 30px;
+  padding: 7px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: #eef1ff;
+  color: #5267ce;
+}
+.focus-session-page .focus-session-question-target div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.focus-session-page .focus-session-question-target strong {
+  color: #374057;
+  font-size: 10px;
+}
+.focus-session-page .focus-session-question-target small {
+  color: #858c9c;
+  font-size: 8px;
+}
+/* =====================================================
+   GOAL PREVIEW
+===================================================== */
+.focus-session-page .focus-session-goal-preview {
+  margin-top: 22px;
+  padding: 12px 14px;
+  border-radius: 11px;
+  background: #f4f6ff;
+  border: 1px solid #e0e4fa;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.focus-session-page .focus-session-goal-preview-icon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: #e4e8ff;
+  color: #4e63cd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.focus-session-page .focus-session-goal-preview div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.focus-session-page .focus-session-goal-preview span {
+  color: #7d87a1;
+  font-size: 8px;
+}
+.focus-session-page .focus-session-goal-preview strong {
+  color: #374057;
+  font-size: 11px;
+}
+/* =====================================================
+   GOAL MODAL FOOTER
+===================================================== */
+.focus-session-page .focus-session-goal-modal-footer {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #edf0f5;
+  display: flex;
+  justify-content: flex-start;
+  gap: 9px;
+}
+.focus-session-page .focus-session-goal-cancel-btn,
+.focus-session-page .focus-session-goal-confirm-btn {
+  height: 42px;
+  border-radius: 9px;
+  padding: 0 18px;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: 0.2s ease;
+}
+.focus-session-page .focus-session-goal-cancel-btn {
+  border: 1px solid #e2e6ed;
+  background: #fff;
+  color: #687287;
+}
+.focus-session-page .focus-session-goal-cancel-btn:hover {
+  background: #f7f8fb;
+}
+.focus-session-page .focus-session-goal-confirm-btn {
+  border: 0;
+  background: #3159dc;
+  color: #fff;
+  min-width: 170px;
+}
+.focus-session-page .focus-session-goal-confirm-btn:hover:not(:disabled) {
+  background: #274bc2;
+}
+.focus-session-page .focus-session-goal-confirm-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+/* =====================================================
+   DARK MODE
+===================================================== */
+.dark-mode .focus-session-page,
+.focus-session-page.dark-mode {
+  background: #0f1420;
+  color: #eef2fa;
+}
+/* Cards */
+.dark-mode .focus-session-page .focus-session-timer-card,
+.dark-mode .focus-session-page .focus-session-session-settings,
+.dark-mode .focus-session-page .focus-session-focus-box,
+.focus-session-page.dark-mode .focus-session-timer-card,
+.focus-session-page.dark-mode .focus-session-session-settings,
+.focus-session-page.dark-mode .focus-session-focus-box {
+  background: #171d2b;
+  border-color: #283247;
+  box-shadow: none;
+}
+/* Timer */
+.dark-mode .focus-session-page .focus-session-session-badge,
+.focus-session-page.dark-mode .focus-session-session-badge {
+  background: #20294b;
+  color: #8294ff;
+}
+.dark-mode .focus-session-page .focus-session-finish-session-btn,
+.focus-session-page.dark-mode .focus-session-finish-session-btn {
+  background: #171d2b;
+  border-color: #303b51;
+  color: #b5bdcc;
+}
+.dark-mode .focus-session-page .focus-session-finish-session-btn:hover,
+.focus-session-page.dark-mode .focus-session-finish-session-btn:hover {
+  border-color: #e35c68;
+  color: #ef727b;
+}
+.dark-mode .focus-session-page .focus-session-timer-track,
+.focus-session-page.dark-mode .focus-session-timer-track {
+  stroke: #293246;
+}
+.dark-mode .focus-session-page .focus-session-timer-progress,
+.focus-session-page.dark-mode .focus-session-timer-progress {
+  stroke: #668cff;
+}
+.dark-mode .focus-session-page .focus-session-timer-content h1,
+.focus-session-page.dark-mode .focus-session-timer-content h1 {
+  color: #f1f4fb;
+}
+.dark-mode .focus-session-page .focus-session-timer-subtitle,
+.focus-session-page.dark-mode .focus-session-timer-subtitle {
+  color: #929caf;
+}
+.dark-mode .focus-session-page .focus-session-timer-time,
+.focus-session-page.dark-mode .focus-session-timer-time {
+  color: #dce5ff;
+}
+.dark-mode .focus-session-page .focus-session-timer-label,
+.focus-session-page.dark-mode .focus-session-timer-label {
+  background: #202637;
+  color: #aeb7c9;
+}
+.dark-mode .focus-session-page .focus-session-session-number,
+.focus-session-page.dark-mode .focus-session-session-number {
+  background: #202844;
+  color: #a8b5ef;
+}
+.dark-mode .focus-session-page .focus-session-session-number svg,
+.focus-session-page.dark-mode .focus-session-session-number svg {
+  color: #4cc58f;
+}
+/* Controls */
+.dark-mode .focus-session-page .focus-session-timer-side-btn.cancel,
+.focus-session-page.dark-mode .focus-session-timer-side-btn.cancel {
+  background: #241b20;
+  border-color: #493038;
+  color: #ed727c;
+}
+.dark-mode .focus-session-page .focus-session-timer-side-btn.finish,
+.focus-session-page.dark-mode .focus-session-timer-side-btn.finish {
+  background: #182820;
+  border-color: #29483a;
+  color: #58c795;
+}
+.dark-mode .focus-session-page .focus-session-main-timer-btn,
+.focus-session-page.dark-mode .focus-session-main-timer-btn {
+  background: #4169e8;
+}
+.dark-mode .focus-session-page .focus-session-main-timer-btn.pause,
+.focus-session-page.dark-mode .focus-session-main-timer-btn.pause {
+  background: #d9922e;
+}
+.dark-mode .focus-session-page .focus-session-timer-reset-btn,
+.focus-session-page.dark-mode .focus-session-timer-reset-btn {
+  color: #8d98aa;
+}
+.dark-mode .focus-session-page .focus-session-timer-reset-btn:hover,
+.focus-session-page.dark-mode .focus-session-timer-reset-btn:hover {
+  background: #202738;
+  color: #9cacff;
+}
+.dark-mode .focus-session-page .focus-session-timer-start-label,
+.focus-session-page.dark-mode .focus-session-timer-start-label {
+  color: #8d98aa;
+}
+.dark-mode .focus-session-page .focus-session-timer-start-label.running,
+.focus-session-page.dark-mode .focus-session-timer-start-label.running {
+  color: #55c996;
+}
+/* Finished */
+.dark-mode .focus-session-page .focus-session-finished-message,
+.focus-session-page.dark-mode .focus-session-finished-message {
+  background: #182b25;
+  border-color: #2d5a48;
+  color: #59c995;
+}
+.dark-mode .focus-session-page .focus-session-finished-message span,
+.focus-session-page.dark-mode .focus-session-finished-message span {
+  color: #8ba99e;
+}
+/* Settings */
+.dark-mode .focus-session-page .focus-session-settings-header,
+.focus-session-page.dark-mode .focus-session-settings-header {
+  border-color: #283247;
+}
+.dark-mode .focus-session-page .focus-session-settings-header h2,
+.focus-session-page.dark-mode .focus-session-settings-header h2 {
+  color: #f1f4fb;
+}
+.dark-mode .focus-session-page .focus-session-settings-header svg,
+.focus-session-page.dark-mode .focus-session-settings-header svg {
+  color: #9da7b9;
+}
+.dark-mode .focus-session-page .focus-session-settings-section h3,
+.focus-session-page.dark-mode .focus-session-settings-section h3 {
+  color: #c8ceda;
+}
+/* Settings Buttons */
+.dark-mode .focus-session-page .focus-session-session-type-options button,
+.dark-mode .focus-session-page .focus-session-time-mode-options button,
+.dark-mode .focus-session-page .focus-session-custom-time-btn,
+.dark-mode .focus-session-page .focus-session-focus-level,
+.focus-session-page.dark-mode .focus-session-session-type-options button,
+.focus-session-page.dark-mode .focus-session-time-mode-options button,
+.focus-session-page.dark-mode .focus-session-custom-time-btn,
+.focus-session-page.dark-mode .focus-session-focus-level {
+  background: #171d2b;
+  border-color: #303a4f;
+  color: #adb6c7;
+}
+.dark-mode .focus-session-page .focus-session-session-type-options button:hover,
+.dark-mode .focus-session-page .focus-session-time-mode-options button:hover,
+.dark-mode .focus-session-page .focus-session-custom-time-btn:hover,
+.dark-mode .focus-session-page .focus-session-focus-level:hover,
+.focus-session-page.dark-mode .focus-session-session-type-options button:hover,
+.focus-session-page.dark-mode .focus-session-time-mode-options button:hover,
+.focus-session-page.dark-mode .focus-session-custom-time-btn:hover,
+.focus-session-page.dark-mode .focus-session-focus-level:hover {
+  border-color: #5369bd;
+}
+.dark-mode .focus-session-page .focus-session-session-type-options button.selected,
+.dark-mode .focus-session-page .focus-session-time-mode-options button.selected,
+.dark-mode .focus-session-page .focus-session-focus-level.selected,
+.focus-session-page.dark-mode .focus-session-session-type-options button.selected,
+.focus-session-page.dark-mode .focus-session-time-mode-options button.selected,
+.focus-session-page.dark-mode .focus-session-focus-level.selected {
+  background: #202946;
+  border-color: #596cb6;
+  color: #a7b5ff;
+}
+/* Goal */
+.dark-mode .focus-session-page .focus-session-session-goal,
+.focus-session-page.dark-mode .focus-session-session-goal {
+  background: #202743;
+}
+.dark-mode .focus-session-page .focus-session-goal-icon,
+.focus-session-page.dark-mode .focus-session-goal-icon {
+  background: #29345a;
+  color: #8fa0ff;
+}
+.dark-mode .focus-session-page .focus-session-session-goal strong,
+.focus-session-page.dark-mode .focus-session-session-goal strong {
+  color: #d4d9e5;
+}
+.dark-mode .focus-session-page .focus-session-session-goal span,
+.focus-session-page.dark-mode .focus-session-session-goal span {
+  color: #8993a7;
+}
+/* Bottom */
+.dark-mode .focus-session-page .focus-session-box-heading,
+.focus-session-page.dark-mode .focus-session-box-heading {
+  border-color: #283247;
+}
+.dark-mode .focus-session-page .focus-session-box-heading h2,
+.focus-session-page.dark-mode .focus-session-box-heading h2 {
+  color: #edf1f9;
+}
+.dark-mode .focus-session-page .focus-session-box-heading > svg,
+.focus-session-page.dark-mode .focus-session-box-heading > svg {
+  color: #9ca7ba;
+}
+/* Stats */
+.dark-mode .focus-session-page .focus-session-stats-circle-track,
+.dark-mode .focus-session-page .focus-session-distribution-bg,
+.focus-session-page.dark-mode .focus-session-stats-circle-track,
+.focus-session-page.dark-mode .focus-session-distribution-bg {
+  stroke: #2c3549;
+}
+.dark-mode .focus-session-page .focus-session-stats-circle-progress,
+.focus-session-page.dark-mode .focus-session-stats-circle-progress {
+  stroke: #5583f1;
+}
+.dark-mode .focus-session-page .focus-session-target-progress,
+.focus-session-page.dark-mode .focus-session-target-progress {
+  background: #2c3549;
+}
+.dark-mode .focus-session-page .focus-session-target-progress div,
+.focus-session-page.dark-mode .focus-session-target-progress div {
+  background: #5583f1;
+}
+.dark-mode .focus-session-page .focus-session-stats-circle-content strong,
+.dark-mode .focus-session-page .focus-session-distribution-chart strong,
+.dark-mode .focus-session-page .focus-session-previous-info strong,
+.dark-mode .focus-session-page .focus-session-previous-time strong,
+.focus-session-page.dark-mode .focus-session-stats-circle-content strong,
+.focus-session-page.dark-mode .focus-session-distribution-chart strong,
+.focus-session-page.dark-mode .focus-session-previous-info strong,
+.focus-session-page.dark-mode .focus-session-previous-time strong {
+  color: #e9edf6;
+}
+.dark-mode .focus-session-page .focus-session-stats-circle-content span,
+.dark-mode .focus-session-page .focus-session-stats-target > span,
+.dark-mode .focus-session-page .focus-session-mini-stats span,
+.dark-mode .focus-session-page .focus-session-previous-info span,
+.dark-mode .focus-session-page .focus-session-previous-time span,
+.dark-mode .focus-session-page .focus-session-distribution-chart span,
+.dark-mode .focus-session-page .focus-session-distribution-row > span:not(.focus-session-distribution-dot),
+.dark-mode .focus-session-page .focus-session-distribution-row small,
+.focus-session-page.dark-mode .focus-session-stats-circle-content span,
+.focus-session-page.dark-mode .focus-session-stats-target > span,
+.focus-session-page.dark-mode .focus-session-mini-stats span,
+.focus-session-page.dark-mode .focus-session-previous-info span,
+.focus-session-page.dark-mode .focus-session-previous-time span,
+.focus-session-page.dark-mode .focus-session-distribution-chart span,
+.focus-session-page.dark-mode .focus-session-distribution-row > span:not(.focus-session-distribution-dot),
+.focus-session-page.dark-mode .focus-session-distribution-row small {
+  color: #8994a8;
+}
+/* Mini Stats */
+.dark-mode .focus-session-page .focus-session-mini-stats div,
+.focus-session-page.dark-mode .focus-session-mini-stats div {
+  background: #1b2232;
+  border-color: #2b3549;
+}
+.dark-mode .focus-session-page .focus-session-mini-stats strong,
+.focus-session-page.dark-mode .focus-session-mini-stats strong {
+  color: #dce1eb;
+}
+/* Buttons */
+.dark-mode .focus-session-page .focus-session-outline-btn,
+.focus-session-page.dark-mode .focus-session-outline-btn {
+  background: #1c2435;
+  border-color: #303b50;
+  color: #91a3ff;
+}
+.dark-mode .focus-session-page .focus-session-outline-btn:hover,
+.focus-session-page.dark-mode .focus-session-outline-btn:hover {
+  background: #222c42;
+}
+.dark-mode .focus-session-page .focus-session-custom-time-btn.selected,
+.focus-session-page.dark-mode .focus-session-custom-time-btn.selected {
+  background: #202946;
+  border-color: #596cb6;
+  color: #a7b5ff;
+}
+.dark-mode .focus-session-page .focus-session-custom-time-btn.selected small,
+.focus-session-page.dark-mode .focus-session-custom-time-btn.selected small {
+  color: #8995c4;
+}
+/* Feedback */
+.dark-mode .focus-session-page .focus-session-feedback-content h3,
+.focus-session-page.dark-mode .focus-session-feedback-content h3 {
+  color: #eef2fa;
+}
+.dark-mode .focus-session-page .focus-session-feedback-content > p,
+.focus-session-page.dark-mode .focus-session-feedback-content > p {
+  color: #8994a8;
+}
+.dark-mode .focus-session-page .focus-session-feedback-option,
+.focus-session-page.dark-mode .focus-session-feedback-option {
+  background: #1b2232;
+  border-color: #303a4e;
+}
+.dark-mode .focus-session-page .focus-session-feedback-option.yes,
+.focus-session-page.dark-mode .focus-session-feedback-option.yes {
+  background: #182a26;
+}
+.dark-mode .focus-session-page .focus-session-feedback-option.partial,
+.focus-session-page.dark-mode .focus-session-feedback-option.partial {
+  background: #2b271a;
+}
+.dark-mode .focus-session-page .focus-session-feedback-option.no,
+.focus-session-page.dark-mode .focus-session-feedback-option.no {
+  background: #2a1c21;
+}
+.dark-mode .focus-session-page .focus-session-feedback-content textarea,
+.focus-session-page.dark-mode .focus-session-feedback-content textarea {
+  background: #141a27;
+  border-color: #303a4e;
+  color: #edf1f8;
+}
+.dark-mode .focus-session-page .focus-session-feedback-content textarea::placeholder,
+.focus-session-page.dark-mode .focus-session-feedback-content textarea::placeholder {
+  color: #717c90;
+}
+.dark-mode .focus-session-page .focus-session-feedback-content textarea:focus,
+.focus-session-page.dark-mode .focus-session-feedback-content textarea:focus {
+  border-color: #596cb6;
+  background: #161d2b;
+}
+.dark-mode .focus-session-page .focus-session-save-feedback,
+.focus-session-page.dark-mode .focus-session-save-feedback {
+  background: #3159dc;
+  color: #fff;
+}
+.dark-mode .focus-session-page .focus-session-save-feedback:disabled,
+.focus-session-page.dark-mode .focus-session-save-feedback:disabled {
+  background: #2a3142;
+  color: #8d97aa;
+}
+/* Previous */
+.dark-mode .focus-session-page .focus-session-previous-session,
+.focus-session-page.dark-mode .focus-session-previous-session {
+  border-color: #283247;
+}
+.dark-mode .focus-session-page .focus-session-previous-status.completed,
+.focus-session-page.dark-mode .focus-session-previous-status.completed {
+  background: #193126;
+  color: #50c28e;
+}
+.dark-mode .focus-session-page .focus-session-text-btn,
+.focus-session-page.dark-mode .focus-session-text-btn {
+  color: #8ea1ff;
+}
+/* Distribution */
+.dark-mode .focus-session-page .focus-session-distribution-segment.blue,
+.focus-session-page.dark-mode .focus-session-distribution-segment.blue {
+  stroke: #5278ed;
+}
+.dark-mode .focus-session-page .focus-session-distribution-segment.green,
+.focus-session-page.dark-mode .focus-session-distribution-segment.green {
+  stroke: #45bc8b;
+}
+.dark-mode .focus-session-page .focus-session-distribution-segment.purple,
+.focus-session-page.dark-mode .focus-session-distribution-segment.purple {
+  stroke: #8d70e5;
+}
+.dark-mode .focus-session-page .focus-session-distribution-segment.orange,
+.focus-session-page.dark-mode .focus-session-distribution-segment.orange {
+  stroke: #e5a846;
+}
+/* Tip */
+.dark-mode .focus-session-page .focus-session-tip,
+.focus-session-page.dark-mode .focus-session-tip {
+  background: #28251a;
+  border-color: #4a4025;
+}
+.dark-mode .focus-session-page .focus-session-tip-text h2,
+.focus-session-page.dark-mode .focus-session-tip-text h2 {
+  color: #e8dfc4;
+}
+.dark-mode .focus-session-page .focus-session-tip-text p,
+.focus-session-page.dark-mode .focus-session-tip-text p {
+  color: #aaa386;
+}
+.dark-mode .focus-session-page .focus-session-tip-image,
+.focus-session-page.dark-mode .focus-session-tip-image {
+  background: #203126;
+  color: #70b887;
+}
+.dark-mode .focus-session-page .focus-session-tip-light,
+.focus-session-page.dark-mode .focus-session-tip-light {
+  color: #e5a92e;
+}
+/* =====================================================
+   GOAL DARK MODE
+===================================================== */
+.dark-mode .focus-session-page .focus-session-goal-edit-btn,
+.focus-session-page.dark-mode .focus-session-goal-edit-btn {
+  color: #91a1ff;
+}
+.dark-mode .focus-session-page .focus-session-goal-overlay,
+.focus-session-page.dark-mode .focus-session-goal-overlay {
+  background: rgba(3, 6, 12, 0.72);
+}
+.dark-mode .focus-session-page .focus-session-goal-modal,
+.focus-session-page.dark-mode .focus-session-goal-modal {
+  background: #171d2b;
+  border-color: #2b3549;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.35);
+}
+.dark-mode .focus-session-page .focus-session-goal-modal-header,
+.focus-session-page.dark-mode .focus-session-goal-modal-header {
+  border-color: #283247;
+}
+.dark-mode .focus-session-page .focus-session-goal-modal-header h2,
+.focus-session-page.dark-mode .focus-session-goal-modal-header h2 {
+  color: #eef2fa;
+}
+.dark-mode .focus-session-page .focus-session-goal-modal-header p,
+.focus-session-page.dark-mode .focus-session-goal-modal-header p {
+  color: #8994a8;
+}
+.dark-mode .focus-session-page .focus-session-goal-close-btn,
+.focus-session-page.dark-mode .focus-session-goal-close-btn {
+  background: #1b2232;
+  border-color: #303a4e;
+  color: #9aa5b8;
+}
+.dark-mode .focus-session-page .focus-session-goal-close-btn:hover,
+.focus-session-page.dark-mode .focus-session-goal-close-btn:hover {
+  background: #2a1d23;
+  border-color: #5a343d;
+  color: #ed727c;
+}
+.dark-mode .focus-session-page .focus-session-goal-step-title > span,
+.focus-session-page.dark-mode .focus-session-goal-step-title > span {
+  background: #202946;
+  color: #9aaaff;
+}
+.dark-mode .focus-session-page .focus-session-goal-step-title strong,
+.focus-session-page.dark-mode .focus-session-goal-step-title strong {
+  color: #d9deea;
+}
+.dark-mode .focus-session-page .focus-session-goal-step-title small,
+.focus-session-page.dark-mode .focus-session-goal-step-title small {
+  color: #8994a8;
+}
+/* Subjects / Goal Options */
+.dark-mode .focus-session-page .focus-session-subject-option,
+.dark-mode .focus-session-page .focus-session-goal-type-option,
+.dark-mode .focus-session-page .focus-session-lesson-option,
+.dark-mode .focus-session-page .focus-session-unit-option,
+.dark-mode .focus-session-page .focus-session-question-target,
+.focus-session-page.dark-mode .focus-session-subject-option,
+.focus-session-page.dark-mode .focus-session-goal-type-option,
+.focus-session-page.dark-mode .focus-session-lesson-option,
+.focus-session-page.dark-mode .focus-session-unit-option,
+.focus-session-page.dark-mode .focus-session-question-target {
+  background: #171d2b;
+  border-color: #303a4e;
+  color: #b7c0d0;
+}
+.dark-mode .focus-session-page .focus-session-subject-option:hover,
+.dark-mode .focus-session-page .focus-session-goal-type-option:hover,
+.dark-mode .focus-session-page .focus-session-lesson-option:hover,
+.dark-mode .focus-session-page .focus-session-unit-option:hover,
+.dark-mode .focus-session-page .focus-session-question-target:hover,
+.focus-session-page.dark-mode .focus-session-subject-option:hover,
+.focus-session-page.dark-mode .focus-session-goal-type-option:hover,
+.focus-session-page.dark-mode .focus-session-lesson-option:hover,
+.focus-session-page.dark-mode .focus-session-unit-option:hover,
+.focus-session-page.dark-mode .focus-session-question-target:hover {
+  border-color: #5369bd;
+}
+.dark-mode .focus-session-page .focus-session-subject-option.selected,
+.dark-mode .focus-session-page .focus-session-goal-type-option.selected,
+.dark-mode .focus-session-page .focus-session-lesson-option.selected,
+.dark-mode .focus-session-page .focus-session-unit-option.selected,
+.dark-mode .focus-session-page .focus-session-question-target.selected,
+.focus-session-page.dark-mode .focus-session-subject-option.selected,
+.focus-session-page.dark-mode .focus-session-goal-type-option.selected,
+.focus-session-page.dark-mode .focus-session-lesson-option.selected,
+.focus-session-page.dark-mode .focus-session-unit-option.selected,
+.focus-session-page.dark-mode .focus-session-question-target.selected {
+  background: #202946;
+  border-color: #596cb6;
+}
+.dark-mode .focus-session-page .focus-session-subject-emoji,
+.focus-session-page.dark-mode .focus-session-subject-emoji {
+  background: #202637;
+}
+.dark-mode .focus-session-page .focus-session-subject-option strong,
+.dark-mode .focus-session-page .focus-session-goal-type-option strong,
+.dark-mode .focus-session-page .focus-session-lesson-info strong,
+.dark-mode .focus-session-page .focus-session-question-target strong,
+.focus-session-page.dark-mode .focus-session-subject-option strong,
+.focus-session-page.dark-mode .focus-session-goal-type-option strong,
+.focus-session-page.dark-mode .focus-session-lesson-info strong,
+.focus-session-page.dark-mode .focus-session-question-target strong {
+  color: #e0e5ef;
+}
+.dark-mode .focus-session-page .focus-session-subject-option small,
+.dark-mode .focus-session-page .focus-session-goal-type-option small,
+.dark-mode .focus-session-page .focus-session-lesson-info span,
+.dark-mode .focus-session-page .focus-session-question-target small,
+.focus-session-page.dark-mode .focus-session-subject-option small,
+.focus-session-page.dark-mode .focus-session-goal-type-option small,
+.focus-session-page.dark-mode .focus-session-lesson-info span,
+.focus-session-page.dark-mode .focus-session-question-target small {
+  color: #8994a8;
+}
+.dark-mode .focus-session-page .focus-session-subject-check,
+.dark-mode .focus-session-page .focus-session-goal-type-check,
+.focus-session-page.dark-mode .focus-session-subject-check,
+.focus-session-page.dark-mode .focus-session-goal-type-check {
+  color: #55c996;
+}
+.dark-mode .focus-session-page .focus-session-goal-type-icon,
+.dark-mode .focus-session-page .focus-session-question-target > svg,
+.focus-session-page.dark-mode .focus-session-goal-type-icon,
+.focus-session-page.dark-mode .focus-session-question-target > svg {
+  background: #29345a;
+  color: #9baaff;
+}
+.dark-mode .focus-session-page .focus-session-lesson-priority,
+.focus-session-page.dark-mode .focus-session-lesson-priority {
+  background: #222a3a;
+  color: #9aa5b8;
+}
+.dark-mode
+  .focus-session-page
+  .focus-session-lesson-option.selected
+  .focus-session-lesson-priority,
+.focus-session-page.dark-mode
+  .focus-session-lesson-option.selected
+  .focus-session-lesson-priority {
+  background: #303b68;
+  color: #a9b5ff;
+}
+.dark-mode .focus-session-page .focus-session-lesson-option > svg,
+.focus-session-page.dark-mode .focus-session-lesson-option > svg {
+  color: #8994a8;
+}
+.dark-mode .focus-session-page .focus-session-goal-select-label,
+.focus-session-page.dark-mode .focus-session-goal-select-label {
+  color: #a5afc1;
+}
+.dark-mode .focus-session-page .focus-session-unit-option,
+.focus-session-page.dark-mode .focus-session-unit-option {
+  color: #adb7c8;
+}
+.dark-mode .focus-session-page .focus-session-goal-preview,
+.focus-session-page.dark-mode .focus-session-goal-preview {
+  background: #202743;
+  border-color: #303b59;
+}
+.dark-mode .focus-session-page .focus-session-goal-preview-icon,
+.focus-session-page.dark-mode .focus-session-goal-preview-icon {
+  background: #29345a;
+  color: #9aaaff;
+}
+.dark-mode .focus-session-page .focus-session-goal-preview span,
+.focus-session-page.dark-mode .focus-session-goal-preview span {
+  color: #8994a8;
+}
+.dark-mode .focus-session-page .focus-session-goal-preview strong,
+.focus-session-page.dark-mode .focus-session-goal-preview strong {
+  color: #dce2ed;
+}
+.dark-mode .focus-session-page .focus-session-goal-modal-footer,
+.focus-session-page.dark-mode .focus-session-goal-modal-footer {
+  border-color: #283247;
+}
+.dark-mode .focus-session-page .focus-session-goal-cancel-btn,
+.focus-session-page.dark-mode .focus-session-goal-cancel-btn {
+  background: #1b2232;
+  border-color: #303a4e;
+  color: #adb6c7;
+}
+.dark-mode .focus-session-page .focus-session-goal-cancel-btn:hover,
+.focus-session-page.dark-mode .focus-session-goal-cancel-btn:hover {
+  background: #222a3b;
+}
+/* =====================================================
+   GOAL RESPONSIVE
+===================================================== */
+@media (max-width: 800px) {
+  .focus-session-page .focus-session-subjects-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .focus-session-page .focus-session-goal-types-grid {
+    grid-template-columns: 1fr;
+  }
+  .focus-session-page .focus-session-question-targets {
+    grid-template-columns: 1fr;
+  }
+  .focus-session-page .focus-session-units-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 550px) {
+  .focus-session-page .focus-session-goal-overlay {
+    padding: 10px;
+    align-items: flex-start;
+  }
+  .focus-session-page .focus-session-goal-modal {
+    max-height: calc(100vh - 20px);
+    border-radius: 15px;
+    padding: 16px;
+  }
+  .focus-session-page .focus-session-goal-modal-header h2 {
+    font-size: 17px;
+  }
+  .focus-session-page .focus-session-subjects-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+  }
+  .focus-session-page .focus-session-subject-option {
+    min-height: 105px;
+    padding: 10px 6px;
+  }
+  .focus-session-page .focus-session-subject-emoji {
+    width: 35px;
+    height: 35px;
+    font-size: 18px;
+  }
+  .focus-session-page .focus-session-subject-option strong {
+    font-size: 11px;
+  }
+  .focus-session-page .focus-session-subject-option small {
+    font-size: 7px;
+  }
+  .focus-session-page .focus-session-goal-modal-footer {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    margin-left: -16px;
+    margin-right: -16px;
+    margin-bottom: -16px;
+    padding: 12px 16px;
+  }
+  .dark-mode .focus-session-page .focus-session-goal-modal-footer,
+  .focus-session-page.dark-mode .focus-session-goal-modal-footer {
+    background: #171d2b;
+  }
+  .focus-session-page .focus-session-goal-cancel-btn,
+  .focus-session-page .focus-session-goal-confirm-btn {
+    flex: 1;
+  }
+}
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+@media (max-width: 1200px) {
+  .focus-session-page .focus-session-main-grid {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+  .focus-session-page .focus-session-timer-wrapper {
+    width: min(420px, 100%);
+  }
+  .focus-session-page .focus-session-distribution-content {
+    flex-direction: column;
+  }
+  .focus-session-page .focus-session-distribution-chart {
+    width: 170px;
+    height: 170px;
+  }
+}
+@media (max-width: 950px) {
+  .focus-session-page .focus-session-main-grid {
+    grid-template-columns: 1fr;
+  }
+  .focus-session-page .focus-session-timer-card {
+    order: 1;
+  }
+  .focus-session-page .focus-session-session-settings {
+    order: 2;
+  }
+  .focus-session-page .focus-session-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+  .focus-session-page .focus-session-distribution-content {
+    flex-direction: row;
+  }
+  .focus-session-page .focus-session-distribution-chart {
+    width: 190px;
+    height: 190px;
+  }
+}
+@media (max-width: 700px) {
+  .focus-session-page .focus-session-container {
+    padding: 15px;
+  }
+  .focus-session-page .focus-session-timer-card,
+  .focus-session-page .focus-session-session-settings,
+  .focus-session-page .focus-session-focus-box {
+    border-radius: 15px;
+  }
+  .focus-session-page .focus-session-timer-wrapper {
+    width: min(400px, 100%);
+  }
+  .focus-session-page .focus-session-timer-content h1 {
+    font-size: 23px;
+  }
+  .focus-session-page .focus-session-timer-subtitle {
+    font-size: 10px;
+  }
+  .focus-session-page .focus-session-timer-time {
+    font-size: 54px;
+    margin-top: 22px;
+  }
+  .focus-session-page .focus-session-timer-controls {
+    gap: 12px;
+  }
+  .focus-session-page .focus-session-timer-side-btn {
+    min-width: 105px;
+    font-size: 10px;
+  }
+  .focus-session-page .focus-session-main-timer-btn {
+    width: 62px;
+    height: 62px;
+  }
+  .focus-session-page .focus-session-distribution-content {
+    flex-direction: column;
+  }
+  .focus-session-page .focus-session-tip {
+    padding: 15px;
+  }
+  .focus-session-page .focus-session-tip-image,
+  .focus-session-page .focus-session-tip-light {
+    display: none;
+  }
+  .focus-session-page .focus-session-tip-text {
+    text-align: center;
+  }
+}
+@media (max-width: 500px) {
+  .focus-session-page .focus-session-container {
+    padding: 12px;
+  }
+  .focus-session-page .focus-session-timer-card,
+  .focus-session-page .focus-session-session-settings {
+    padding: 15px;
+  }
+  .focus-session-page .focus-session-timer-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .focus-session-page .focus-session-session-badge,
+  .focus-session-page .focus-session-finish-session-btn {
+    justify-content: center;
+  }
+  .focus-session-page .focus-session-timer-wrapper {
+    width: 100%;
+  }
+  .focus-session-page .focus-session-timer-content {
+    width: 76%;
+  }
+  .focus-session-page .focus-session-timer-content h1 {
+    font-size: 20px;
+  }
+  .focus-session-page .focus-session-timer-subtitle {
+    font-size: 9px;
+    margin-top: 8px;
+  }
+  .focus-session-page .focus-session-timer-time {
+    font-size: 45px;
+    margin-top: 18px;
+  }
+  .focus-session-page .focus-session-timer-label {
+    margin-top: 10px;
+    padding: 7px 12px;
+    font-size: 10px;
+  }
+  .focus-session-page .focus-session-session-number {
+    margin-top: 17px;
+    padding: 7px 12px;
+    font-size: 10px;
+  }
+  .focus-session-page .focus-session-timer-controls {
+    gap: 6px;
+  }
+  .focus-session-page .focus-session-timer-side-btn {
+    min-width: 0;
+    width: 100%;
+    height: 42px;
+    padding: 0 8px;
+    font-size: 9px;
+  }
+  .focus-session-page .focus-session-main-timer-btn {
+    width: 58px;
+    height: 58px;
+    font-size: 19px;
+  }
+  .focus-session-page .focus-session-time-mode-options {
+    grid-template-columns: 1fr 1fr;
+  }
+  .focus-session-page .focus-session-feedback-options {
+    gap: 6px;
+  }
+  .focus-session-page .focus-session-feedback-option {
+    height: 75px;
+  }
+  .focus-session-page .focus-session-mini-stats {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .focus-session-page .focus-session-distribution-content {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .focus-session-page .focus-session-distribution-chart {
+    width: 165px;
+    height: 165px;
+  }
+  .focus-session-page .focus-session-distribution-row {
+    grid-template-columns: 8px 1fr auto;
+  }
+  .focus-session-page .focus-session-distribution-row small {
+    display: none;
+  }
+  .focus-session-page .focus-session-finished-message {
+    padding: 10px;
+  }
+}
+@media (max-width: 360px) {
+  .focus-session-page .focus-session-timer-time {
+    font-size: 40px;
+  }
+  .focus-session-page .focus-session-timer-side-btn {
+    font-size: 8px;
+  }
+  .focus-session-page .focus-session-main-timer-btn {
+    width: 52px;
+    height: 52px;
+  }
+  .focus-session-page .focus-session-feedback-option svg {
+    font-size: 20px;
+  }
+  .focus-session-page .focus-session-feedback-option span {
+    font-size: 9px;
+  }
+}

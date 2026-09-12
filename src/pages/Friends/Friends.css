@@ -1,0 +1,2178 @@
+/* =========================================================
+   Friends Page
+========================================================= */
+.friends-page {
+  min-height: 100vh;
+  background: #f6f8fc;
+  direction: rtl;
+  color: #172033;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.friends-container {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+}
+/* =========================================================
+   Header
+========================================================= */
+.friends-header {
+  padding-top: 70px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.friends-title-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.friends-title-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6757e8, #8175f4);
+  color: #fff;
+  font-size: 23px;
+  box-shadow: 0 10px 25px rgba(103, 87, 232, 0.22);
+}
+.friends-header h1 {
+  margin: 0 0 5px;
+  font-size: 30px;
+  font-weight: 900;
+  color: #172033;
+}
+.friends-header p {
+  margin: 0;
+  color: #7a8497;
+  font-size: 14px;
+}
+.friends-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.friends-refresh-btn,
+.friends-add-btn {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.friends-refresh-btn {
+  border: 1px solid #dfe4ee;
+  background: #fff;
+  color: #59647a;
+}
+.friends-refresh-btn:hover {
+  background: #f7f8fb;
+  border-color: #cfd5e2;
+}
+.friends-refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.friends-add-btn {
+  border: 1px solid #6657e8;
+  background: #6657e8;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(102, 87, 232, 0.2);
+}
+.friends-add-btn:hover {
+  background: #5849db;
+  transform: translateY(-1px);
+}
+/* =========================================================
+   Stats
+========================================================= */
+.friends-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.friends-stat-card {
+  min-height: 105px;
+  padding: 18px;
+  border: 1px solid #e6eaf1;
+  border-radius: 16px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-sizing: border-box;
+  box-shadow: 0 5px 18px rgba(30, 45, 75, 0.035);
+}
+.friends-stat-icon {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.friends-stat-icon.purple {
+  background: #eeebff;
+  color: #6757e8;
+}
+.friends-stat-icon.gold {
+  background: #fff6db;
+  color: #d69b00;
+}
+.friends-stat-icon.orange {
+  background: #fff0e4;
+  color: #e87821;
+}
+.friends-stat-icon.green {
+  background: #e7f8ee;
+  color: #2c9b61;
+}
+.friends-stat-card span {
+  display: block;
+  margin-bottom: 5px;
+  color: #7c8799;
+  font-size: 12px;
+  font-weight: 700;
+}
+.friends-stat-card strong {
+  display: block;
+  color: #172033;
+  font-size: 24px;
+  font-weight: 900;
+}
+/* =========================================================
+   Tabs
+========================================================= */
+.friends-tabs {
+  width: 100%;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px;
+  border: 1px solid #e5e9f1;
+  border-radius: 13px;
+  background: #fff;
+  box-sizing: border-box;
+}
+.friends-tabs button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #727d91;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+  position: relative;
+}
+.friends-tabs button:hover {
+  background: #f6f7fb;
+  color: #4d5669;
+}
+.friends-tabs button.active {
+  background: #6657e8;
+  color: #fff;
+  box-shadow: 0 5px 12px rgba(102, 87, 232, 0.2);
+}
+.friends-tab-count {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ef5d68;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+}
+.friends-tab-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #36b86c;
+  box-shadow: 0 0 0 3px rgba(54, 184, 108, 0.12);
+}
+/* =========================================================
+   Sections
+========================================================= */
+.friends-section {
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid #e6eaf1;
+  border-radius: 17px;
+  background: #fff;
+  box-shadow: 0 5px 18px rgba(30, 45, 75, 0.035);
+  box-sizing: border-box;
+}
+.section-heading {
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+.section-heading h2 {
+  margin: 0 0 5px;
+  color: #172033;
+  font-size: 19px;
+  font-weight: 900;
+}
+.section-heading p {
+  margin: 0;
+  color: #8992a4;
+  font-size: 12px;
+}
+.section-heading > svg {
+  color: #6657e8;
+  font-size: 21px;
+}
+.section-count {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 9px;
+  border-radius: 10px;
+  background: #f0edff;
+  color: #6657e8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+}
+/* =========================================================
+   Empty State
+========================================================= */
+.friends-empty-state {
+  min-height: 180px;
+  border: 1px dashed #dce1eb;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  gap: 7px;
+  color: #8b95a7;
+}
+.friends-empty-state > svg {
+  font-size: 31px;
+  color: #b2bac8;
+  margin-bottom: 5px;
+}
+.friends-empty-state h3 {
+  margin: 0;
+  color: #515c70;
+  font-size: 15px;
+}
+.friends-empty-state p {
+  margin: 0;
+  font-size: 12px;
+}
+/* =========================================================
+   Requests
+========================================================= */
+.requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.request-card {
+  padding: 13px 15px;
+  border: 1px solid #e7eaf0;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  transition: 0.2s ease;
+}
+.request-card:hover {
+  border-color: #d9d4ff;
+  background: #fcfbff;
+}
+.request-avatar {
+  width: 50px;
+  height: 50px;
+  flex: 0 0 50px;
+  border-radius: 14px;
+  object-fit: cover;
+}
+.request-info {
+  min-width: 0;
+  flex: 1;
+}
+.request-info h3 {
+  margin: 0 0 3px;
+  color: #20293b;
+  font-size: 14px;
+  font-weight: 900;
+}
+.request-info > span {
+  color: #6657e8;
+  font-size: 11px;
+  font-weight: 800;
+}
+.request-info p {
+  margin: 4px 0 0;
+  color: #8a94a6;
+  font-size: 11px;
+}
+.request-actions {
+  display: flex;
+  gap: 8px;
+}
+.accept-request,
+.reject-request {
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.accept-request {
+  background: #ecfbf3;
+  border-color: #bde8d0;
+  color: #23945a;
+}
+.accept-request:hover {
+  background: #dff7e9;
+  border-color: #9dd9b9;
+}
+.reject-request {
+  background: #fff5f5;
+  border-color: #f1caca;
+  color: #d64545;
+}
+.reject-request:hover {
+  background: #ffe8e8;
+  border-color: #e9a7a7;
+}
+/* =========================================================
+   Friends Toolbar
+========================================================= */
+.friends-toolbar {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.friends-search {
+  height: 44px;
+  flex: 1;
+  padding: 0 13px;
+  border: 1px solid #e0e4ec;
+  border-radius: 10px;
+  background: #fafbfc;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  box-sizing: border-box;
+}
+.friends-search > svg {
+  color: #969faf;
+  font-size: 14px;
+}
+.friends-search input {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #252e40;
+  font-size: 12px;
+  font-family: inherit;
+}
+.friends-search input::placeholder {
+  color: #a2a9b7;
+}
+.friends-sort-btn {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #e0e4ec;
+  border-radius: 10px;
+  background: #fff;
+  color: #687286;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.friends-sort-btn:hover {
+  background: #f8f9fb;
+}
+/* =========================================================
+   Friends List
+========================================================= */
+.friends-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.friend-card {
+  padding: 13px 15px;
+  border: 1px solid #e7eaf0;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  transition: 0.2s ease;
+}
+.friend-card:hover {
+  border-color: #dcd8fb;
+  background: #fcfbff;
+}
+.friend-main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.friend-avatar-wrapper {
+  width: 50px;
+  height: 50px;
+  flex: 0 0 50px;
+  position: relative;
+}
+.friend-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  object-fit: cover;
+}
+.friend-online-dot {
+  width: 11px;
+  height: 11px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #36b86c;
+}
+.friend-info {
+  min-width: 0;
+}
+.friend-info h3 {
+  margin: 0 0 2px;
+  color: #20293b;
+  font-size: 14px;
+  font-weight: 900;
+}
+.friend-code {
+  color: #6657e8;
+  font-size: 10px;
+  font-weight: 800;
+}
+.friend-meta {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 11px;
+}
+.friend-meta span {
+  color: #8a94a6;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.friend-meta svg {
+  font-size: 9px;
+  color: #d7a000;
+}
+.friend-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.friend-status {
+  min-height: 28px;
+  padding: 0 9px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f3f7;
+  color: #8b94a4;
+  font-size: 10px;
+  font-weight: 800;
+}
+.friend-status.active {
+  background: #eaf9f0;
+  color: #23945a;
+}
+.friend-remove-btn {
+  min-height: 38px;
+  padding: 0 12px;
+  border-radius: 9px;
+  border: 1px solid #f1caca;
+  background: #fff5f5;
+  color: #d64545;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+  white-space: nowrap;
+}
+.friend-remove-btn:hover {
+  background: #ffe8e8;
+  border-color: #e9a7a7;
+}
+/* =========================================================
+   Challenges Hero
+========================================================= */
+.challenges-hero {
+  margin-bottom: 20px;
+  padding: 22px 24px;
+  border-radius: 17px;
+  background: linear-gradient(
+    135deg,
+    #6657e8,
+    #8074ef
+  );
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 12px 30px rgba(102, 87, 232, 0.18);
+}
+.challenges-hero-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.challenges-hero-icon {
+  width: 55px;
+  height: 55px;
+  flex: 0 0 55px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 23px;
+}
+.challenges-hero h2 {
+  margin: 0 0 5px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 900;
+}
+.challenges-hero p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 12px;
+}
+.create-challenge-btn {
+  min-height: 43px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 10px;
+  background: #fff;
+  color: #6657e8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.2s ease;
+  white-space: nowrap;
+}
+.create-challenge-btn:hover {
+  background: #f6f4ff;
+  transform: translateY(-1px);
+}
+/* =========================================================
+   Challenges Grid
+========================================================= */
+.challenges-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.challenge-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e6e9f0;
+  border-radius: 15px;
+  background: #fff;
+  box-sizing: border-box;
+}
+.challenge-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: #6657e8;
+}
+.challenge-card.orange::before {
+  background: #ef8a35;
+}
+.challenge-card.purple::before {
+  background: #765fe8;
+}
+.challenge-card.gold::before {
+  background: #d9a500;
+}
+.challenge-card.green::before {
+  background: #32a866;
+}
+.challenge-card-top {
+  padding: 18px 18px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.challenge-icon {
+  width: 43px;
+  height: 43px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.challenge-card.orange .challenge-icon {
+  background: #fff0e3;
+  color: #e87821;
+}
+.challenge-card.purple .challenge-icon {
+  background: #efecff;
+  color: #715ee2;
+}
+.challenge-card.gold .challenge-icon {
+  background: #fff6dc;
+  color: #d29a00;
+}
+.challenge-card.green .challenge-icon {
+  background: #e9f8ef;
+  color: #2d9b60;
+}
+.challenge-category {
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: #f4f5f8;
+  color: #7e8797;
+  font-size: 9px;
+  font-weight: 800;
+}
+.challenge-content {
+  padding: 14px 18px 18px;
+}
+.challenge-content h3 {
+  margin: 0 0 6px;
+  color: #20293b;
+  font-size: 15px;
+  font-weight: 900;
+}
+.challenge-content > p {
+  min-height: 34px;
+  margin: 0 0 12px;
+  color: #8992a3;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.challenge-details {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.challenge-details span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #7d8799;
+  font-size: 10px;
+  font-weight: 700;
+}
+.challenge-details svg {
+  color: #6657e8;
+  font-size: 10px;
+}
+/* =========================================================
+   Challenge Progress
+========================================================= */
+.challenge-progress {
+  margin-bottom: 14px;
+}
+.challenge-progress-header {
+  margin-bottom: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #7c8697;
+  font-size: 10px;
+  font-weight: 800;
+}
+.challenge-progress-header strong {
+  color: #6657e8;
+  font-size: 11px;
+}
+.challenge-progress-bar {
+  width: 100%;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #edf0f4;
+}
+.challenge-progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    #6657e8,
+    #9185f4
+  );
+  transition: width 0.35s ease;
+}
+.challenge-card.orange
+  .challenge-progress-bar
+  span {
+  background: linear-gradient(
+    90deg,
+    #e87821,
+    #f4a65d
+  );
+}
+.challenge-card.gold
+  .challenge-progress-bar
+  span {
+  background: linear-gradient(
+    90deg,
+    #d19a00,
+    #e6bd4c
+  );
+}
+.challenge-card.green
+  .challenge-progress-bar
+  span {
+  background: linear-gradient(
+    90deg,
+    #2d9b60,
+    #58c884
+  );
+}
+.challenge-progress-values {
+  margin-top: 5px;
+  display: flex;
+  justify-content: space-between;
+  color: #9aa2b0;
+  font-size: 9px;
+}
+/* =========================================================
+   Challenge Footer
+========================================================= */
+.challenge-footer {
+  padding-top: 11px;
+  border-top: 1px solid #edf0f4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.challenge-participants {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #7d8798;
+  font-size: 10px;
+  font-weight: 800;
+}
+.challenge-participants svg {
+  color: #6657e8;
+}
+.challenge-details-btn {
+  border: 0;
+  background: transparent;
+  color: #6657e8;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.challenge-details-btn:hover {
+  color: #5142d1;
+}
+.challenge-details-btn svg {
+  font-size: 8px;
+}
+/* =========================================================
+   Challenge Invitation
+========================================================= */
+.challenge-invitation {
+  margin-top: 13px;
+  padding: 10px;
+  border: 1px dashed #ddd8ff;
+  border-radius: 10px;
+  background: #faf9ff;
+}
+.challenge-invitation-text {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #6657e8;
+  font-size: 10px;
+  font-weight: 900;
+}
+.challenge-invitation-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  width: 100%;
+}
+.challenge-invite-btn,
+.challenge-reject-btn {
+  min-height: 40px;
+  padding: 0 10px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+  border: 1px solid transparent;
+}
+.challenge-invite-btn {
+  border-color: #bde8d0;
+  background: #ecfbf3;
+  color: #23945a;
+}
+.challenge-invite-btn:hover {
+  background: #dff7e9;
+  border-color: #9dd9b9;
+}
+.challenge-reject-btn {
+  border-color: #f1caca;
+  background: #fff5f5;
+  color: #d64545;
+}
+.challenge-reject-btn:hover {
+  background: #ffe8e8;
+  border-color: #e9a7a7;
+}
+/* =========================================================
+   Add Friend
+========================================================= */
+.add-friend-section {
+  margin-bottom: 20px;
+  padding: 21px;
+  border: 1px solid #e5e9f1;
+  border-radius: 17px;
+  background: #fff;
+  box-shadow: 0 5px 18px rgba(30, 45, 75, 0.035);
+}
+.add-friend-header {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.add-friend-icon {
+  width: 43px;
+  height: 43px;
+  border-radius: 12px;
+  background: #eeecff;
+  color: #6657e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.add-friend-header h2 {
+  margin: 0 0 4px;
+  color: #20293b;
+  font-size: 16px;
+  font-weight: 900;
+}
+.add-friend-header p {
+  margin: 0;
+  color: #8a94a6;
+  font-size: 11px;
+}
+.add-friend-form {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.student-code-input {
+  height: 45px;
+  flex: 1;
+  padding: 0 13px;
+  border: 1px solid #e0e4ec;
+  border-radius: 10px;
+  background: #fafbfc;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  box-sizing: border-box;
+}
+.student-code-input > svg {
+  color: #929aaa;
+  font-size: 13px;
+}
+.student-code-input input {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #252e40;
+  font-size: 12px;
+  font-family: inherit;
+}
+.student-code-input input::placeholder {
+  color: #a1a8b6;
+}
+.student-search-btn {
+  min-height: 45px;
+  padding: 0 23px;
+  border: 0;
+  border-radius: 10px;
+  background: #6657e8;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.student-search-btn:hover {
+  background: #5849db;
+}
+.student-search-message {
+  margin-top: 9px;
+  padding: 9px 11px;
+  border-radius: 9px;
+  background: #fff8e8;
+  color: #a47700;
+  font-size: 11px;
+  font-weight: 800;
+}
+.searched-student-card {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #ddd9ff;
+  border-radius: 12px;
+  background: #faf9ff;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.searched-student-card img {
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+.searched-student-card > div {
+  min-width: 0;
+  flex: 1;
+}
+.searched-student-card h3 {
+  margin: 0 0 2px;
+  color: #242d40;
+  font-size: 13px;
+  font-weight: 900;
+}
+.searched-student-card span {
+  color: #6657e8;
+  font-size: 10px;
+  font-weight: 800;
+}
+.searched-student-card p {
+  margin: 3px 0 0;
+  color: #8b94a5;
+  font-size: 10px;
+}
+.add-searched-student-btn {
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid #6657e8;
+  border-radius: 9px;
+  background: #6657e8;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.add-searched-student-btn:hover {
+  background: #5849db;
+}
+.add-searched-student-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+/* =========================================================
+   Ranking
+========================================================= */
+.ranking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ranking-item {
+  min-height: 64px;
+  padding: 9px 11px;
+  border: 1px solid #e8ebf1;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ranking-position {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 8px;
+  background: #f2f3f7;
+  color: #747e91;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+}
+.ranking-item:first-child
+  .ranking-position {
+  background: #fff4d4;
+  color: #d59c00;
+}
+.ranking-position svg {
+  font-size: 12px;
+}
+.ranking-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  object-fit: cover;
+}
+.ranking-info {
+  min-width: 0;
+  flex: 1;
+}
+.ranking-info h3 {
+  margin: 0 0 3px;
+  color: #242d3e;
+  font-size: 12px;
+  font-weight: 900;
+}
+.ranking-info span {
+  color: #8b94a5;
+  font-size: 10px;
+}
+.ranking-points {
+  color: #d29a00;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 900;
+}
+.ranking-points svg {
+  font-size: 10px;
+}
+/* =========================================================
+   Activity
+========================================================= */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.activity-item {
+  padding: 10px 11px;
+  border: 1px solid #e8ebf1;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.activity-avatar {
+  width: 39px;
+  height: 39px;
+  flex: 0 0 39px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.activity-content {
+  min-width: 0;
+  flex: 1;
+}
+.activity-content h3 {
+  margin: 0 0 2px;
+  color: #2a3345;
+  font-size: 11px;
+  font-weight: 900;
+}
+.activity-content p {
+  margin: 0 0 2px;
+  color: #8992a3;
+  font-size: 10px;
+}
+.activity-content span {
+  color: #6657e8;
+  font-size: 9px;
+  font-weight: 800;
+}
+.activity-points {
+  color: #2c9b61;
+  font-size: 12px;
+  font-weight: 900;
+}
+/* =========================================================
+   Footer CTA
+========================================================= */
+.friends-footer-cta {
+  margin-bottom: 30px;
+  padding: 20px 22px;
+  border-radius: 16px;
+  background: linear-gradient(
+    135deg,
+    #20283b,
+    #303a52
+  );
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.friends-footer-cta > div {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+.friends-footer-cta > div > svg {
+  font-size: 28px;
+  color: #a69cff;
+}
+.friends-footer-cta h2 {
+  margin: 0 0 4px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 900;
+}
+.friends-footer-cta p {
+  margin: 0;
+  color: #aeb6c5;
+  font-size: 11px;
+}
+.friends-footer-cta > button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 10px;
+  background: #fff;
+  color: #30394e;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.friends-footer-cta > button:hover {
+  background: #f1f2f6;
+}
+/* =========================================================
+   Modal Overlay
+========================================================= */
+.friends-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  padding: 20px;
+  background: rgba(15, 20, 32, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  backdrop-filter: blur(4px);
+}
+.friends-modal {
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 17px;
+  background: #fff;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.22);
+  animation: friendsModalIn 0.2s ease;
+}
+@keyframes friendsModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.friends-modal-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid #eceef3;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+}
+.friends-modal-header h2 {
+  margin: 0 0 4px;
+  color: #20293b;
+  font-size: 18px;
+  font-weight: 900;
+}
+.friends-modal-header p {
+  margin: 0;
+  color: #8992a3;
+  font-size: 11px;
+}
+.friends-modal-header > button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 9px;
+  background: #f2f3f7;
+  color: #737d90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.friends-modal-header > button:hover {
+  background: #e9ebf0;
+  color: #4d5668;
+}
+.friends-modal form {
+  padding: 20px;
+}
+/* =========================================================
+   Form
+========================================================= */
+.form-group {
+  margin-bottom: 15px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 7px;
+  color: #3b4558;
+  font-size: 11px;
+  font-weight: 900;
+}
+.form-group input,
+.form-group select {
+  width: 100%;
+  min-height: 43px;
+  padding: 0 12px;
+  border: 1px solid #dfe3eb;
+  border-radius: 9px;
+  outline: 0;
+  background: #fafbfc;
+  color: #263044;
+  font-size: 12px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #9187ec;
+  box-shadow: 0 0 0 3px rgba(102, 87, 232, 0.09);
+  background: #fff;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+/* =========================================================
+   Challenge Type Options
+========================================================= */
+.challenge-type-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+}
+.challenge-type-options button {
+  min-height: 68px;
+  border: 1px solid #e2e5ec;
+  border-radius: 10px;
+  background: #fafbfc;
+  color: #7a8497;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.challenge-type-options button svg {
+  font-size: 17px;
+}
+.challenge-type-options button:hover {
+  border-color: #cfcaf8;
+  background: #faf9ff;
+}
+.challenge-type-options button.selected {
+  border-color: #6657e8;
+  background: #f1efff;
+  color: #6657e8;
+}
+/* =========================================================
+   Invite Friends
+========================================================= */
+.invite-friends-list {
+  max-height: 190px;
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid #e5e8ee;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.invite-friend {
+  width: 100%;
+  min-height: 54px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-align: right;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.invite-friend:hover {
+  background: #f7f7fa;
+}
+.invite-friend.selected {
+  border-color: #d9d4ff;
+  background: #f7f5ff;
+}
+.invite-friend img {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  object-fit: cover;
+}
+.invite-friend > div {
+  min-width: 0;
+  flex: 1;
+}
+.invite-friend strong {
+  display: block;
+  color: #293246;
+  font-size: 10px;
+  font-weight: 900;
+}
+.invite-friend span {
+  display: block;
+  margin-top: 2px;
+  color: #8c95a5;
+  font-size: 9px;
+}
+.invite-friend > svg {
+  color: #6657e8;
+  font-size: 14px;
+}
+.no-friends-invite {
+  padding: 13px;
+  border-radius: 9px;
+  background: #f6f7fa;
+  color: #8b94a4;
+  text-align: center;
+  font-size: 11px;
+}
+/* =========================================================
+   Modal Actions
+========================================================= */
+.friends-modal-actions {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+.modal-cancel-btn,
+.modal-submit-btn {
+  min-height: 43px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.modal-cancel-btn {
+  border: 1px solid #dfe3ea;
+  background: #fff;
+  color: #687286;
+}
+.modal-cancel-btn:hover {
+  background: #f7f8fa;
+}
+.modal-submit-btn {
+  border: 1px solid #6657e8;
+  background: #6657e8;
+  color: #fff;
+}
+.modal-submit-btn:hover {
+  background: #5849db;
+}
+/* =========================================================
+   Challenge Details Modal
+========================================================= */
+.challenge-details-modal {
+  max-width: 600px;
+}
+.challenge-modal-summary {
+  padding: 15px 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.challenge-modal-summary > div {
+  padding: 12px;
+  border-radius: 10px;
+  background: #f7f7fa;
+  text-align: center;
+}
+.challenge-modal-summary span {
+  display: block;
+  margin-bottom: 5px;
+  color: #8c95a5;
+  font-size: 9px;
+  font-weight: 800;
+}
+.challenge-modal-summary strong {
+  color: #252e40;
+  font-size: 12px;
+  font-weight: 900;
+}
+.challenge-details-progress {
+  margin: 0 20px 18px;
+  padding: 14px;
+  border: 1px solid #e8eaf0;
+  border-radius: 11px;
+}
+.challenge-leaderboard {
+  padding: 0 20px 20px;
+}
+.challenge-leaderboard h3 {
+  margin: 0 0 10px;
+  color: #293246;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 900;
+}
+.challenge-leaderboard h3 svg {
+  color: #d19a00;
+}
+.challenge-leaderboard-item {
+  min-height: 54px;
+  padding: 7px 9px;
+  border: 1px solid #e8ebf0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 6px;
+}
+.leaderboard-rank {
+  width: 23px;
+  height: 23px;
+  flex: 0 0 23px;
+  border-radius: 7px;
+  background: #f3f4f7;
+  color: #788193;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 900;
+}
+.challenge-leaderboard-item img {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  object-fit: cover;
+}
+.challenge-leaderboard-item > div {
+  min-width: 0;
+  flex: 1;
+}
+.challenge-leaderboard-item > div strong {
+  display: block;
+  color: #30394c;
+  font-size: 10px;
+  font-weight: 900;
+}
+.challenge-leaderboard-item > div span {
+  display: block;
+  margin-top: 2px;
+  color: #8d96a5;
+  font-size: 9px;
+}
+.challenge-leaderboard-item > strong {
+  color: #6657e8;
+  font-size: 10px;
+  font-weight: 900;
+}
+/* =========================================================
+   Duel
+========================================================= */
+.friends-duel-trigger {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 900;
+  direction: rtl;
+}
+.friends-duel-trigger button {
+  min-height: 44px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 12px;
+  background: #20283b;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(20, 27, 43, 0.22);
+  transition: 0.2s ease;
+}
+.friends-duel-trigger button:hover {
+  background: #151c2c;
+  transform: translateY(-2px);
+}
+.duel-modal {
+  max-width: 480px;
+}
+/* =========================================================
+   Dark Mode
+========================================================= */
+.dark-mode .friends-page {
+  background: #0f1420;
+  color: #e9edf5;
+}
+.dark-mode .friends-header h1 {
+  color: #f1f4fa;
+}
+.dark-mode .friends-header p {
+  color: #8993a6;
+}
+.dark-mode .friends-refresh-btn {
+  border-color: #293142;
+  background: #171d2a;
+  color: #aab3c4;
+}
+.dark-mode .friends-refresh-btn:hover {
+  background: #1d2432;
+  border-color: #363f52;
+}
+.dark-mode .friends-tabs,
+.dark-mode .friends-section,
+.dark-mode .friends-stat-card,
+.dark-mode .add-friend-section {
+  border-color: #272f3e;
+  background: #171d2a;
+}
+.dark-mode .friends-stat-card strong {
+  color: #f1f4fa;
+}
+.dark-mode .friends-stat-card span {
+  color: #8e98aa;
+}
+.dark-mode .friends-tabs button {
+  color: #919bad;
+}
+.dark-mode .friends-tabs button:hover {
+  background: #202735;
+  color: #c2c9d5;
+}
+.dark-mode .friends-tabs button.active {
+  background: #6657e8;
+  color: #fff;
+}
+.dark-mode .section-heading h2 {
+  color: #edf1f7;
+}
+.dark-mode .section-heading p {
+  color: #8993a5;
+}
+.dark-mode .section-count {
+  background: #25213f;
+  color: #a49bff;
+}
+.dark-mode .request-card,
+.dark-mode .friend-card,
+.dark-mode .ranking-item,
+.dark-mode .activity-item {
+  border-color: #2a3241;
+  background: #171d2a;
+}
+.dark-mode .request-card:hover,
+.dark-mode .friend-card:hover {
+  border-color: #403a69;
+  background: #1b2130;
+}
+.dark-mode .request-info h3,
+.dark-mode .friend-info h3,
+.dark-mode .ranking-info h3,
+.dark-mode .activity-content h3,
+.dark-mode .add-friend-header h2,
+.dark-mode .challenge-content h3 {
+  color: #edf1f7;
+}
+.dark-mode .request-info p,
+.dark-mode .friend-meta span,
+.dark-mode .ranking-info span,
+.dark-mode .activity-content p,
+.dark-mode .add-friend-header p,
+.dark-mode .challenge-content > p {
+  color: #8c96a8;
+}
+.dark-mode .friend-online-dot {
+  border-color: #171d2a;
+}
+.dark-mode .friend-status {
+  background: #242a36;
+  color: #939cad;
+}
+.dark-mode .friend-status.active {
+  background: #173125;
+  color: #6fdb9c;
+}
+.dark-mode .friend-remove-btn {
+  background: #2a181a;
+  border-color: #613033;
+  color: #ff9d9d;
+}
+.dark-mode .friend-remove-btn:hover {
+  background: #351d20;
+  border-color: #7a3a3f;
+}
+.dark-mode .accept-request {
+  background: #172c22;
+  border-color: #2c6145;
+  color: #7ee0a8;
+}
+.dark-mode .accept-request:hover {
+  background: #1d382a;
+  border-color: #397455;
+}
+.dark-mode .reject-request {
+  background: #2a181a;
+  border-color: #613033;
+  color: #ff9d9d;
+}
+.dark-mode .reject-request:hover {
+  background: #351d20;
+  border-color: #7a3a3f;
+}
+.dark-mode .friends-search,
+.dark-mode .student-code-input {
+  border-color: #303849;
+  background: #121822;
+}
+.dark-mode .friends-search input,
+.dark-mode .student-code-input input {
+  color: #e7ebf2;
+}
+.dark-mode .friends-search input::placeholder,
+.dark-mode .student-code-input input::placeholder {
+  color: #737e91;
+}
+.dark-mode .friends-sort-btn {
+  border-color: #303849;
+  background: #171d2a;
+  color: #9ba4b5;
+}
+.dark-mode .friends-empty-state {
+  border-color: #303848;
+  color: #808a9d;
+}
+.dark-mode .friends-empty-state h3 {
+  color: #adb5c4;
+}
+.dark-mode .challenges-hero {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+.dark-mode .challenge-card {
+  border-color: #2a3241;
+  background: #171d2a;
+}
+.dark-mode .challenge-category {
+  background: #252a35;
+  color: #9ca5b5;
+}
+.dark-mode .challenge-details span,
+.dark-mode .challenge-progress-header,
+.dark-mode .challenge-progress-values,
+.dark-mode .challenge-participants {
+  color: #8d97a9;
+}
+.dark-mode .challenge-footer {
+  border-color: #2a3241;
+}
+.dark-mode .challenge-progress-bar {
+  background: #292f3b;
+}
+.dark-mode .challenge-invitation {
+  border-color: #40396a;
+  background: #1c1a2b;
+}
+.dark-mode .challenge-invite-btn {
+  background: #172c22;
+  border-color: #2c6145;
+  color: #7ee0a8;
+}
+.dark-mode .challenge-invite-btn:hover {
+  background: #1d382a;
+  border-color: #397455;
+}
+.dark-mode .challenge-reject-btn {
+  background: #2a181a;
+  border-color: #613033;
+  color: #ff9d9d;
+}
+.dark-mode .challenge-reject-btn:hover {
+  background: #351d20;
+  border-color: #7a3a3f;
+}
+.dark-mode .student-search-message {
+  background: #302a16;
+  color: #d8b24b;
+}
+.dark-mode .searched-student-card {
+  border-color: #40396a;
+  background: #1c1a2b;
+}
+.dark-mode .searched-student-card h3 {
+  color: #edf1f7;
+}
+.dark-mode .searched-student-card p {
+  color: #8d97a9;
+}
+.dark-mode .ranking-position {
+  background: #252a34;
+  color: #939cab;
+}
+.dark-mode .ranking-item:first-child
+  .ranking-position {
+  background: #3b3219;
+  color: #e0b53e;
+}
+.dark-mode .activity-points {
+  color: #69d79a;
+}
+.dark-mode .friends-footer-cta {
+  background: linear-gradient(
+    135deg,
+    #171d2a,
+    #232b3d
+  );
+}
+.dark-mode .friends-footer-cta p {
+  color: #919bad;
+}
+.dark-mode .friends-modal {
+  background: #171d2a;
+}
+.dark-mode .friends-modal-header {
+  border-color: #2b3342;
+}
+.dark-mode .friends-modal-header h2 {
+  color: #edf1f7;
+}
+.dark-mode .friends-modal-header p {
+  color: #8d97a9;
+}
+.dark-mode .friends-modal-header > button {
+  background: #252b38;
+  color: #a3acbc;
+}
+.dark-mode .form-group label {
+  color: #c1c8d5;
+}
+.dark-mode .form-group input,
+.dark-mode .form-group select {
+  border-color: #303849;
+  background: #121822;
+  color: #e7ebf2;
+}
+.dark-mode .form-group input:focus,
+.dark-mode .form-group select:focus {
+  background: #151c27;
+  border-color: #7168d9;
+}
+.dark-mode .challenge-type-options button {
+  border-color: #303849;
+  background: #121822;
+  color: #919bad;
+}
+.dark-mode .challenge-type-options button:hover {
+  background: #1c2130;
+  border-color: #454064;
+}
+.dark-mode .challenge-type-options button.selected {
+  border-color: #6657e8;
+  background: #25213f;
+  color: #aaa2ff;
+}
+.dark-mode .invite-friends-list {
+  border-color: #303849;
+  background: #121822;
+}
+.dark-mode .invite-friend {
+  background: #121822;
+  color: #e8ecf3;
+}
+.dark-mode .invite-friend:hover {
+  background: #1d2330;
+}
+.dark-mode .invite-friend.selected {
+  border-color: #454064;
+  background: #25213f;
+}
+.dark-mode .invite-friend strong {
+  color: #e7ebf2;
+}
+.dark-mode .invite-friend span {
+  color: #818b9e;
+}
+.dark-mode .no-friends-invite {
+  background: #202632;
+  color: #8d97a9;
+}
+.dark-mode .modal-cancel-btn {
+  border-color: #303849;
+  background: #171d2a;
+  color: #9da6b7;
+}
+.dark-mode .modal-cancel-btn:hover {
+  background: #202735;
+}
+.dark-mode .challenge-modal-summary > div {
+  background: #202632;
+}
+.dark-mode .challenge-modal-summary span {
+  color: #8e98aa;
+}
+.dark-mode .challenge-modal-summary strong {
+  color: #e7ebf2;
+}
+.dark-mode .challenge-details-progress {
+  border-color: #2c3443;
+}
+.dark-mode .challenge-leaderboard h3 {
+  color: #e7ebf2;
+}
+.dark-mode .challenge-leaderboard-item {
+  border-color: #2b3342;
+  background: #171d2a;
+}
+.dark-mode .leaderboard-rank {
+  background: #252b36;
+  color: #919bad;
+}
+.dark-mode .challenge-leaderboard-item > div strong {
+  color: #e6eaf2;
+}
+.dark-mode .challenge-leaderboard-item > div span {
+  color: #838d9f;
+}
+.dark-mode .friends-duel-trigger button {
+  background: #6657e8;
+}
+.dark-mode .friends-duel-trigger button:hover {
+  background: #5849db;
+}
+/* =========================================================
+   Responsive
+========================================================= */
+@media (max-width: 1100px) {
+  .friends-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .challenges-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 800px) {
+  .friends-page {
+    padding: 15px;
+  }
+  .friends-header {
+    padding-top: 65px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .friends-header-actions {
+    width: 100%;
+  }
+  .friends-refresh-btn,
+  .friends-add-btn {
+    flex: 1;
+  }
+  .friends-tabs {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .friends-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .friends-tabs button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .friend-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .friend-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .friends-footer-cta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .friends-footer-cta > button {
+    width: 100%;
+  }
+}
+@media (max-width: 600px) {
+  .friends-header h1 {
+    font-size: 25px;
+  }
+  .friends-title-icon {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+    border-radius: 14px;
+    font-size: 20px;
+  }
+  .friends-stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+  }
+  .friends-stat-card {
+    min-height: 90px;
+    padding: 13px;
+    gap: 9px;
+  }
+  .friends-stat-icon {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+    border-radius: 11px;
+    font-size: 17px;
+  }
+  .friends-stat-card strong {
+    font-size: 19px;
+  }
+  .friends-section,
+  .add-friend-section {
+    padding: 15px;
+  }
+  .friends-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .friends-sort-btn {
+    width: 100%;
+  }
+  .request-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .request-info {
+    flex: 1;
+  }
+  .request-actions {
+    width: 100%;
+  }
+  .accept-request,
+  .reject-request {
+    flex: 1;
+  }
+  .challenges-hero {
+    padding: 17px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .create-challenge-btn {
+    width: 100%;
+  }
+  .add-friend-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .student-search-btn {
+    width: 100%;
+  }
+  .searched-student-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .add-searched-student-btn {
+    width: 100%;
+  }
+  .challenge-type-options {
+    grid-template-columns: 1fr 1fr;
+  }
+  .friends-footer-cta {
+    padding: 17px;
+  }
+  .friends-duel-trigger {
+    left: 12px;
+    bottom: 12px;
+  }
+  .friends-duel-trigger button {
+    min-height: 40px;
+    padding: 0 12px;
+  }
+}
+@media (max-width: 430px) {
+  .friends-page {
+    padding: 10px;
+  }
+  .friends-header {
+    padding-top: 60px;
+  }
+  .friends-header-actions {
+    flex-direction: column;
+  }
+  .friends-refresh-btn,
+  .friends-add-btn {
+    width: 100%;
+  }
+  .friends-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .friends-tabs button {
+    padding: 0 12px;
+  }
+  .friend-main {
+    width: 100%;
+  }
+  .friend-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .friend-remove-btn,
+  .friend-status {
+    width: 100%;
+  }
+  .challenge-invitation-actions {
+    grid-template-columns: 1fr;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .challenge-modal-summary {
+    grid-template-columns: 1fr;
+  }
+  .friends-modal-overlay {
+    padding: 10px;
+  }
+  .friends-modal {
+    max-height: 94vh;
+    border-radius: 14px;
+  }
+  .friends-modal-header,
+  .friends-modal form {
+    padding: 15px;
+  }
+  .challenge-leaderboard {
+    padding: 0 15px 15px;
+  }
+  .challenge-details-progress {
+    margin-right: 15px;
+    margin-left: 15px;
+  }
+  .friends-modal-actions {
+    grid-template-columns: 1fr;
+  }
+  .friends-footer-cta > div {
+    align-items: flex-start;
+  }
+}

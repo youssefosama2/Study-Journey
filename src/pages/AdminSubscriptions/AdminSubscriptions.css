@@ -1,0 +1,729 @@
+/* =========================================================
+   Admin Subscriptions Page - Scoped Styles
+========================================================= */
+.admin-subscriptions-page {
+  min-height: 100vh;
+  background: var(--bg-color, #f7f8fc);
+  font-family: "Cairo", sans-serif;
+  color: var(--text-color, #1f2937);
+  padding: 0 20px;
+}
+.admin-subscriptions-page .admin-subscriptions-container {
+  width: min(1400px, calc(100% - 40px));
+  margin: 0 auto;
+  /* padding: 35px 0 60px; */
+}
+/* =========================================================
+   Loading
+========================================================= */
+.admin-subscriptions-page .admin-subscriptions-loading,
+.admin-subscriptions-page .admin-route-loading {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  direction: rtl;
+  font-family: "Cairo", sans-serif;
+}
+.admin-subscriptions-page .admin-loading-spinner,
+.admin-subscriptions-page .admin-route-spinner {
+  width: 42px;
+  height: 42px;
+  border: 4px solid rgba(99, 102, 241, 0.15);
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: adminSubscriptionsSpin 0.8s linear infinite;
+}
+@keyframes adminSubscriptionsSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* =========================================================
+   Stats
+========================================================= */
+.admin-subscriptions-page .admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 25px;
+}
+.admin-subscriptions-page .admin-stat-card {
+  background: white;
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+.admin-subscriptions-page .admin-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef2ff;
+  color: #6366f1;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.admin-subscriptions-page .admin-stat-card.active .admin-stat-icon {
+  background: #ecfdf5;
+  color: #10b981;
+}
+.admin-subscriptions-page .admin-stat-card.expired .admin-stat-icon {
+  background: #fef2f2;
+  color: #ef4444;
+}
+.admin-subscriptions-page .admin-stat-card.trial .admin-stat-icon {
+  background: #fff7ed;
+  color: #f59e0b;
+}
+.admin-subscriptions-page .admin-stat-card.none .admin-stat-icon {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+.admin-subscriptions-page .admin-stat-card span {
+  display: block;
+  color: #6b7280;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+.admin-subscriptions-page .admin-stat-card strong {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+}
+/* =========================================================
+   Filters
+========================================================= */
+.admin-subscriptions-page .admin-filters {
+  background: white;
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+.admin-subscriptions-page .search-box {
+  flex: 1;
+  max-width: 500px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fafafa;
+}
+.admin-subscriptions-page .search-box svg {
+  color: #9ca3af;
+}
+.admin-subscriptions-page .search-box input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  color: #111827;
+}
+.admin-subscriptions-page .status-filter {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.admin-subscriptions-page .status-filter button {
+  border: 1px solid #e5e7eb;
+  background: white;
+  color: #6b7280;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  transition: 0.2s;
+}
+.admin-subscriptions-page .status-filter button:hover,
+.admin-subscriptions-page .status-filter button.active {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: white;
+}
+/* =========================================================
+   Students Section
+========================================================= */
+.admin-subscriptions-page .students-section {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+.admin-subscriptions-page .students-section-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #eef0f4;
+}
+.admin-subscriptions-page .students-section-header > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.admin-subscriptions-page .students-section-header h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+}
+.admin-subscriptions-page .students-section-header h2 svg {
+  color: #6366f1;
+}
+.admin-subscriptions-page .students-section-header span {
+  color: #6b7280;
+  font-size: 13px;
+}
+/* =========================================================
+   Table
+========================================================= */
+.admin-subscriptions-page .students-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+.admin-subscriptions-page .students-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+}
+.admin-subscriptions-page .students-table th {
+  padding: 15px 20px;
+  text-align: right;
+  background: #fafafa;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.admin-subscriptions-page .students-table td {
+  padding: 16px 20px;
+  border-top: 1px solid #f0f1f4;
+  vertical-align: middle;
+}
+.admin-subscriptions-page .students-table tbody tr {
+  transition: 0.2s;
+}
+.admin-subscriptions-page .students-table tbody tr:hover {
+  background: #fafbff;
+}
+.admin-subscriptions-page .student-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.admin-subscriptions-page .student-info img {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #eef2ff;
+}
+.admin-subscriptions-page .student-info strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 3px;
+}
+.admin-subscriptions-page .student-info span {
+  display: block;
+  font-size: 11px;
+  color: #9ca3af;
+}
+/* =========================================================
+   Status
+========================================================= */
+.admin-subscriptions-page .subscription-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.admin-subscriptions-page .status-active {
+  background: #ecfdf5;
+  color: #059669;
+}
+.admin-subscriptions-page .status-trial {
+  background: #fff7ed;
+  color: #ea580c;
+}
+.admin-subscriptions-page .status-expired {
+  background: #fef2f2;
+  color: #dc2626;
+}
+.admin-subscriptions-page .status-cancelled {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+.admin-subscriptions-page .status-none {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+/* =========================================================
+   Subscription Type
+========================================================= */
+.admin-subscriptions-page .subscription-type {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 800;
+}
+.admin-subscriptions-page .subscription-type.trial {
+  background: #fff7ed;
+  color: #ea580c;
+}
+.admin-subscriptions-page .subscription-type.paid {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+.admin-subscriptions-page .remaining-days {
+  color: #059669;
+  font-weight: 800;
+  font-size: 13px;
+}
+.admin-subscriptions-page .no-remaining {
+  color: #9ca3af;
+}
+/* =========================================================
+   Activate Button
+========================================================= */
+.admin-subscriptions-page .activate-button {
+  border: none;
+  background: #6366f1;
+  color: white;
+  border-radius: 9px;
+  padding: 9px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: 0.2s;
+}
+.admin-subscriptions-page .activate-button:hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
+}
+/* =========================================================
+   Empty
+========================================================= */
+.admin-subscriptions-page .empty-state {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  padding: 30px;
+  text-align: center;
+}
+.admin-subscriptions-page .empty-state > svg {
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+.admin-subscriptions-page .empty-state h3 {
+  color: #374151;
+  margin: 0 0 5px;
+}
+.admin-subscriptions-page .empty-state p {
+  margin: 0;
+  font-size: 13px;
+}
+/* =========================================================
+   Pagination
+========================================================= */
+.admin-subscriptions-page .pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 20px;
+  border-top: 1px solid #eef0f4;
+}
+.admin-subscriptions-page .pagination button {
+  border: 1px solid #e5e7eb;
+  background: white;
+  color: #374151;
+  border-radius: 9px;
+  padding: 8px 15px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.admin-subscriptions-page .pagination button:hover:not(:disabled) {
+  border-color: #6366f1;
+  color: #6366f1;
+}
+.admin-subscriptions-page .pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.admin-subscriptions-page .pagination span {
+  color: #6b7280;
+  font-size: 13px;
+}
+/* =========================================================
+   Modal
+========================================================= */
+.admin-subscriptions-page .subscription-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.admin-subscriptions-page .subscription-modal {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  background: white;
+  border-radius: 22px;
+  padding: 25px;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.2);
+  direction: rtl;
+}
+.admin-subscriptions-page .modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.admin-subscriptions-page .modal-header h2 {
+  margin: 0 0 4px;
+  font-size: 21px;
+}
+.admin-subscriptions-page .modal-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+.admin-subscriptions-page .modal-header button {
+  width: 35px;
+  height: 35px;
+  border: none;
+  border-radius: 10px;
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+/* =========================================================
+   Current Subscription
+========================================================= */
+.admin-subscriptions-page .current-subscription {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 15px;
+  margin-bottom: 22px;
+}
+.admin-subscriptions-page .current-subscription-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #4f46e5;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+.admin-subscriptions-page .current-subscription-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  font-size: 12px;
+  color: #6b7280;
+}
+.admin-subscriptions-page .current-subscription-info strong {
+  color: #111827;
+  margin-right: 5px;
+}
+.admin-subscriptions-page .current-subscription p {
+  margin: 12px 0 0;
+  color: #6b7280;
+  font-size: 11px;
+}
+/* =========================================================
+   Plans
+========================================================= */
+.admin-subscriptions-page .plans-title {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+.admin-subscriptions-page .plans-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.admin-subscriptions-page .plan-card {
+  position: relative;
+  border: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 15px;
+  padding: 17px;
+  text-align: right;
+  cursor: pointer;
+  font-family: inherit;
+  transition: 0.2s;
+}
+.admin-subscriptions-page .plan-card:hover {
+  border-color: #a5b4fc;
+  transform: translateY(-2px);
+}
+.admin-subscriptions-page .plan-card.selected {
+  border-color: #6366f1;
+  background: #f5f3ff;
+}
+.admin-subscriptions-page .plan-selected {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: #6366f1;
+}
+.admin-subscriptions-page .plan-name {
+  display: block;
+  color: #6b7280;
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+.admin-subscriptions-page .plan-price {
+  display: block;
+  color: #111827;
+  font-size: 24px;
+  margin-bottom: 3px;
+}
+.admin-subscriptions-page .plan-price small {
+  font-size: 11px;
+  font-weight: 600;
+}
+.admin-subscriptions-page .plan-days {
+  color: #6b7280;
+  font-size: 11px;
+}
+/* =========================================================
+   Confirm
+========================================================= */
+.admin-subscriptions-page .confirm-activation-button {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: #6366f1;
+  color: white;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.admin-subscriptions-page .confirm-activation-button:hover:not(:disabled) {
+  background: #4f46e5;
+}
+.admin-subscriptions-page .confirm-activation-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.admin-subscriptions-page .button-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: adminSubscriptionsSpin 0.7s linear infinite;
+}
+/* =========================================================
+   Dark Mode
+========================================================= */
+.dark-mode .admin-subscriptions-page,
+[data-theme="dark"] .admin-subscriptions-page {
+  background: #0f172a;
+  color: #f8fafc;
+}
+.dark-mode .admin-subscriptions-page .admin-stat-card,
+.dark-mode .admin-subscriptions-page .admin-filters,
+.dark-mode .admin-subscriptions-page .students-section,
+[data-theme="dark"] .admin-subscriptions-page .admin-stat-card,
+[data-theme="dark"] .admin-subscriptions-page .admin-filters,
+[data-theme="dark"] .admin-subscriptions-page .students-section {
+  background: #1e293b;
+  border-color: #334155;
+}
+.dark-mode .admin-subscriptions-page .admin-header-title p,
+[data-theme="dark"] .admin-subscriptions-page .admin-header-title p {
+  color: #94a3b8;
+}
+.dark-mode .admin-subscriptions-page .back-button,
+[data-theme="dark"] .admin-subscriptions-page .back-button {
+  background: #1e293b;
+  color: #f8fafc;
+}
+.dark-mode .admin-subscriptions-page .admin-stat-card span,
+[data-theme="dark"] .admin-subscriptions-page .admin-stat-card span {
+  color: #94a3b8;
+}
+.dark-mode .admin-subscriptions-page .search-box,
+[data-theme="dark"] .admin-subscriptions-page .search-box {
+  background: #0f172a;
+  border-color: #334155;
+}
+.dark-mode .admin-subscriptions-page .search-box input,
+[data-theme="dark"] .admin-subscriptions-page .search-box input {
+  color: #f8fafc;
+}
+.dark-mode .admin-subscriptions-page .status-filter button,
+[data-theme="dark"] .admin-subscriptions-page .status-filter button {
+  background: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+.dark-mode .admin-subscriptions-page .students-section-header,
+.dark-mode .admin-subscriptions-page .students-table th,
+[data-theme="dark"] .admin-subscriptions-page .students-section-header,
+[data-theme="dark"] .admin-subscriptions-page .students-table th {
+  background: #172033;
+}
+.dark-mode .admin-subscriptions-page .students-section-header,
+[data-theme="dark"] .admin-subscriptions-page .students-section-header {
+  border-color: #334155;
+}
+.dark-mode .admin-subscriptions-page .students-table th,
+[data-theme="dark"] .admin-subscriptions-page .students-table th {
+  color: #94a3b8;
+}
+.dark-mode .admin-subscriptions-page .students-table td,
+[data-theme="dark"] .admin-subscriptions-page .students-table td {
+  border-color: #334155;
+}
+.dark-mode .admin-subscriptions-page .students-table tbody tr:hover,
+[data-theme="dark"] .admin-subscriptions-page .students-table tbody tr:hover {
+  background: #243247;
+}
+.dark-mode .admin-subscriptions-page .student-info strong,
+[data-theme="dark"] .admin-subscriptions-page .student-info strong {
+  color: #f8fafc;
+}
+.dark-mode .admin-subscriptions-page .current-subscription,
+[data-theme="dark"] .admin-subscriptions-page .current-subscription {
+  background: #172033;
+  border-color: #334155;
+}
+.dark-mode .admin-subscriptions-page .current-subscription-info strong,
+[data-theme="dark"] .admin-subscriptions-page .current-subscription-info strong {
+  color: #f8fafc;
+}
+.dark-mode .admin-subscriptions-page .plan-card,
+[data-theme="dark"] .admin-subscriptions-page .plan-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+.dark-mode .admin-subscriptions-page .plan-card.selected,
+[data-theme="dark"] .admin-subscriptions-page .plan-card.selected {
+  background: #312e81;
+  border-color: #818cf8;
+}
+.dark-mode .admin-subscriptions-page .plan-price,
+[data-theme="dark"] .admin-subscriptions-page .plan-price {
+  color: #f8fafc;
+}
+.dark-mode .admin-subscriptions-page .subscription-modal,
+[data-theme="dark"] .admin-subscriptions-page .subscription-modal {
+  background: #1e293b;
+}
+.dark-mode .admin-subscriptions-page .modal-header h2,
+[data-theme="dark"] .admin-subscriptions-page .modal-header h2 {
+  color: #f8fafc;
+}
+.dark-mode .admin-subscriptions-page .modal-header button,
+[data-theme="dark"] .admin-subscriptions-page .modal-header button {
+  background: #334155;
+  color: #cbd5e1;
+}
+/* =========================================================
+   Responsive
+========================================================= */
+@media (max-width: 1100px) {
+  .admin-subscriptions-page .admin-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 800px) {
+  .admin-subscriptions-page .admin-subscriptions-container {
+    width: min(100% - 24px, 1400px);
+    padding-top: 25px;
+  }
+  .admin-subscriptions-page .admin-page-header {
+    align-items: flex-start;
+  }
+  .admin-subscriptions-page .admin-header-title h1 {
+    font-size: 22px;
+  }
+  .admin-subscriptions-page .admin-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .admin-subscriptions-page .admin-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .admin-subscriptions-page .search-box {
+    max-width: none;
+  }
+  .admin-subscriptions-page .status-filter {
+    width: 100%;
+  }
+}
+@media (max-width: 520px) {
+  .admin-subscriptions-page .admin-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-subscriptions-page .admin-page-header {
+    flex-direction: column;
+  }
+  .admin-subscriptions-page .refresh-button {
+    width: 100%;
+    justify-content: center;
+  }
+  .admin-subscriptions-page .admin-header-title {
+    width: 100%;
+  }
+  .admin-subscriptions-page .plans-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-subscriptions-page .subscription-modal {
+    padding: 18px;
+    border-radius: 18px;
+  }
+}
