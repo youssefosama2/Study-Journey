@@ -44,6 +44,7 @@ import AdminSubscriptions from "./pages/AdminSubscriptions/AdminSubscriptions";
 import AdminRoute from "./components/AdminRoute/AdminRoute";
 import AuthRoute from "./components/AuthRoute/AuthRoute";
 import Notifications from "./pages/Notifications/Notifications";
+import ResetPassword from "./pages/reset-password/reset-password";
 
 function App() {
   return (
@@ -73,6 +74,11 @@ function App() {
           <Route
             path="/Login"
             element={<Login />}
+          />
+
+          <Route
+            path="/reset-password"
+            element={<ResetPassword />}
           />
 
 

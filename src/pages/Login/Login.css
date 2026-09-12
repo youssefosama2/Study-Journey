@@ -210,3 +210,30 @@
     font-size: 22px;
   }
 }
+.forgot-password-wrapper {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: -10px;
+  margin-bottom: 20px;
+}
+
+.forgot-password-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: #4f46e5;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.forgot-password-link:hover {
+  color: #3730a3;
+  text-decoration: underline;
+}
+
+.forgot-password-link:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
