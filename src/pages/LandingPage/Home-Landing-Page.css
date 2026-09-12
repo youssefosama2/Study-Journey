@@ -1667,3 +1667,13 @@
     transition-duration: 0.01ms !important;
   }
 }
+.developer-credit {
+  text-align: center;
+  font-size: 13px;
+  color: #999;
+}
+
+.developer-credit strong {
+  color: #fff;
+  font-weight: 600;
+}

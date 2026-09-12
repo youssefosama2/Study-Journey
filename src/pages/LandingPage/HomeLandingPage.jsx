@@ -555,10 +555,14 @@ export default function HomeLandingPage() {
               </div>
             </Col>
           </Row>
-          <div className="copyright">
-            <span>© 2026 Study Journey</span>
-            <span>جميع الحقوق محفوظة</span>
-          </div>
+            <div className="copyright">
+              <span>© 2026 Study Journey</span>
+                <div className="developer-credit">
+                  Designed & Developed by <strong>Youssef Osama</strong>
+                </div>
+              <span>جميع الحقوق محفوظة</span>
+            </div>
+
         </Container>
       </footer>
     </div>
