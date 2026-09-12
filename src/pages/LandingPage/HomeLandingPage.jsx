@@ -541,7 +541,7 @@ export default function HomeLandingPage() {
             <Col lg="2" md="4" sm="6">
               <div className="footer-links">
                 <h4>الدعم</h4>
-                <a href="#contact">تواصل معنا</a>
+                <a href="https://wa.me/+201091654379">تواصل معنا</a>
                 <a href="#contact">الأسئلة الشائعة</a>
                 <a href="#contact">سياسة الخصوصية</a>
               </div>
