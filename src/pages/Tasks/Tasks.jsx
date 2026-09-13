@@ -95,6 +95,10 @@ const getDueLabel = (dueDate) => {
   return `بعد ${difference} أيام`;
 };
 
+/* =========================================================
+   SUBJECT ICON
+========================================================= */
+
 const getSubjectIcon = (subject) => {
   const type = String(
     subject?.type || ""
@@ -152,16 +156,30 @@ const getSubjectIcon = (subject) => {
   };
 };
 
+/* =========================================================
+   PRIORITY
+========================================================= */
+
+const priorityLabels = {
+  high: "عالية",
+  medium: "متوسطة",
+  low: "منخفضة",
+};
+
+const getPriorityLabel = (priority) => {
+  return priorityLabels[priority] || "—";
+};
+
 const getPriorityClass = (priority) => {
-  if (priority === "عالية") {
+  if (priority === "high") {
     return "عالية";
   }
 
-  if (priority === "متوسطة") {
+  if (priority === "medium") {
     return "متوسطة";
   }
 
-  if (priority === "منخفضة") {
+  if (priority === "low") {
     return "منخفضة";
   }
 
@@ -245,10 +263,22 @@ const Tasks = () => {
   ======================================================= */
 
   const priorities = [
-    "كل الأولويات",
-    "عالية",
-    "متوسطة",
-    "منخفضة",
+    {
+      value: "كل الأولويات",
+      label: "كل الأولويات",
+    },
+    {
+      value: "high",
+      label: "عالية",
+    },
+    {
+      value: "medium",
+      label: "متوسطة",
+    },
+    {
+      value: "low",
+      label: "منخفضة",
+    },
   ];
 
   const tabs = [
@@ -303,131 +333,158 @@ const Tasks = () => {
 
   /* =======================================================
      FETCH SUBJECTS
-======================================================= */
-  const fetchSubjects = useCallback(async () => {
-    // ==========================================
-    // 1️⃣ المستخدم الحالي
-    // ==========================================
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+  ======================================================= */
 
-    if (userError) {
-      throw userError;
-    }
+  const fetchSubjects = useCallback(
+    async () => {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-    if (!user) {
-      throw new Error("يجب تسجيل الدخول أولاً");
-    }
-
-    // ==========================================
-    // 2️⃣ شعبة الطالب
-    // ==========================================
-    const {
-      data: profileData,
-      error: profileError,
-    } = await supabase
-      .from("student_profiles")
-      .select(`
-        id,
-        user_id,
-        section
-      `)
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (profileError) {
-      throw profileError;
-    }
-
-    if (!profileData) {
-      throw new Error("لم يتم العثور على بيانات الطالب");
-    }
-
-    const studentSection = profileData.section?.trim();
-
-    if (!studentSection) {
-      throw new Error("لم يتم تحديد شعبة الطالب");
-    }
-
-    // ==========================================
-    // 3️⃣ الحصول على ID الشعبة
-    // ==========================================
-    const {
-      data: sectionData,
-      error: sectionError,
-    } = await supabase
-      .from("sections")
-      .select(`
-        id,
-        name
-      `)
-      .eq("name", studentSection)
-      .maybeSingle();
-
-    if (sectionError) {
-      throw sectionError;
-    }
-
-    if (!sectionData) {
-      throw new Error(
-        `لم يتم العثور على الشعبة "${studentSection}"`
-      );
-    }
-
-    // ==========================================
-    // 4️⃣ مواد الشعبة فقط
-    // ==========================================
-    const {
-      data: subjectSectionsData,
-      error: subjectSectionsError,
-    } = await supabase
-      .from("subject_sections")
-      .select(`
-        subject_id,
-        section_id,
-        subjects (
-          id,
-          name,
-          subtitle,
-          type,
-          icon,
-          icon_class,
-          is_active,
-          slug
-        )
-      `)
-      .eq("section_id", sectionData.id);
-
-    if (subjectSectionsError) {
-      throw subjectSectionsError;
-    }
-
-    // إزالة التكرار
-    const subjectsMap = new Map();
-
-    (subjectSectionsData || []).forEach((item) => {
-      const subject = item.subjects;
-
-      if (!subject || !subject.is_active) {
-        return;
+      if (userError) {
+        throw userError;
       }
 
-      subjectsMap.set(subject.id, subject);
-    });
+      if (!user) {
+        throw new Error(
+          "يجب تسجيل الدخول أولاً"
+        );
+      }
 
-    return Array.from(subjectsMap.values()).sort((a, b) =>
-      String(a.name || "").localeCompare(
-        String(b.name || ""),
-        "ar"
-      )
-    );
-  }, []);
+      /* -----------------------------------------------
+         Student Profile
+      ------------------------------------------------ */
+
+      const {
+        data: profileData,
+        error: profileError,
+      } = await supabase
+        .from("student_profiles")
+        .select(`
+          id,
+          user_id,
+          section
+        `)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      if (!profileData) {
+        throw new Error(
+          "لم يتم العثور على بيانات الطالب"
+        );
+      }
+
+      const studentSection =
+        profileData.section?.trim();
+
+      if (!studentSection) {
+        throw new Error(
+          "لم يتم تحديد شعبة الطالب"
+        );
+      }
+
+      /* -----------------------------------------------
+         Section
+      ------------------------------------------------ */
+
+      const {
+        data: sectionData,
+        error: sectionError,
+      } = await supabase
+        .from("sections")
+        .select(`
+          id,
+          name
+        `)
+        .eq("name", studentSection)
+        .maybeSingle();
+
+      if (sectionError) {
+        throw sectionError;
+      }
+
+      if (!sectionData) {
+        throw new Error(
+          `لم يتم العثور على الشعبة "${studentSection}"`
+        );
+      }
+
+      /* -----------------------------------------------
+         Subjects
+      ------------------------------------------------ */
+
+      const {
+        data: subjectSectionsData,
+        error: subjectSectionsError,
+      } = await supabase
+        .from("subject_sections")
+        .select(`
+          subject_id,
+          section_id,
+          subjects (
+            id,
+            name,
+            subtitle,
+            type,
+            icon,
+            icon_class,
+            is_active,
+            slug
+          )
+        `)
+        .eq(
+          "section_id",
+          sectionData.id
+        );
+
+      if (subjectSectionsError) {
+        throw subjectSectionsError;
+      }
+
+      const subjectsMap = new Map();
+
+      (subjectSectionsData || []).forEach(
+        (item) => {
+          const subject =
+            item.subjects;
+
+          if (
+            !subject ||
+            !subject.is_active
+          ) {
+            return;
+          }
+
+          subjectsMap.set(
+            subject.id,
+            subject
+          );
+        }
+      );
+
+      return Array.from(
+        subjectsMap.values()
+      ).sort((a, b) =>
+        String(a.name || "").localeCompare(
+          String(b.name || ""),
+          "ar"
+        )
+      );
+    },
+    []
+  );
 
   /* =======================================================
      FETCH UNITS
-======================================================= */
+     
+     NEW CURRICULUM:
+     units
+  ======================================================= */
 
   const fetchUnits = useCallback(
     async (subjectIds = []) => {
@@ -448,11 +505,20 @@ const Tasks = () => {
           parent_unit_id,
           is_active
         `)
-        .in("subject_id", subjectIds)
-        .eq("is_active", true)
-        .order("sort_order", {
-          ascending: true,
-        });
+        .in(
+          "subject_id",
+          subjectIds
+        )
+        .eq(
+          "is_active",
+          true
+        )
+        .order(
+          "sort_order",
+          {
+            ascending: true,
+          }
+        );
 
       if (error) {
         throw error;
@@ -465,7 +531,10 @@ const Tasks = () => {
 
   /* =======================================================
      FETCH LESSONS
-======================================================= */
+     
+     NEW CURRICULUM:
+     lessons
+  ======================================================= */
 
   const fetchLessons = useCallback(
     async (unitIds = []) => {
@@ -485,11 +554,20 @@ const Tasks = () => {
           sort_order,
           is_active
         `)
-        .in("unit_id", unitIds)
-        .eq("is_active", true)
-        .order("sort_order", {
-          ascending: true,
-        });
+        .in(
+          "unit_id",
+          unitIds
+        )
+        .eq(
+          "is_active",
+          true
+        )
+        .order(
+          "sort_order",
+          {
+            ascending: true,
+          }
+        );
 
       if (error) {
         throw error;
@@ -502,14 +580,7 @@ const Tasks = () => {
 
   /* =======================================================
      FETCH TASKS
-     
-     IMPORTANT:
-     لا نستخدم Nested Relations هنا.
-     بنجيب المهام فقط ثم نربط:
-     subject_id -> subjectsData
-     unit_id    -> unitsData
-     lesson_id  -> lessonsData
-======================================================= */
+  ======================================================= */
 
   const fetchTasks = useCallback(
     async (currentUser) => {
@@ -540,10 +611,16 @@ const Tasks = () => {
           due_date,
           due_time
         `)
-        .eq("user_id", currentUser.id)
-        .order("created_at", {
-          ascending: false,
-        });
+        .eq(
+          "user_id",
+          currentUser.id
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false,
+          }
+        );
 
       if (error) {
         console.error(
@@ -560,17 +637,60 @@ const Tasks = () => {
   );
 
   /* =======================================================
+     MAP TASKS
+  ======================================================= */
+
+  const mapTasks = useCallback(
+    (
+      tasksData,
+      subjects,
+      units,
+      lessons
+    ) => {
+      return (
+        tasksData || []
+      ).map((task) => ({
+        ...task,
+
+        subjects:
+          subjects.find(
+            (subject) =>
+              subject.id ===
+              task.subject_id
+          ) || null,
+
+        units:
+          units.find(
+            (unit) =>
+              unit.id ===
+              task.unit_id
+          ) || null,
+
+        lessons:
+          lessons.find(
+            (lesson) =>
+              lesson.id ===
+              task.lesson_id
+          ) || null,
+      }));
+    },
+    []
+  );
+
+  /* =======================================================
      INITIAL LOAD
-     
-     IMPORTANT:
-     هذا الـ effect يعمل مرة واحدة فقط.
-======================================================= */
+  ======================================================= */
 
   useEffect(() => {
     let mounted = true;
+
     const loadData = async () => {
       try {
         setLoading(true);
+
+        /* -----------------------------------------------
+           User
+        ------------------------------------------------ */
 
         const currentUser =
           await getCurrentUser();
@@ -581,9 +701,10 @@ const Tasks = () => {
 
         setUser(currentUser);
 
-        // ==========================================
-        // 1️⃣ المواد حسب شعبة الطالب
-        // ==========================================
+        /* -----------------------------------------------
+           Subjects
+        ------------------------------------------------ */
+
         const subjects =
           await fetchSubjects();
 
@@ -593,12 +714,14 @@ const Tasks = () => {
 
         const subjectIds =
           subjects.map(
-            (subject) => subject.id
+            (subject) =>
+              subject.id
           );
 
-        // ==========================================
-        // 2️⃣ الوحدات من المنهج الجديد
-        // ==========================================
+        /* -----------------------------------------------
+           Units
+        ------------------------------------------------ */
+
         const units =
           await fetchUnits(
             subjectIds
@@ -610,12 +733,14 @@ const Tasks = () => {
 
         const unitIds =
           units.map(
-            (unit) => unit.id
+            (unit) =>
+              unit.id
           );
 
-        // ==========================================
-        // 3️⃣ الدروس من المنهج الجديد
-        // ==========================================
+        /* -----------------------------------------------
+           Lessons
+        ------------------------------------------------ */
+
         const lessons =
           await fetchLessons(
             unitIds
@@ -625,9 +750,10 @@ const Tasks = () => {
           return;
         }
 
-        // ==========================================
-        // 4️⃣ المهام
-        // ==========================================
+        /* -----------------------------------------------
+           Tasks
+        ------------------------------------------------ */
+
         const tasksData =
           await fetchTasks(
             currentUser
@@ -636,6 +762,10 @@ const Tasks = () => {
         if (!mounted) {
           return;
         }
+
+        /* -----------------------------------------------
+           Save data to state
+        ------------------------------------------------ */
 
         setSubjectsData(
           subjects
@@ -649,36 +779,23 @@ const Tasks = () => {
           lessons
         );
 
-        // ==========================================
-        // 5️⃣ ربط IDs الجديدة بالمهام
-        // ==========================================
-      const mappedTasks =
-        tasksData.map((task) => ({
-          ...task,
+        /* -----------------------------------------------
+           IMPORTANT:
+           استخدم الـ arrays المحلية
+           وليس الـ state لأنها async
+        ------------------------------------------------ */
 
-          subjects:
-            subjectsData.find(
-              (subject) =>
-                subject.id ===
-                task.subject_id
-            ) || null,
+        const mappedTasks =
+          mapTasks(
+            tasksData,
+            subjects,
+            units,
+            lessons
+          );
 
-          units:
-            unitsData.find(
-              (unit) =>
-                unit.id ===
-                task.unit_id
-            ) || null,
-
-          lessons:
-            lessonsData.find(
-              (lesson) =>
-                lesson.id ===
-                task.lesson_id
-            ) || null,
-        }));
-
-        setTasks(mappedTasks);
+        setTasks(
+          mappedTasks
+        );
       } catch (error) {
         console.error(
           "TASKS LOAD ERROR:",
@@ -714,40 +831,45 @@ const Tasks = () => {
     fetchUnits,
     fetchLessons,
     fetchTasks,
+    mapTasks,
   ]);
 
   /* =======================================================
      SUBJECT CHANGE
-======================================================= */
+  ======================================================= */
 
   const handleSubjectChange = (
     subjectId
   ) => {
-    setFormData((current) => ({
-      ...current,
-      subjectId,
-      unitId: "",
-      lessonId: "",
-    }));
+    setFormData(
+      (current) => ({
+        ...current,
+        subjectId,
+        unitId: "",
+        lessonId: "",
+      })
+    );
   };
 
   /* =======================================================
      UNIT CHANGE
-======================================================= */
+  ======================================================= */
 
   const handleUnitChange = (
     unitId
   ) => {
-    setFormData((current) => ({
-      ...current,
-      unitId,
-      lessonId: "",
-    }));
+    setFormData(
+      (current) => ({
+        ...current,
+        unitId,
+        lessonId: "",
+      })
+    );
   };
 
   /* =======================================================
      OPEN ADD MODAL
-======================================================= */
+  ======================================================= */
 
   const openAddModal = () => {
     setEditingTask(null);
@@ -770,7 +892,7 @@ const Tasks = () => {
 
   /* =======================================================
      OPEN EDIT MODAL
-======================================================= */
+  ======================================================= */
 
   const openEditModal = (
     task
@@ -780,19 +902,28 @@ const Tasks = () => {
     setOpenMenuId(null);
 
     setFormData({
-      title: task.title || "",
+      title:
+        task.title || "",
+
       subjectId:
         task.subject_id || "",
+
       unitId:
         task.unit_id || "",
+
       lessonId:
         task.lesson_id || "",
+
       priority:
         task.priority || "",
+
       durationMinutes:
-        task.duration_minutes ?? "",
+        task.duration_minutes ??
+        "",
+
       dueDate:
         task.due_date || "",
+
       dueTime: task.due_time
         ? String(
             task.due_time
@@ -805,7 +936,7 @@ const Tasks = () => {
 
   /* =======================================================
      CLOSE MODAL
-======================================================= */
+  ======================================================= */
 
   const closeTaskModal = () => {
     if (saving) {
@@ -818,7 +949,7 @@ const Tasks = () => {
 
   /* =======================================================
      SAVE TASK
-======================================================= */
+  ======================================================= */
 
   const handleSaveTask = async (
     event
@@ -830,7 +961,8 @@ const Tasks = () => {
         icon: "error",
         title: "انتهت الجلسة",
         text: "سجل الدخول مرة أخرى.",
-        confirmButtonText: "حسنًا",
+        confirmButtonText:
+          "حسنًا",
       });
 
       return;
@@ -844,7 +976,8 @@ const Tasks = () => {
         toast: true,
         position: "top-end",
         icon: "warning",
-        title: "اكتب اسم المهمة أولًا",
+        title:
+          "اكتب اسم المهمة أولًا",
         showConfirmButton: false,
         timer: 2500,
       });
@@ -859,22 +992,28 @@ const Tasks = () => {
         formData.dueDate ||
         getLocalDate();
 
-      /* =====================================================
-         ربط المهمة بخطة نفس اليوم إن وجدت
-      ===================================================== */
+      /* -----------------------------------------------
+         Plan
+      ------------------------------------------------ */
 
       let planId =
         editingTask?.plan_id ||
         null;
 
-      if (!editingTask || !planId) {
+      if (
+        !editingTask ||
+        !planId
+      ) {
         const {
           data: planData,
           error: planError,
         } = await supabase
           .from("study_plans")
           .select("id")
-          .eq("user_id", user.id)
+          .eq(
+            "user_id",
+            user.id
+          )
           .eq(
             "plan_date",
             taskDate
@@ -889,50 +1028,75 @@ const Tasks = () => {
         }
 
         planId =
-          planData?.id || null;
+          planData?.id ||
+          null;
       }
 
+      /* -----------------------------------------------
+         Payload
+         
+         IMPORTANT:
+         priority:
+         high / medium / low
+
+         unit_id:
+         units.id
+
+         lesson_id:
+         lessons.id
+      ------------------------------------------------ */
+
       const payload = {
-        user_id: user.id,
+        user_id:
+          user.id,
 
-        plan_id: planId,
+        plan_id:
+          planId,
 
-        plan_date: taskDate,
+        plan_date:
+          taskDate,
 
         title,
 
         subject_id:
-          formData.subjectId || null,
+          formData.subjectId ||
+          null,
 
         unit_id:
-          formData.unitId || null,
+          formData.unitId ||
+          null,
 
         lesson_id:
-          formData.lessonId || null,
+          formData.lessonId ||
+          null,
 
         priority:
-          formData.priority || null,
+          formData.priority ||
+          null,
 
         duration_minutes:
-          formData.durationMinutes === ""
+          formData.durationMinutes ===
+          ""
             ? null
             : Number(
                 formData.durationMinutes
               ),
 
         due_date:
-          formData.dueDate || null,
+          formData.dueDate ||
+          null,
 
         due_time:
-          formData.dueTime || null,
+          formData.dueTime ||
+          null,
 
         updated_at:
           new Date().toISOString(),
       };
 
-      /* =====================================================
+      /* -----------------------------------------------
          EDIT
-      ===================================================== */
+      ------------------------------------------------ */
 
       if (editingTask) {
         const {
@@ -964,9 +1128,9 @@ const Tasks = () => {
         });
       }
 
-      /* =====================================================
+      /* -----------------------------------------------
          INSERT
-      ===================================================== */
+      ------------------------------------------------ */
 
       else {
         const {
@@ -976,9 +1140,11 @@ const Tasks = () => {
           .insert({
             ...payload,
 
-            is_completed: false,
+            is_completed:
+              false,
 
-            completed_at: null,
+            completed_at:
+              null,
           });
 
         if (error) {
@@ -996,41 +1162,34 @@ const Tasks = () => {
         });
       }
 
-      /*
-       * إعادة تحميل المهام
-       */
+      /* -----------------------------------------------
+         Reload Tasks
+      ------------------------------------------------ */
+
       const tasksData =
-        await fetchTasks(user);
+        await fetchTasks(
+          user
+        );
 
       const mappedTasks =
-        tasksData.map((task) => ({
-          ...task,
+        mapTasks(
+          tasksData,
+          subjectsData,
+          unitsData,
+          lessonsData
+        );
 
-          subjects:
-            subjectsData.find(
-              (subject) =>
-                subject.id ===
-                task.subject_id
-            ) || null,
+      setTasks(
+        mappedTasks
+      );
 
-          subject_units:
-            unitsData.find(
-              (unit) =>
-                unit.id ===
-                task.unit_id
-            ) || null,
+      setShowTaskModal(
+        false
+      );
 
-          subject_lessons:
-            lessonsData.find(
-              (lesson) =>
-                lesson.id ===
-                task.lesson_id
-            ) || null,
-        }));
-
-      setTasks(mappedTasks);
-
-      closeTaskModal();
+      setEditingTask(
+        null
+      );
     } catch (error) {
       console.error(
         "SAVE TASK ERROR:",
@@ -1054,11 +1213,7 @@ const Tasks = () => {
 
   /* =======================================================
      TOGGLE TASK
-     
-     IMPORTANT:
-     تحديث study_tasks يشغل Achievement Trigger
-     الموجود في قاعدة البيانات.
-======================================================= */
+  ======================================================= */
 
   const toggleTaskStatus = async (
     task
@@ -1085,11 +1240,14 @@ const Tasks = () => {
       (currentTasks) =>
         currentTasks.map(
           (item) =>
-            item.id === task.id
+            item.id ===
+            task.id
               ? {
                   ...item,
+
                   is_completed:
                     newCompleted,
+
                   completed_at:
                     completedAt,
                 }
@@ -1125,15 +1283,6 @@ const Tasks = () => {
         throw error;
       }
 
-      /*
-       * مهم:
-       *
-       * لا نستدعي Achievement
-       * من React.
-       *
-       * Database Trigger هو المسؤول.
-       */
-
       if (newCompleted) {
         Swal.fire({
           toast: true,
@@ -1151,7 +1300,9 @@ const Tasks = () => {
         error
       );
 
-      setTasks(previousTasks);
+      setTasks(
+        previousTasks
+      );
 
       Swal.fire({
         toast: true,
@@ -1167,7 +1318,7 @@ const Tasks = () => {
 
   /* =======================================================
      DELETE TASK
-======================================================= */
+  ======================================================= */
 
   const deleteTask = async (
     task
@@ -1220,7 +1371,8 @@ const Tasks = () => {
         (currentTasks) =>
           currentTasks.filter(
             (item) =>
-              item.id !== task.id
+              item.id !==
+              task.id
           )
       );
 
@@ -1254,7 +1406,7 @@ const Tasks = () => {
 
   /* =======================================================
      FILTERED TASKS
-======================================================= */
+  ======================================================= */
 
   const filteredTasks = useMemo(() => {
     let result = [
@@ -1381,10 +1533,12 @@ const Tasks = () => {
               "";
 
             const unit =
-              task.units?.title?.toLowerCase() || "";
+              task.units?.title?.toLowerCase() ||
+              "";
 
             const lesson =
-              task.lessons?.title?.toLowerCase() || "";
+              task.lessons?.title?.toLowerCase() ||
+              "";
 
             return (
               title.includes(
@@ -1441,19 +1595,23 @@ const Tasks = () => {
       "الأولوية"
     ) {
       const priorityOrder = {
-        عالية: 1,
-        متوسطة: 2,
-        منخفضة: 3,
+        high: 1,
+        medium: 2,
+        low: 3,
       };
 
       result.sort(
         (a, b) =>
-          (priorityOrder[
-            a.priority
-          ] || 4) -
-          (priorityOrder[
-            b.priority
-          ] || 4)
+          (
+            priorityOrder[
+              a.priority
+            ] || 4
+          ) -
+          (
+            priorityOrder[
+              b.priority
+            ] || 4
+          )
       );
     }
 
@@ -1469,7 +1627,7 @@ const Tasks = () => {
 
   /* =======================================================
      STATISTICS
-======================================================= */
+  ======================================================= */
 
   const totalTasks =
     tasks.length;
@@ -1523,7 +1681,7 @@ const Tasks = () => {
 
   /* =======================================================
      PRIORITY STATISTICS
-======================================================= */
+  ======================================================= */
 
   const priorityStats =
     useMemo(() => {
@@ -1531,21 +1689,21 @@ const Tasks = () => {
         tasks.filter(
           (task) =>
             task.priority ===
-            "عالية"
+            "high"
         ).length;
 
       const medium =
         tasks.filter(
           (task) =>
             task.priority ===
-            "متوسطة"
+            "medium"
         ).length;
 
       const low =
         tasks.filter(
           (task) =>
             task.priority ===
-            "منخفضة"
+            "low"
         ).length;
 
       const none =
@@ -1605,23 +1763,37 @@ const Tasks = () => {
       : 0;
 
   /* =======================================================
-     FORM FILTERED UNITS / LESSONS
-======================================================= */
+     FORM UNITS
+  ======================================================= */
 
   const formUnits = useMemo(() => {
     if (!formData.subjectId) {
       return [];
     }
 
-    return unitsData.filter(
-      (unit) =>
-        unit.subject_id ===
-        formData.subjectId
-    );
+    return unitsData
+      .filter(
+        (unit) =>
+          unit.subject_id ===
+          formData.subjectId
+      )
+      .sort(
+        (a, b) =>
+          Number(
+            a.sort_order || 0
+          ) -
+          Number(
+            b.sort_order || 0
+          )
+      );
   }, [
     unitsData,
     formData.subjectId,
   ]);
+
+  /* =======================================================
+     FORM LESSONS
+  ======================================================= */
 
   const formLessons =
     useMemo(() => {
@@ -1631,11 +1803,21 @@ const Tasks = () => {
         return [];
       }
 
-      return lessonsData.filter(
-        (lesson) =>
-          lesson.unit_id ===
-          formData.unitId
-      );
+      return lessonsData
+        .filter(
+          (lesson) =>
+            lesson.unit_id ===
+            formData.unitId
+        )
+        .sort(
+          (a, b) =>
+            Number(
+              a.sort_order || 0
+            ) -
+            Number(
+              b.sort_order || 0
+            )
+        );
     }, [
       lessonsData,
       formData.unitId,
@@ -1643,7 +1825,7 @@ const Tasks = () => {
 
   /* =======================================================
      UPCOMING TASKS
-======================================================= */
+  ======================================================= */
 
   const upcomingTasksList =
     useMemo(() => {
@@ -1680,7 +1862,7 @@ const Tasks = () => {
 
   /* =======================================================
      RESET FILTERS
-======================================================= */
+  ======================================================= */
 
   const resetFilters = () => {
     setActiveTab(
@@ -1704,7 +1886,7 @@ const Tasks = () => {
 
   /* =======================================================
      RENDER
-======================================================= */
+  ======================================================= */
 
   return (
     <main className="tasks-page">
@@ -1852,6 +2034,7 @@ const Tasks = () => {
                       tab
                     )
                   }
+                  type="button"
                 >
                   {tab}
 
@@ -1906,7 +2089,8 @@ const Tasks = () => {
 
               <FaChevronDown />
 
-              <select className="global-select"
+              <select
+                className="global-select"
                 value={
                   selectedSubject
                 }
@@ -1947,14 +2131,19 @@ const Tasks = () => {
 
             <div className="select-control">
               <span>
-                {
+                {getPriorityLabel(
                   selectedPriority
-                }
+                ) === "—"
+                  ? "كل الأولويات"
+                  : getPriorityLabel(
+                      selectedPriority
+                    )}
               </span>
 
               <FaChevronDown />
 
-              <select className="global-select"
+              <select
+                className="global-select"
                 value={
                   selectedPriority
                 }
@@ -1972,14 +2161,14 @@ const Tasks = () => {
                   (priority) => (
                     <option
                       key={
-                        priority
+                        priority.value
                       }
                       value={
-                        priority
+                        priority.value
                       }
                     >
                       {
-                        priority
+                        priority.label
                       }
                     </option>
                   )
@@ -2018,7 +2207,8 @@ const Tasks = () => {
 
               <FaChevronDown />
 
-              <select className="global-select"
+              <select
+                className="global-select"
                 value={sortBy}
                 onChange={(
                   event
@@ -2174,9 +2364,25 @@ const Tasks = () => {
                           {/* Lesson */}
 
                           <div className="task-lesson">
-                            <strong>{task.lessons?.title || "بدون درس"}</strong>
-                            <small>{task.units?.title || "بدون وحدة"}</small>
+                            <strong>
+                              {
+                                task
+                                  .lessons
+                                  ?.title ||
+                                "بدون درس"
+                              }
+                            </strong>
+
+                            <small>
+                              {
+                                task
+                                  .units
+                                  ?.title ||
+                                "بدون وحدة"
+                              }
+                            </small>
                           </div>
+
                           {/* Priority */}
 
                           <div>
@@ -2187,7 +2393,9 @@ const Tasks = () => {
                                 )}`}
                               >
                                 {
-                                  task.priority
+                                  getPriorityLabel(
+                                    task.priority
+                                  )
                                 }
                               </span>
                             ) : (
@@ -2422,9 +2630,11 @@ const Tasks = () => {
 
               <div>
                 <span className="legend-dot high" />
+
                 <span>
                   عالية
                 </span>
+
                 <strong>
                   {
                     priorityStats.high
@@ -2434,9 +2644,11 @@ const Tasks = () => {
 
               <div>
                 <span className="legend-dot medium" />
+
                 <span>
                   متوسطة
                 </span>
+
                 <strong>
                   {
                     priorityStats.medium
@@ -2446,9 +2658,11 @@ const Tasks = () => {
 
               <div>
                 <span className="legend-dot low" />
+
                 <span>
                   منخفضة
                 </span>
+
                 <strong>
                   {
                     priorityStats.low
@@ -2458,9 +2672,11 @@ const Tasks = () => {
 
               <div>
                 <span className="legend-dot complete" />
+
                 <span>
                   مكتملة
                 </span>
+
                 <strong>
                   {
                     completedTasks
@@ -2537,8 +2753,13 @@ const Tasks = () => {
                               "بدون مادة"}
 
                             {" - "}
-                            {task.lessons?.title ||
-                              task.units?.title ||
+
+                            {task
+                              .lessons
+                              ?.title ||
+                              task
+                                .units
+                                ?.title ||
                               "بدون درس"}
                           </small>
 
@@ -2861,12 +3082,9 @@ const Tasks = () => {
                             unit.id
                           }
                         >
-                        <option
-                          key={unit.id}
-                          value={unit.id}
-                        >
-                          {unit.title}
-                        </option>
+                          {
+                            unit.title
+                          }
                         </option>
                       )
                     )}
@@ -2919,12 +3137,9 @@ const Tasks = () => {
                             lesson.id
                           }
                         >
-                        <option
-                          key={lesson.id}
-                          value={lesson.id}
-                        >
-                          {lesson.title}
-                        </option>
+                          {
+                            lesson.title
+                          }
                         </option>
                       )
                     )}
@@ -2964,15 +3179,15 @@ const Tasks = () => {
                       بدون أولوية
                     </option>
 
-                    <option value="عالية">
+                    <option value="high">
                       عالية
                     </option>
 
-                    <option value="متوسطة">
+                    <option value="medium">
                       متوسطة
                     </option>
 
-                    <option value="منخفضة">
+                    <option value="low">
                       منخفضة
                     </option>
                   </select>

@@ -1,4 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { supabase } from "./utils/supabaseClient";
 
 // =========================================
 // PUBLIC PAGES
@@ -46,31 +53,127 @@ import AuthRoute from "./components/AuthRoute/AuthRoute";
 import Notifications from "./pages/Notifications/Notifications";
 import ResetPassword from "./pages/reset-password/reset-password";
 
+// =========================================
+// ROOT ROUTE
+// لو المستخدم مسجل → Home
+// لو غير مسجل → Landing Page
+// =========================================
+
+function RootRoute() {
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const checkAuth = async () => {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+
+        if (error) {
+          console.error("ROOT AUTH ERROR:", error);
+        }
+
+        if (mounted) {
+          setUser(session?.user || null);
+          setCheckingAuth(false);
+        }
+      } catch (error) {
+        console.error("ROOT AUTH CHECK ERROR:", error);
+
+        if (mounted) {
+          setUser(null);
+          setCheckingAuth(false);
+        }
+      }
+    };
+
+    checkAuth();
+
+    // متابعة تسجيل الدخول / تسجيل الخروج
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (!mounted) return;
+
+        setUser(session?.user || null);
+        setCheckingAuth(false);
+      }
+    );
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  // =========================================
+  // انتظار التحقق من Supabase
+  // =========================================
+
+  if (checkingAuth) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          direction: "rtl",
+        }}
+      >
+        جاري التحميل...
+      </div>
+    );
+  }
+
+  // =========================================
+  // المستخدم مسجل
+  // =========================================
+
+  if (user) {
+    return <Navigate to="/home" replace />;
+  }
+
+  // =========================================
+  // المستخدم غير مسجل
+  // =========================================
+
+  return <HomeLandingPage />;
+}
+
+// =========================================
+// APP
+// =========================================
+
 function App() {
   return (
     <ThemeProvider>
       <Router>
-
         <Routes>
 
           {/* =====================================================
-              PUBLIC PAGES
-              الصفحات المفتوحة بدون تسجيل دخول
+              ROOT
           ===================================================== */}
 
-          {/* Landing Page */}
           <Route
             path="/"
-            element={<HomeLandingPage />}
+            element={<RootRoute />}
           />
 
-          {/* Sign Up */}
+          {/* =====================================================
+              PUBLIC PAGES
+          ===================================================== */}
+
           <Route
             path="/SignUp"
             element={<SignUp />}
           />
 
-          {/* Login */}
           <Route
             path="/Login"
             element={<Login />}
@@ -81,10 +184,8 @@ function App() {
             element={<ResetPassword />}
           />
 
-
           {/* =====================================================
               PROTECTED DASHBOARD
-              كل الصفحات التالية تحتاج Login
           ===================================================== */}
 
           <Route
@@ -222,7 +323,18 @@ function App() {
             }
           />
 
-          <Route path="/Notifications" element={ <ProtectedRoute> <Notifications /> </ProtectedRoute> } />
+          <Route
+            path="/Notifications"
+            element={
+              <ProtectedRoute>
+                <Notifications />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* =====================================================
+              ADMIN
+          ===================================================== */}
 
           <Route
             path="/AdminSubscriptions"
@@ -232,6 +344,10 @@ function App() {
               </AdminRoute>
             }
           />
+
+          {/* =====================================================
+              SUBSCRIPTION
+          ===================================================== */}
 
           <Route
             path="/Subscription"
@@ -243,7 +359,6 @@ function App() {
           />
 
         </Routes>
-
       </Router>
     </ThemeProvider>
   );
