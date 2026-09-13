@@ -438,10 +438,32 @@ const Friends = () => {
           )
           .in("challenge_id", challengeIds);
         if (memberError) {
-          console.error(
-            "challenge members error:",
-            memberError
-          );
+          console.error("DUEL MEMBERS ERROR FULL:", memberError);
+          console.error("CODE:", memberError.code);
+          console.error("MESSAGE:", memberError.message);
+          console.error("DETAILS:", memberError.details);
+          console.error("HINT:", memberError.hint);
+
+          await supabase
+            .from("friend_challenges")
+            .delete()
+            .eq("id", challenge.id);
+
+          Swal.fire({
+            icon: "error",
+            title: "خطأ في إرسال التحدي",
+            html: `
+              <div style="text-align:right;direction:rtl">
+                <p><strong>الرسالة:</strong></p>
+                <p>${memberError.message || "خطأ غير معروف"}</p>
+                ${
+                  memberError.code
+                    ? `<p><strong>Code:</strong> ${memberError.code}</p>`
+                    : ""
+                }
+              </div>
+            `,
+          });
         } else {
           memberRows = data || [];
         }

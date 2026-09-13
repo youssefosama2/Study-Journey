@@ -67,6 +67,11 @@ const calculateDuration = (startTime, endTime) => {
   if (end < start) end += 24 * 60;
   return end - start;
 };
+
+/* =====================================================
+   SESSION TYPE FROM SUBJECT
+===================================================== */
+
 const getSessionIcon = (type) => {
   switch (type) {
     case "break":
@@ -88,6 +93,17 @@ const getSessionIcon = (type) => {
     default:
       return <FaBookOpen />;
   }
+};
+
+const getSessionTypeFromSubject = (subject) => {
+  const name = subject?.name || "";
+
+  if (name.includes("فيزياء")) return "physics";
+  if (name.includes("كيمياء")) return "chemistry";
+  if (name.includes("أحياء")) return "biology";
+  if (name.includes("عربي")) return "arabic";
+
+  return "study";
 };
 
 /* =====================================================
@@ -227,58 +243,228 @@ const Plan = () => {
     try {
       setLoadingSubjects(true);
       setSubjectsError("");
-      const [subjectsResult, unitsResult, lessonsResult] = await Promise.all([
-        supabase.from("subjects").select("id, name, subtitle, icon, icon_class, is_active, type").eq("is_active", true).order("name", { ascending: true }),
-        supabase.from("subject_units").select("id, subject_id, unit_number, title, is_active").eq("is_active", true).order("unit_number", { ascending: true }),
-        supabase.from("subject_lessons").select("id, unit_id, lesson_number, title, is_active").eq("is_active", true).order("lesson_number", { ascending: true }),
-      ]);
-      if (subjectsResult.error) {
-        throw subjectsResult.error;
+
+      const {
+        data: { user: currentUser },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError) throw userError;
+      if (!currentUser) {
+        throw new Error("يجب تسجيل الدخول أولاً");
       }
-      if (unitsResult.error) {
-        throw unitsResult.error;
+
+      // =========================
+      // Student Profile
+      // =========================
+      const { data: profileData, error: profileError } = await supabase
+        .from("student_profiles")
+        .select(`
+          id,
+          user_id,
+          section
+        `)
+        .eq("user_id", currentUser.id)
+        .maybeSingle();
+
+      if (profileError) throw profileError;
+
+      if (!profileData) {
+        throw new Error("لم يتم العثور على بيانات الطالب");
       }
-      if (lessonsResult.error) {
-        throw lessonsResult.error;
+
+      const studentSection = profileData.section?.trim();
+
+      if (!studentSection) {
+        throw new Error("لم يتم تحديد شعبة الطالب");
       }
-      const subjectsData = subjectsResult.data || [];
-      const unitsData = unitsResult.data || [];
-      const lessonsData = lessonsResult.data || [];
-      const lessonsByUnit = {};
-      lessonsData.forEach((lesson) => {
-        if (!lessonsByUnit[lesson.unit_id]) {
-          lessonsByUnit[lesson.unit_id] = [];
-        }
-        lessonsByUnit[lesson.unit_id].push(lesson);
+
+      // =========================
+      // Section
+      // =========================
+      const { data: sectionData, error: sectionError } = await supabase
+        .from("sections")
+        .select(`
+          id,
+          name
+        `)
+        .eq("name", studentSection)
+        .maybeSingle();
+
+      if (sectionError) throw sectionError;
+
+      if (!sectionData) {
+        throw new Error(
+          `لم يتم العثور على الشعبة "${studentSection}"`
+        );
+      }
+
+      // =========================
+      // Subjects by Section
+      // =========================
+      const {
+        data: subjectSectionsData,
+        error: subjectSectionsError,
+      } = await supabase
+        .from("subject_sections")
+        .select(`
+          subject_id,
+          section_id,
+          subjects (
+            id,
+            name,
+            subtitle,
+            icon,
+            icon_class,
+            is_active,
+            type,
+            slug
+          )
+        `)
+        .eq("section_id", sectionData.id);
+
+      if (subjectSectionsError) {
+        throw subjectSectionsError;
+      }
+
+      const subjectsMap = new Map();
+
+      (subjectSectionsData || []).forEach((item) => {
+        const subject = item.subjects;
+
+        if (!subject || !subject.is_active) return;
+
+        subjectsMap.set(subject.id, subject);
       });
-      const unitsBySubject = {};
-      unitsData.forEach((unit) => {
-        if (!unitsBySubject[unit.subject_id]) {
-          unitsBySubject[unit.subject_id] = [];
-        }
-        unitsBySubject[unit.subject_id].push({
-          ...unit,
-          lessons: lessonsByUnit[unit.id] || [],
+
+      const subjectsData = Array.from(
+        subjectsMap.values()
+      ).sort((a, b) =>
+        String(a.name || "").localeCompare(
+          String(b.name || ""),
+          "ar"
+        )
+      );
+
+      if (!subjectsData.length) {
+        setSubjects([]);
+        return;
+      }
+
+      const subjectIds = subjectsData.map(
+        (subject) => subject.id
+      );
+
+      // =========================
+      // New Curriculum Units
+      // =========================
+      const { data: unitsData, error: unitsError } = await supabase
+        .from("units")
+        .select(`
+          id,
+          subject_id,
+          title,
+          sort_order,
+          parent_unit_id,
+          is_active
+        `)
+        .in("subject_id", subjectIds)
+        .eq("is_active", true)
+        .order("sort_order", {
+          ascending: true,
         });
-      });
+
+      if (unitsError) throw unitsError;
+
+      const allUnits = unitsData || [];
+
+      const unitIds = allUnits.map(
+        (unit) => unit.id
+      );
+
+      // =========================
+      // New Curriculum Lessons
+      // =========================
+      let lessonsData = [];
+
+      if (unitIds.length) {
+        const { data, error } = await supabase
+          .from("lessons")
+          .select(`
+            id,
+            unit_id,
+            title,
+            sort_order,
+            is_active
+          `)
+          .in("unit_id", unitIds)
+          .eq("is_active", true)
+          .order("sort_order", {
+            ascending: true,
+          });
+
+        if (error) throw error;
+
+        lessonsData = data || [];
+      }
+
+      // =========================
+      // Build Subjects
+      // =========================
       const formattedSubjects = subjectsData.map((subject) => {
-        const subjectUnits = unitsBySubject[subject.id] || [];
-        const lessons = subjectUnits.flatMap((unit) => (unit.lessons || []).map((lesson) => ({
-          ...lesson,
-          unitId: unit.id,
-          unitTitle: unit.title,
-        })));
+        const subjectUnits = allUnits.filter(
+          (unit) =>
+            String(unit.subject_id) === String(subject.id)
+        );
+
+        const subjectLessons = lessonsData
+          .filter((lesson) =>
+            subjectUnits.some(
+              (unit) =>
+                String(unit.id) === String(lesson.unit_id)
+            )
+          )
+          .map((lesson) => {
+            const unit = subjectUnits.find(
+              (item) =>
+                String(item.id) === String(lesson.unit_id)
+            );
+
+            return {
+              ...lesson,
+              unitId: unit?.id || lesson.unit_id,
+              unitTitle: unit?.title || "",
+            };
+          });
+
         return {
           ...subject,
-          description: subject.subtitle || "اختر المادة وابدأ الدراسة",
+
+          description:
+            subject.subtitle ||
+            "اختر المادة وابدأ الدراسة",
+
+          // كل الوحدات
           units: subjectUnits,
-          lessons,
+
+          // كل الدروس
+          lessons: subjectLessons,
+
+          // مهم لو احتجنا الوحدات الفرعية لاحقًا
+          allUnits: subjectUnits,
         };
       });
+
       setSubjects(formattedSubjects);
+
     } catch (err) {
       console.error("fetchSubjects error:", err);
-      setSubjectsError(err?.message || "حدث خطأ أثناء تحميل المواد والدروس.");
+
+      setSubjectsError(
+        err?.message ||
+          "حدث خطأ أثناء تحميل المواد والدروس."
+      );
+
       setSubjects([]);
     } finally {
       setLoadingSubjects(false);
@@ -309,8 +495,17 @@ const Plan = () => {
   ===================================================== */
   const formatTask = useCallback((task) => {
     const subject = findSubject(task.subject_id);
-    const unit = subject?.units?.find((item) => String(item.id) === String(task.unit_id));
-    const lesson = subject?.lessons?.find((item) => String(item.id) === String(task.lesson_id));
+
+    const unit = subject?.units?.find(
+      (item) =>
+        String(item.id) === String(task.unit_id)
+    );
+
+    const lesson = subject?.lessons?.find(
+      (item) =>
+        String(item.id) === String(task.lesson_id)
+    );
+
     return {
       ...task,
       checked: Boolean(task.is_completed),
@@ -325,8 +520,17 @@ const Plan = () => {
   ===================================================== */
   const formatNote = useCallback((note) => {
     const subject = findSubject(note.subject_id);
-    const unit = subject?.units?.find((item) => String(item.id) === String(note.unit_id));
-    const lesson = subject?.lessons?.find((item) => String(item.id) === String(note.lesson_id));
+
+    const unit = subject?.units?.find(
+      (item) =>
+        String(item.id) === String(note.unit_id)
+    );
+
+    const lesson = subject?.lessons?.find(
+      (item) =>
+        String(item.id) === String(note.lesson_id)
+    );
+
     return {
       ...note,
       text: note.content || "",
@@ -1003,57 +1207,70 @@ const Plan = () => {
      SMART PLAN DATA
   ===================================================== */
   const smartPlanData = useMemo(() => {
-    const incompleteTasks = tasks.filter((task) => !task.checked);
-    /*
-     * نستخدم الدروس المرتبطة
-     * بالمهام غير المكتملة.
-     */
-    const lessonsFromTasks = incompleteTasks.map((task) => {
-      if (!task.lesson_id) {
-        return null;
-      }
-      const subject = findSubject(task.subject_id);
-      const lesson = subject?.lessons?.find((item) => String(item.id) === String(task.lesson_id));
-      if (!lesson) {
-        return null;
-      }
-      return {
-        ...lesson,
-        subjectId: task.subject_id,
-        unitId: task.unit_id,
-        taskTitle: task.title,
-      };
-    }).filter(Boolean);
+    const incompleteTasks = tasks.filter(
+      (task) => !task.checked
+    );
+
+    const lessonsFromTasks = incompleteTasks
+      .map((task) => {
+        if (!task.lesson_id) {
+          return null;
+        }
+
+        const subject = findSubject(task.subject_id);
+
+        const lesson = subject?.lessons?.find(
+          (item) =>
+            String(item.id) ===
+            String(task.lesson_id)
+        );
+
+        if (!lesson) {
+          return null;
+        }
+
+        return {
+          ...lesson,
+          subjectId: task.subject_id,
+          unitId: task.unit_id,
+          taskTitle: task.title,
+        };
+      })
+      .filter(Boolean);
+
     const uniqueLessons = [];
     const seen = new Set();
+
     lessonsFromTasks.forEach((lesson) => {
       const key = String(lesson.id);
+
       if (!seen.has(key)) {
         seen.add(key);
         uniqueLessons.push(lesson);
       }
     });
-    /*
-     * لو مفيش دروس مرتبطة
-     * بالمهام، نأخذ أول 4 دروس
-     * من المنهج.
-     */
+
+    // لو مفيش مهام مرتبطة بدروس
     if (uniqueLessons.length === 0) {
       subjects.forEach((subject) => {
         if (uniqueLessons.length >= 4) {
           return;
         }
-        (subject.lessons || []).slice(0, 4).forEach((lesson) => {
-          if (uniqueLessons.length < 4) {
-            uniqueLessons.push({
-              ...lesson,
-              subjectId: subject.id,
-              unitId: lesson.unitId,
-            });
+
+        (subject.lessons || []).forEach((lesson) => {
+          if (uniqueLessons.length >= 4) {
+            return;
           }
+
+          uniqueLessons.push({
+            ...lesson,
+            subjectId: subject.id,
+            unitId: lesson.unitId,
+          });
         });
       });
     }
+
     return {
       incompleteTasks,
       lessons: uniqueLessons.slice(0, 4),
@@ -1116,7 +1333,7 @@ const Plan = () => {
           end_time: endTime,
           title: subjectName,
           subtitle: lessonTitle,
-          type: subject?.type || "study",
+          type: getSessionTypeFromSubject(subject),
           priority: index === 0 ? "high" : "medium",
         });
         currentMinutes = end + 15;
@@ -1479,14 +1696,13 @@ const Plan = () => {
                   <label>الوحدة</label>
                   <select className="global-select" value={taskForm.unitId} onChange={(e) => setTaskForm((current) => ({ ...current, unitId: e.target.value, lessonId: "" }))} disabled={!taskForm.subjectId}>
                     <option value="">كل الوحدات</option>
-                    {taskUnits.map((unit) => <option key={unit.id} value={unit.id}>{unit.unit_number ? `الوحدة ${unit.unit_number} - ` : ""}{unit.title}</option>)}
-                  </select>
+                    {taskUnits.map((unit) => (<option key={unit.id} value={unit.id}>{unit.title}</option>))}
+                    </select>
                 </div>
                 <div className="form-group">
                   <label>الدرس</label>
                   <select className="global-select" value={taskForm.lessonId} onChange={(e) => setTaskForm((current) => ({ ...current, lessonId: e.target.value }))} disabled={!taskForm.subjectId}>
-                    <option value="">بدون درس</option>
-                    {taskLessons.map((lesson) => <option key={lesson.id} value={lesson.id}>{lesson.lesson_number}.{" "}{lesson.title}</option>)}
+                    <option value="">بدون درس</option>{taskLessons.map((lesson) => (<option key={lesson.id} value={lesson.id}>{lesson.title}</option>))}
                   </select>
                 </div>
               </div>

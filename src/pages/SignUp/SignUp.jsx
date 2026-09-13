@@ -72,7 +72,6 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
-    // التحقق من البيانات
     if (!validateForm()) return;
     setLoading(true);
     try {
@@ -84,9 +83,14 @@ const SignUp = () => {
       const name = formData.name.trim();
       const phone = formData.phone.trim();
       const division = formData.division;
-      // =================================================
+      // قراءة كود الدعوة من الرابط
+      // مثال: /signup?ref=ABC12345
+      const searchParams = new URLSearchParams(window.location.search);
+      const referralCode = searchParams.get("ref")?.trim() || null;
+
+      console.log("REFERRAL CODE:", referralCode || "لا يوجد");
+
       // إنشاء المستخدم في Supabase Auth
-      // =================================================
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
@@ -95,17 +99,17 @@ const SignUp = () => {
             name,
             phone,
             division,
+            // Database Trigger سيقرأ القيمة دي
+            referral_code_used: referralCode,
           },
         },
       });
-      // =================================================
+
       // Debug
-      // =================================================
       console.log("AUTH DATA:", authData);
       console.log("AUTH ERROR:", authError);
-      // =================================================
+
       // خطأ في إنشاء الحساب
-      // =================================================
       if (authError) {
         console.error("SUPABASE AUTH ERROR:", authError);
         const errorMessage = authError.message || "";
@@ -139,36 +143,36 @@ const SignUp = () => {
         });
         return;
       }
-      // =================================================
+
       // التأكد من إنشاء المستخدم
-      // =================================================
       const user = authData?.user;
       if (!user) {
         console.error("No user returned from Supabase");
         throw new Error("لم يتم إنشاء المستخدم");
       }
       console.log("USER CREATED:", user);
-      // =================================================
-      // الـ Profile يتم إنشاؤه تلقائيًا
-      // عن طريق Database Trigger
-      // =================================================
-      console.log("Student profile will be created by database trigger.");
-      // =================================================
-      // نجاح البريد الإلكتروني
-      // =================================================
+
+      // الـ Profile يتم إنشاؤه تلقائيًا عن طريق Database Trigger
+      // والـ Trigger أيضًا:
+      // 1. يقرأ referral_code_used
+      // 2. يبحث عن صاحب الكود
+      // 3. يحفظ referred_by_user_id
+      // 4. ينشئ referral بحالة registered
+      console.log("Student profile and referral will be created by database trigger.");
+
+      // نجاح التسجيل
       await Swal.fire({
         icon: "success",
         title: "تم إنشاء الحساب بنجاح 🎉",
-        text: "تم إنشاء حسابك ويمكنك تسجيل الدخول الآن.",
+        text: referralCode ? "تم تسجيلك بنجاح عن طريق رابط الدعوة. يمكنك تسجيل الدخول الآن." : "تم إنشاء حسابك ويمكنك تسجيل الدخول الآن.",
         confirmButtonText: "تسجيل الدخول",
       });
-      navigate("/Login");
-      // =================================================
+
       // الانتقال إلى Login
-      // =================================================
-      navigate("/Login");
+      navigate("/Login", { replace: true });
     } catch (error) {
       console.error("SIGNUP ERROR:", error);
+
       await Swal.fire({
         icon: "error",
         title: "حدث خطأ",
@@ -179,9 +183,8 @@ const SignUp = () => {
       setLoading(false);
     }
   };
-  // =====================================================
+
   // UI
-  // =====================================================
   return (
     <main className="signup-page" dir="rtl">
       <div className="signup-container">
@@ -201,6 +204,7 @@ const SignUp = () => {
                 <input id="name" type="text" name="name" placeholder="اكتب اسمك بالكامل" value={formData.name} onChange={handleChange} className={errors.name ? "input-error" : ""} disabled={loading} />
                 {errors.name && <span className="error-message">{errors.name}</span>}
               </div>
+
               <div className="form-group">
                 <label htmlFor="phone">رقم الهاتف</label>
                 <input id="phone" type="tel" name="phone" placeholder="01xxxxxxxxx" value={formData.phone} onChange={handleChange} maxLength="11" className={errors.phone ? "input-error" : ""} disabled={loading} />
@@ -214,6 +218,7 @@ const SignUp = () => {
                 <input id="email" type="email" name="email" placeholder="example@email.com" value={formData.email} onChange={handleChange} className={errors.email ? "input-error" : ""} disabled={loading} />
                 {errors.email && <span className="error-message">{errors.email}</span>}
               </div>
+
               <div className="form-group">
                 <label htmlFor="division">الشعبة</label>
                 <select id="division" name="division" value={formData.division} onChange={handleChange} className={errors.division ? "input-error" : ""} disabled={loading}>
@@ -229,21 +234,28 @@ const SignUp = () => {
                 <label htmlFor="password">كلمة المرور</label>
                 <div className="password-input-wrapper">
                   <input id="password" type={showPassword ? "text" : "password"} name="password" placeholder="8 أحرف على الأقل" value={formData.password} onChange={handleChange} className={errors.password ? "input-error" : ""} disabled={loading} />
-                  <button type="button" className="password-toggle" onClick={() => setShowPassword((prev) => !prev)} disabled={loading}>{showPassword ? <FaEyeSlash /> : <FaEye />}</button>
+                  <button type="button" className="password-toggle" onClick={() => setShowPassword((prev) => !prev)} disabled={loading}>
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
                 </div>
                 {errors.password && <span className="error-message">{errors.password}</span>}
               </div>
+
               <div className="form-group">
                 <label htmlFor="confirmPassword">تأكيد كلمة المرور</label>
                 <div className="password-input-wrapper">
                   <input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} name="confirmPassword" placeholder="أعد كتابة كلمة المرور" value={formData.confirmPassword} onChange={handleChange} className={errors.confirmPassword ? "input-error" : ""} disabled={loading} />
-                  <button type="button" className="password-toggle" onClick={() => setShowConfirmPassword((prev) => !prev)} disabled={loading}>{showConfirmPassword ? <FaEyeSlash /> : <FaEye />}</button>
+                  <button type="button" className="password-toggle" onClick={() => setShowConfirmPassword((prev) => !prev)} disabled={loading}>
+                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
                 </div>
                 {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
               </div>
             </div>
             {/* SUBMIT */}
-            <button type="submit" className="signup-submit" disabled={loading}>{loading ? "جاري إنشاء الحساب..." : "إنشاء الحساب"}</button>
+            <button type="submit" className="signup-submit" disabled={loading}>
+              {loading ? "جاري إنشاء الحساب..." : "إنشاء الحساب"}
+            </button>
           </form>
           {/* FOOTER */}
           <div className="signup-footer">
