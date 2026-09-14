@@ -1003,48 +1003,145 @@ const FocusSession = () => {
   }, [selectedMode, currentSessionId]);
   const createFocusSession = useCallback(async () => {
     const validation = validateGoal();
+
     if (!validation.valid) {
       window.alert(validation.message);
       setGoalOpen(true);
       return null;
     }
+
     if (currentSessionId) {
       return currentSessionId;
     }
+
     if (creatingSessionRef.current) {
       return null;
     }
+
     try {
       creatingSessionRef.current = true;
+
       const {
         data: { user },
         error: userError,
       } = await supabase.auth.getUser();
+
       if (userError) {
         throw userError;
       }
+
       if (!user) {
         throw new Error("يجب تسجيل الدخول أولاً");
       }
-      const clientStartedAt = new Date().toISOString();
-      const plannedSeconds = Number(
-        MODES[selectedMode]?.[sessionType]
-      ) || 0;
+
+      let validUnitId = null;
+      let validLessonId = null;
+
+      // لو فيه درس محدد
+      if (selectedLesson) {
+        const selectedLessonFromSubject =
+          selectedSubjectData?.lessons?.find(
+            (lesson) =>
+              String(lesson.id) === String(selectedLesson)
+          );
+
+        if (!selectedLessonFromSubject) {
+          throw new Error(
+            "الدرس المحدد غير موجود ضمن المادة الحالية."
+          );
+        }
+
+        // ID الدرس من جدول lessons الجديد
+        validLessonId = selectedLessonFromSubject.id;
+
+        // ناخد الوحدة الحقيقية المرتبطة بالدرس
+        if (selectedLessonFromSubject.unitId) {
+          const unitExists =
+            selectedSubjectData?.allUnits?.some(
+              (unit) =>
+                String(unit.id) ===
+                String(selectedLessonFromSubject.unitId)
+            );
+
+          if (!unitExists) {
+            throw new Error(
+              "الوحدة المرتبطة بالدرس غير موجودة في المادة الحالية."
+            );
+          }
+
+          validUnitId = selectedLessonFromSubject.unitId;
+        }
+      }
+
+      // لو مفيش درس وفيه وحدة محددة
+      if (!validLessonId && selectedUnit) {
+        const selectedUnitFromSubject =
+          selectedSubjectData?.allUnits?.find(
+            (unit) =>
+              String(unit.id) === String(selectedUnit)
+          );
+
+        if (!selectedUnitFromSubject) {
+          throw new Error(
+            "الوحدة المحددة غير موجودة ضمن المادة الحالية."
+          );
+        }
+
+        // ID حقيقي من units.id
+        validUnitId = selectedUnitFromSubject.id;
+      }
+
+      const clientStartedAt =
+        new Date().toISOString();
+
+      const plannedSeconds =
+        Number(MODES[selectedMode]?.[sessionType]) || 0;
+
       const insertPayload = {
         user_id: user.id,
-        subject_id: selectedSubject,
-        unit_id: selectedUnit || null,
-        lesson_id: selectedLesson || null,
-        review_id: reviewId || null,
-        session_type: sessionType,
-        goal_type: selectedGoalType,
-        timer_mode: selectedMode,
-        started_at: clientStartedAt,
-        ended_at: null,
-        planned_seconds: plannedSeconds,
-        actual_seconds: 0,
-        status: "active",
+
+        subject_id:
+          selectedSubject || null,
+
+        unit_id:
+          validUnitId || null,
+
+        lesson_id:
+          validLessonId || null,
+
+        review_id:
+          reviewId || null,
+
+        session_type:
+          sessionType,
+
+        goal_type:
+          selectedGoalType || null,
+
+        timer_mode:
+          selectedMode,
+
+        started_at:
+          clientStartedAt,
+
+        ended_at:
+          null,
+
+        planned_seconds:
+          plannedSeconds,
+
+        actual_seconds:
+          0,
+
+        status:
+          "active",
       };
+
+      console.log(
+        "Creating focus session:",
+        insertPayload
+      );
+
       const {
         data,
         error,
@@ -1053,25 +1150,52 @@ const FocusSession = () => {
         .insert(insertPayload)
         .select("id, started_at")
         .single();
+
       if (error) {
         throw error;
       }
+
       if (!data?.id) {
-        throw new Error("لم يتم إنشاء جلسة التركيز");
+        throw new Error(
+          "لم يتم إنشاء جلسة التركيز"
+        );
       }
+
       setCurrentSessionId(data.id);
-      sessionIdRef.current = data.id;
-      const dbStartedAt = data.started_at || clientStartedAt;
-      setSessionStartedAt(dbStartedAt);
-      sessionStartedAtRef.current = dbStartedAt;
-      elapsedSecondsRef.current = 0;
+
+      sessionIdRef.current =
+        data.id;
+
+      const dbStartedAt =
+        data.started_at ||
+        clientStartedAt;
+
+      setSessionStartedAt(
+        dbStartedAt
+      );
+
+      sessionStartedAtRef.current =
+        dbStartedAt;
+
+      elapsedSecondsRef.current =
+        0;
+
       return data.id;
     } catch (error) {
-      console.error("createFocusSession error:", error);
-      window.alert(error?.message || "حدث خطأ أثناء بدء جلسة التركيز");
+      console.error(
+        "createFocusSession error:",
+        error
+      );
+
+      window.alert(
+        error?.message ||
+          "حدث خطأ أثناء بدء جلسة التركيز"
+      );
+
       return null;
     } finally {
-      creatingSessionRef.current = false;
+      creatingSessionRef.current =
+        false;
     }
   }, [
     validateGoal,
@@ -1081,6 +1205,7 @@ const FocusSession = () => {
     selectedSubject,
     selectedUnit,
     selectedLesson,
+    selectedSubjectData,
     selectedGoalType,
     reviewId,
   ]);
@@ -1790,6 +1915,7 @@ const FocusSession = () => {
                           className={`focus-session-question-target ${selectedLesson ? "selected" : ""}`}
                           onClick={() => {
                             setSelectedUnit("");
+                            setSelectedLesson("");
                           }}
                         >
                           <FaBook />
