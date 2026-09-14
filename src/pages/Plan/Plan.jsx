@@ -736,9 +736,10 @@ const Plan = () => {
      LOAD DAY AFTER USER + SUBJECTS
   ===================================================== */
   useEffect(() => {
-    if (!user || subjects.length === 0) {
+    if (!user) {
       return;
     }
+
     loadDayData(user);
   }, [user, subjects, selectedDateDB, loadDayData]);
 

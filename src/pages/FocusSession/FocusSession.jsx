@@ -198,17 +198,21 @@ const FocusSession = () => {
       }
 
       // ==========================================
-      // 2️⃣ بيانات الطالب + الشعبة
+      // 2️⃣ بيانات الطالب
       // ==========================================
-      const { data: profileData, error: profileError } = await supabase
-        .from("student_profiles")
-        .select(`
-          id,
-          user_id,
-          section
-        `)
-        .eq("user_id", user.id)
-        .maybeSingle();
+      const { data: profileData, error: profileError } =
+        await supabase
+          .from("student_profiles")
+          .select(`
+            id,
+            user_id,
+            section,
+            grade_level,
+            education_system,
+            track
+          `)
+          .eq("user_id", user.id)
+          .maybeSingle();
 
       if (profileError) {
         throw profileError;
@@ -218,87 +222,182 @@ const FocusSession = () => {
         throw new Error("لم يتم العثور على بيانات الطالب");
       }
 
-      const studentSection = profileData.section?.trim();
+      const gradeLevel = profileData.grade_level?.trim() || "";
+      const educationSystem =
+        profileData.education_system?.trim() || "";
+      const studentTrack = profileData.track?.trim() || "";
+      const studentSection = profileData.section?.trim() || "";
 
-      if (!studentSection) {
-        throw new Error("لم يتم تحديد شعبة الطالب");
+      if (!gradeLevel) {
+        throw new Error("لم يتم تحديد الصف الدراسي للطالب");
+      }
+
+      if (!educationSystem) {
+        throw new Error("لم يتم تحديد نظام التعليم للطالب");
       }
 
       // ==========================================
-      // 3️⃣ جلب الشعبة من جدول sections
+      // 3️⃣ تحديد المواد حسب نظام المنهج
       // ==========================================
-      const { data: sectionData, error: sectionError } = await supabase
-        .from("sections")
-        .select("id, name")
-        .eq("name", studentSection)
-        .maybeSingle();
-
-      if (sectionError) {
-        throw sectionError;
-      }
-
-      if (!sectionData) {
-        throw new Error(
-          `لم يتم العثور على الشعبة "${studentSection}" في جدول الشعب`
-        );
-      }
+      let subjectsData = [];
 
       // ==========================================
-      // 4️⃣ جلب مواد الشعبة
+      // 🟢 الأول والثاني الثانوي
+      // subject_curriculum_access
       // ==========================================
-      const {
-        data: subjectSectionsData,
-        error: subjectSectionsError,
-      } = await supabase
-        .from("subject_sections")
-        .select(`
-          subject_id,
-          section_id,
-          subjects (
-            id,
-            name,
-            subtitle,
-            icon,
-            icon_class,
-            is_active,
-            type,
-            slug
-          )
-        `)
-        .eq("section_id", sectionData.id);
+      if (
+        gradeLevel === "first_secondary" ||
+        gradeLevel === "second_secondary"
+      ) {
+        let accessQuery = supabase
+          .from("subject_curriculum_access")
+          .select(`
+            subject_id,
+            grade_level,
+            education_system,
+            track,
+            subjects (
+              id,
+              name,
+              subtitle,
+              icon,
+              icon_class,
+              is_active,
+              type,
+              slug
+            )
+          `)
+          .eq("grade_level", gradeLevel)
+          .eq("education_system", educationSystem);
 
-      if (subjectSectionsError) {
-        throw subjectSectionsError;
-      }
-
-      // ==========================================
-      // 5️⃣ إزالة التكرار + المواد الفعالة
-      // ==========================================
-      const subjectsMap = new Map();
-
-      (subjectSectionsData || []).forEach((item) => {
-        const subject = item.subjects;
-
-        if (!subject || !subject.is_active) {
-          return;
+        // ------------------------------------------
+        // لو عند الطالب Track
+        // ------------------------------------------
+        if (studentTrack) {
+          accessQuery = accessQuery.or(
+            `track.eq.${studentTrack},track.is.null`
+          );
+        } else {
+          accessQuery = accessQuery.is("track", null);
         }
 
-        subjectsMap.set(subject.id, subject);
-      });
+        const {
+          data: accessData,
+          error: accessError,
+        } = await accessQuery;
 
-      const subjectsData = Array.from(subjectsMap.values());
+        if (accessError) {
+          throw accessError;
+        }
 
+        const subjectsMap = new Map();
+
+        (accessData || []).forEach((item) => {
+          const subject = item.subjects;
+
+          if (!subject || !subject.is_active) {
+            return;
+          }
+
+          subjectsMap.set(subject.id, subject);
+        });
+
+        subjectsData = Array.from(subjectsMap.values());
+      }
+
+      // ==========================================
+      // 🔵 الثالث الثانوي
+      // sections + subject_sections
+      // ==========================================
+      else if (gradeLevel === "third_secondary") {
+        if (!studentSection) {
+          throw new Error("لم يتم تحديد شعبة الطالب");
+        }
+
+        const {
+          data: sectionData,
+          error: sectionError,
+        } = await supabase
+          .from("sections")
+          .select("id, name")
+          .eq("name", studentSection)
+          .maybeSingle();
+
+        if (sectionError) {
+          throw sectionError;
+        }
+
+        if (!sectionData) {
+          throw new Error(
+            `لم يتم العثور على الشعبة "${studentSection}" في جدول الشعب`
+          );
+        }
+
+        const {
+          data: subjectSectionsData,
+          error: subjectSectionsError,
+        } = await supabase
+          .from("subject_sections")
+          .select(`
+            subject_id,
+            section_id,
+            subjects (
+              id,
+              name,
+              subtitle,
+              icon,
+              icon_class,
+              is_active,
+              type,
+              slug
+            )
+          `)
+          .eq("section_id", sectionData.id);
+
+        if (subjectSectionsError) {
+          throw subjectSectionsError;
+        }
+
+        const subjectsMap = new Map();
+
+        (subjectSectionsData || []).forEach((item) => {
+          const subject = item.subjects;
+
+          if (!subject || !subject.is_active) {
+            return;
+          }
+
+          subjectsMap.set(subject.id, subject);
+        });
+
+        subjectsData = Array.from(subjectsMap.values());
+      }
+
+      // ==========================================
+      // 🟠 fallback
+      // ==========================================
+      else {
+        throw new Error("الصف الدراسي غير مدعوم حاليًا");
+      }
+
+      // ==========================================
+      // 4️⃣ لا توجد مواد
+      // ==========================================
       if (subjectsData.length === 0) {
         setSubjects([]);
         return;
       }
 
+      // ==========================================
+      // 5️⃣ IDs المواد
+      // ==========================================
       const subjectIds = subjectsData.map(
         (subject) => subject.id
       );
 
       // ==========================================
       // 6️⃣ جلب الوحدات من المنهج الجديد
+      // لجميع الصفوف
       // ==========================================
       const {
         data: unitsData,
@@ -326,7 +425,7 @@ const FocusSession = () => {
       const units = unitsData || [];
 
       // ==========================================
-      // 7️⃣ جلب الدروس من المنهج الجديد
+      // 7️⃣ جلب الدروس
       // ==========================================
       const unitIds = units.map(
         (unit) => unit.id
@@ -390,25 +489,33 @@ const FocusSession = () => {
       });
 
       // ==========================================
-      // 🔟 تجهيز البيانات للصفحة
+      // 🔟 تجهيز المواد للصفحة
       // ==========================================
       const formattedSubjects = subjectsData
         .map((subject) => {
           const allSubjectUnits =
             unitsBySubject[subject.id] || [];
 
+          // ------------------------------------------
           // الوحدات الرئيسية
+          // ------------------------------------------
           const mainUnits = allSubjectUnits.filter(
             (unit) => !unit.parent_unit_id
           );
 
+          // ------------------------------------------
           // كل الدروس
+          // ------------------------------------------
           const lessons = allSubjectUnits.flatMap(
             (unit) =>
               (unit.lessons || []).map((lesson) => ({
                 ...lesson,
+
+                // مهم جدًا لأن FocusSession
+                // يستخدمهم في اختيار الدرس
                 unitId: unit.id,
                 unitTitle: unit.title,
+
                 parentUnitId:
                   unit.parent_unit_id || null,
               }))
@@ -424,10 +531,10 @@ const FocusSession = () => {
             // الوحدات الرئيسية
             units: mainUnits,
 
-            // كل الوحدات، الرئيسية والفرعية
+            // جميع الوحدات
             allUnits: allSubjectUnits,
 
-            // كل الدروس
+            // جميع الدروس
             lessons,
           };
         })

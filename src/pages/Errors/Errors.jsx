@@ -68,6 +68,16 @@ const emptyForm = {
   lesson_id: "",
 };
 
+const trackLabels = {
+  science: "علمي علوم",
+  math: "علمي رياضة",
+  literary: "أدبي",
+  medicine_life: "الطب وعلوم الحياة",
+  engineering_cs: "الهندسة وعلوم الحاسب",
+  business: "إدارة الأعمال",
+  arts: "الآداب والفنون",
+};
+
 const getDisplayName = (item, fallback = "بدون اسم") => {
   if (!item) return fallback;
 
@@ -175,7 +185,7 @@ export default function Errors() {
   }, []);
 
   // =========================================================
-  // Fetch subjects according to student's section
+  // Fetch subjects according to student's curriculum
   // =========================================================
 
   const fetchSubjects = useCallback(async () => {
@@ -202,7 +212,10 @@ export default function Errors() {
       .select(`
         id,
         user_id,
-        section
+        section,
+        grade_level,
+        education_system,
+        track
       `)
       .eq("user_id", currentUser.id)
       .maybeSingle();
@@ -213,81 +226,159 @@ export default function Errors() {
       throw new Error("لم يتم العثور على بيانات الطالب");
     }
 
-    const studentSection = profileData.section?.trim();
+    const gradeLevel = profileData.grade_level?.trim();
+    const educationSystem =
+      profileData.education_system?.trim();
+    const track = profileData.track?.trim();
 
-    if (!studentSection) {
-      throw new Error("لم يتم تحديد شعبة الطالب");
+    if (!gradeLevel) {
+      throw new Error("لم يتم تحديد الصف الدراسي");
     }
 
-    // -------------------------------------------------------
-    // Section
-    // -------------------------------------------------------
+    // =======================================================
+    // First / Second Secondary
+    // =======================================================
 
-    const {
-      data: sectionData,
-      error: sectionError,
-    } = await supabase
-      .from("sections")
-      .select(`
-        id,
-        name
-      `)
-      .eq("name", studentSection)
-      .maybeSingle();
+    if (
+      gradeLevel === "first_secondary" ||
+      gradeLevel === "second_secondary"
+    ) {
+      if (!educationSystem) {
+        throw new Error("لم يتم تحديد نظام التعليم");
+      }
 
-    if (sectionError) throw sectionError;
+      let query = supabase
+        .from("subject_curriculum_access")
+        .select(`
+          subject_id,
+          grade_level,
+          education_system,
+          track,
+          subjects (
+            id,
+            name,
+            subtitle,
+            type,
+            icon,
+            icon_class,
+            is_active,
+            slug
+          )
+        `)
+        .eq("grade_level", gradeLevel)
+        .eq("education_system", educationSystem);
 
-    if (!sectionData) {
-      throw new Error(
-        `لم يتم العثور على الشعبة "${studentSection}"`
+      if (track) {
+        query = query.or(
+          `track.eq.${track},track.is.null`
+        );
+      } else {
+        query = query.is("track", null);
+      }
+
+      const {
+        data: accessData,
+        error: accessError,
+      } = await query;
+
+      if (accessError) throw accessError;
+
+      const subjectsMap = new Map();
+
+      (accessData || []).forEach((item) => {
+        const subject = item.subjects;
+
+        if (!subject || !subject.is_active) return;
+
+        subjectsMap.set(subject.id, subject);
+      });
+
+      return Array.from(subjectsMap.values()).sort(
+        (a, b) =>
+          String(a.name || "").localeCompare(
+            String(b.name || ""),
+            "ar"
+          )
       );
     }
 
-    // -------------------------------------------------------
-    // Subjects linked to section
-    // -------------------------------------------------------
+    // =======================================================
+    // Third Secondary
+    // =======================================================
 
-    const {
-      data: subjectSectionsData,
-      error: subjectSectionsError,
-    } = await supabase
-      .from("subject_sections")
-      .select(`
-        subject_id,
-        section_id,
-        subjects (
+    if (gradeLevel === "third_secondary") {
+      const studentSection =
+        profileData.section?.trim();
+
+      if (!studentSection) {
+        throw new Error("لم يتم تحديد شعبة الطالب");
+      }
+
+      const {
+        data: sectionData,
+        error: sectionError,
+      } = await supabase
+        .from("sections")
+        .select(`
           id,
-          name,
-          subtitle,
-          type,
-          icon,
-          icon_class,
-          is_active,
-          slug
-        )
-      `)
-      .eq("section_id", sectionData.id);
+          name
+        `)
+        .eq("name", studentSection)
+        .maybeSingle();
 
-    if (subjectSectionsError) {
-      throw subjectSectionsError;
+      if (sectionError) throw sectionError;
+
+      if (!sectionData) {
+        throw new Error(
+          `لم يتم العثور على الشعبة "${studentSection}"`
+        );
+      }
+
+      const {
+        data: subjectSectionsData,
+        error: subjectSectionsError,
+      } = await supabase
+        .from("subject_sections")
+        .select(`
+          subject_id,
+          section_id,
+          subjects (
+            id,
+            name,
+            subtitle,
+            type,
+            icon,
+            icon_class,
+            is_active,
+            slug
+          )
+        `)
+        .eq("section_id", sectionData.id);
+
+      if (subjectSectionsError) {
+        throw subjectSectionsError;
+      }
+
+      const subjectsMap = new Map();
+
+      (subjectSectionsData || []).forEach((item) => {
+        const subject = item.subjects;
+
+        if (!subject || !subject.is_active) return;
+
+        subjectsMap.set(subject.id, subject);
+      });
+
+      return Array.from(subjectsMap.values()).sort(
+        (a, b) =>
+          String(a.name || "").localeCompare(
+            String(b.name || ""),
+            "ar"
+          )
+      );
     }
 
-    const subjectsMap = new Map();
-
-    (subjectSectionsData || []).forEach((item) => {
-      const subject = item.subjects;
-
-      if (!subject || !subject.is_active) return;
-
-      subjectsMap.set(subject.id, subject);
-    });
-
-    return Array.from(subjectsMap.values()).sort((a, b) =>
-      String(a.name || "").localeCompare(
-        String(b.name || ""),
-        "ar"
-      )
-    );
+    throw new Error("نوع الصف الدراسي غير مدعوم.");
   }, []);
 
   // =========================================================
@@ -390,7 +481,7 @@ export default function Errors() {
         }
 
         // ---------------------------------------------------
-        // 2. Subjects according to student's section
+        // 2. Subjects according to student's curriculum
         // ---------------------------------------------------
 
         const subjectsData = await fetchSubjects();
@@ -403,7 +494,8 @@ export default function Errors() {
           (subject) => subject.id
         );
 
-        const unitsData = await fetchUnits(subjectIds);
+        const unitsData =
+          await fetchUnits(subjectIds);
 
         // ---------------------------------------------------
         // 4. New lessons
@@ -413,7 +505,8 @@ export default function Errors() {
           (unit) => unit.id
         );
 
-        const lessonsData = await fetchLessons(unitIds);
+        const lessonsData =
+          await fetchLessons(unitIds);
 
         // ---------------------------------------------------
         // 5. Set state
@@ -454,7 +547,8 @@ export default function Errors() {
     let mounted = true;
 
     const load = async () => {
-      const currentUser = await getCurrentUser();
+      const currentUser =
+        await getCurrentUser();
 
       if (!mounted) return;
 
@@ -482,9 +576,11 @@ export default function Errors() {
   useEffect(() => {
     if (!user?.id) return;
 
-    const channelName = `study-errors-${user.id}`;
+    const channelName =
+      `study-errors-${user.id}`;
 
-    const channel = supabase.channel(channelName);
+    const channel =
+      supabase.channel(channelName);
 
     channel.on(
       "postgres_changes",
@@ -610,15 +706,20 @@ export default function Errors() {
 
     const repeated = errors.filter(
       (error) =>
-        Number(error.repetition_count || 0) > 1
+        Number(
+          error.repetition_count || 0
+        ) > 1
     ).length;
 
-    const totalRepetitions = errors.reduce(
-      (sum, error) =>
-        sum +
-        Number(error.repetition_count || 0),
-      0
-    );
+    const totalRepetitions =
+      errors.reduce(
+        (sum, error) =>
+          sum +
+          Number(
+            error.repetition_count || 0
+          ),
+        0
+      );
 
     return {
       total,
@@ -857,20 +958,27 @@ export default function Errors() {
 
         const updateData = {
           title: form.title.trim(),
+
           description:
             form.description.trim(),
+
           category:
             form.category.trim() || null,
+
           status: form.status,
+
           is_corrected: isCorrected,
+
           solution:
             form.solution.trim() || null,
 
-          // NEW curriculum IDs
+          // New curriculum IDs
           subject_id:
             form.subject_id || null,
+
           unit_id:
             form.unit_id || null,
+
           lesson_id:
             form.lesson_id || null,
 
@@ -880,11 +988,12 @@ export default function Errors() {
               : editingError.last_reviewed_at,
         };
 
-        const { error } = await supabase
-          .from("study_errors")
-          .update(updateData)
-          .eq("id", editingError.id)
-          .eq("user_id", user.id);
+        const { error } =
+          await supabase
+            .from("study_errors")
+            .update(updateData)
+            .eq("id", editingError.id)
+            .eq("user_id", user.id);
 
         if (error) throw error;
 
@@ -893,44 +1002,53 @@ export default function Errors() {
           "تم تعديل الخطأ بنجاح"
         );
       } else {
-        const { error } = await supabase
-          .from("study_errors")
-          .insert({
-            user_id: user.id,
+        const { error } =
+          await supabase
+            .from("study_errors")
+            .insert({
+              user_id: user.id,
 
-            // NEW curriculum IDs
-            subject_id:
-              form.subject_id || null,
-            unit_id:
-              form.unit_id || null,
-            lesson_id:
-              form.lesson_id || null,
+              // New curriculum IDs
+              subject_id:
+                form.subject_id || null,
 
-            title: form.title.trim(),
-            description:
-              form.description.trim(),
+              unit_id:
+                form.unit_id || null,
 
-            category:
-              form.category.trim() || null,
+              lesson_id:
+                form.lesson_id || null,
 
-            status: form.status,
+              title:
+                form.title.trim(),
 
-            repetition_count: 1,
+              description:
+                form.description.trim(),
 
-            is_corrected:
-              form.status === "corrected",
+              category:
+                form.category.trim() || null,
 
-            solution:
-              form.solution.trim() || null,
+              status:
+                form.status,
 
-            last_occurred_at:
-              new Date().toISOString(),
+              repetition_count: 1,
 
-            last_reviewed_at:
-              form.status !== "uncorrected"
-                ? new Date().toISOString()
-                : null,
-          });
+              is_corrected:
+                form.status ===
+                "corrected",
+
+              solution:
+                form.solution.trim() ||
+                null,
+
+              last_occurred_at:
+                new Date().toISOString(),
+
+              last_reviewed_at:
+                form.status !==
+                "uncorrected"
+                  ? new Date().toISOString()
+                  : null,
+            });
 
         if (error) throw error;
 
@@ -977,11 +1095,12 @@ export default function Errors() {
     if (!result.isConfirmed) return;
 
     try {
-      const { error } = await supabase
-        .from("study_errors")
-        .delete()
-        .eq("id", errorItem.id)
-        .eq("user_id", user.id);
+      const { error } =
+        await supabase
+          .from("study_errors")
+          .delete()
+          .eq("id", errorItem.id)
+          .eq("user_id", user.id);
 
       if (error) throw error;
 
@@ -1017,18 +1136,21 @@ export default function Errors() {
       const nextCorrected =
         !currentlyCorrected;
 
-      const { error } = await supabase
-        .from("study_errors")
-        .update({
-          is_corrected: nextCorrected,
-          status: nextCorrected
-            ? "corrected"
-            : "uncorrected",
-          last_reviewed_at:
-            new Date().toISOString(),
-        })
-        .eq("id", errorItem.id)
-        .eq("user_id", user.id);
+      const { error } =
+        await supabase
+          .from("study_errors")
+          .update({
+            is_corrected: nextCorrected,
+
+            status: nextCorrected
+              ? "corrected"
+              : "uncorrected",
+
+            last_reviewed_at:
+              new Date().toISOString(),
+          })
+          .eq("id", errorItem.id)
+          .eq("user_id", user.id);
 
       if (error) throw error;
 
@@ -1064,17 +1186,21 @@ export default function Errors() {
           errorItem.repetition_count || 0
         ) + 1;
 
-      const { error } = await supabase
-        .from("study_errors")
-        .update({
-          repetition_count: nextCount,
-          last_occurred_at:
-            new Date().toISOString(),
-          is_corrected: false,
-          status: "uncorrected",
-        })
-        .eq("id", errorItem.id)
-        .eq("user_id", user.id);
+      const { error } =
+        await supabase
+          .from("study_errors")
+          .update({
+            repetition_count: nextCount,
+
+            last_occurred_at:
+              new Date().toISOString(),
+
+            is_corrected: false,
+
+            status: "uncorrected",
+          })
+          .eq("id", errorItem.id)
+          .eq("user_id", user.id);
 
       if (error) throw error;
 
@@ -1131,10 +1257,6 @@ export default function Errors() {
 
       <main className="errors-container">
 
-        {/* ================================================= */}
-        {/* Header */}
-        {/* ================================================= */}
-
         <section className="errors-hero">
           <div className="errors-hero-content">
             <div className="errors-title-row">
@@ -1161,10 +1283,6 @@ export default function Errors() {
             </button>
           </div>
         </section>
-
-        {/* ================================================= */}
-        {/* Statistics */}
-        {/* ================================================= */}
 
         <section className="errors-stats">
 
@@ -1224,10 +1342,6 @@ export default function Errors() {
           </div>
 
         </section>
-
-        {/* ================================================= */}
-        {/* Search + filters */}
-        {/* ================================================= */}
 
         <section className="errors-toolbar">
 
@@ -1404,10 +1518,6 @@ export default function Errors() {
           </section>
         )}
 
-        {/* ================================================= */}
-        {/* Results info */}
-        {/* ================================================= */}
-
         <div className="errors-results-info">
 
           <div>
@@ -1433,10 +1543,6 @@ export default function Errors() {
           )}
 
         </div>
-
-        {/* ================================================= */}
-        {/* Loading */}
-        {/* ================================================= */}
 
         {loading ? (
           <section className="errors-loading">
@@ -1711,10 +1817,6 @@ export default function Errors() {
         )}
 
       </main>
-
-      {/* ================================================= */}
-      {/* Modal */}
-      {/* ================================================= */}
 
       {showModal && (
         <div

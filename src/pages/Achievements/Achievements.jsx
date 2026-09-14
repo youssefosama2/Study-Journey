@@ -10,11 +10,8 @@ import {
   FaCalendarAlt,
   FaClock,
   FaFileAlt,
-  FaCheckSquare,
-  FaArrowUp,
   FaChevronLeft,
   FaChevronRight,
-  FaGraduationCap,
   FaTasks,
   FaLightbulb,
   FaCheckCircle,
@@ -52,76 +49,120 @@ const Achievements = () => {
   ===================================================== */
 
   const getAchievementIcon = (achievement) => {
-    const title = achievement?.title || "";
     const category = achievement?.category || "";
-    const icon = achievement?.icon || "";
+    const icon = String(achievement?.icon || "").trim().toLowerCase();
 
     /*
-      لو الـ icon المخزن في DB عبارة عن Emoji
-      نعرضه مباشرة.
+      Icons المدعومة من قاعدة البيانات.
+      أي قيمة غير موجودة هنا ممكن تكون Emoji
+      وبالتالي نعرضها كما هي.
     */
 
+    const supportedIcons = [
+      "star",
+      "fire",
+      "shield",
+      "medal",
+      "trophy",
+      "book",
+      "target",
+      "bullseye",
+      "calendar",
+      "clock",
+      "file",
+      "task",
+      "rocket",
+      "award",
+    ];
+
+    /*
+      لو الـ icon Emoji أو قيمة مخصصة
+      نعرضها مباشرة.
+    */
     if (
-      icon &&
-      ![
-        "star",
-        "fire",
-        "shield",
-        "medal",
-        "trophy",
-        "book",
-        "target",
-        "calendar",
-        "clock",
-        "file",
-        "task",
-        "rocket",
-        "award",
-      ].includes(icon.toLowerCase())
+      achievement?.icon &&
+      !supportedIcons.includes(icon)
     ) {
-      return <span className="achievement-db-icon">{icon}</span>;
+      return (
+        <span className="achievement-db-icon">
+          {achievement.icon}
+        </span>
+      );
     }
 
-    const iconName = icon.toLowerCase();
+    /* =========================
+      ICON MAPPING
+    ========================= */
 
-    if (iconName === "fire" || category === "الالتزام") {
-      return <FaFire />;
-    }
-
-    if (iconName === "trophy") {
-      return <FaTrophy />;
-    }
-
-    if (iconName === "target" || category === "الأهداف") {
+    if (
+      icon === "bullseye" ||
+      icon === "target" ||
+      category === "الأهداف"
+    ) {
       return <FaBullseye />;
     }
 
-    if (iconName === "book" || category === "الدراسة") {
+    if (
+      icon === "fire" ||
+      category === "الالتزام"
+    ) {
+      return <FaFire />;
+    }
+
+    if (icon === "trophy") {
+      return <FaTrophy />;
+    }
+
+    if (
+      icon === "book" ||
+      category === "الدراسة"
+    ) {
       return <FaBookOpen />;
     }
 
-    if (iconName === "calendar") {
+    if (icon === "calendar") {
       return <FaCalendarAlt />;
     }
 
-    if (iconName === "clock" || category === "التركيز") {
+    if (
+      icon === "clock" ||
+      category === "التركيز"
+    ) {
       return <FaClock />;
     }
 
-    if (iconName === "file" || category === "المعلومات") {
+    if (
+      icon === "file" ||
+      category === "المعلومات"
+    ) {
       return <FaFileAlt />;
     }
 
-    if (iconName === "task" || category === "المهام") {
+    if (
+      icon === "task" ||
+      category === "المهام"
+    ) {
       return <FaTasks />;
     }
 
-    if (iconName === "rocket") {
+    if (icon === "rocket") {
       return <FaRocket />;
     }
 
-    if (iconName === "award") {
+    if (icon === "award") {
       return <FaAward />;
+    }
+
+    if (icon === "star") {
+      return <FaStar />;
+    }
+
+    if (icon === "shield") {
+      return <FaShieldAlt />;
+    }
+
+    if (icon === "medal") {
+      return <FaMedal />;
     }
 
     if (category === "المراجعة") {

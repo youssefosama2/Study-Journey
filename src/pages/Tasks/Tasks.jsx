@@ -353,7 +353,7 @@ const Tasks = () => {
       }
 
       /* -----------------------------------------------
-         Student Profile
+        Student Profile
       ------------------------------------------------ */
 
       const {
@@ -364,7 +364,10 @@ const Tasks = () => {
         .select(`
           id,
           user_id,
-          section
+          section,
+          grade_level,
+          education_system,
+          track
         `)
         .eq("user_id", user.id)
         .maybeSingle();
@@ -379,77 +382,224 @@ const Tasks = () => {
         );
       }
 
-      const studentSection =
-        profileData.section?.trim();
+      const gradeLevel =
+        profileData.grade_level?.trim();
 
-      if (!studentSection) {
+      const educationSystem =
+        profileData.education_system?.trim();
+
+      const track =
+        profileData.track?.trim();
+
+      /* -----------------------------------------------
+        Validate Grade
+      ------------------------------------------------ */
+
+      if (!gradeLevel) {
         throw new Error(
-          "لم يتم تحديد شعبة الطالب"
+          "لم يتم تحديد الصف الدراسي"
         );
       }
 
-      /* -----------------------------------------------
-         Section
-      ------------------------------------------------ */
+      /* =================================================
+        FIRST / SECOND SECONDARY
+        
+        الجديد:
+        subject_curriculum_access
+      ================================================= */
 
-      const {
-        data: sectionData,
-        error: sectionError,
-      } = await supabase
-        .from("sections")
-        .select(`
-          id,
-          name
-        `)
-        .eq("name", studentSection)
-        .maybeSingle();
+      if (
+        gradeLevel ===
+          "first_secondary" ||
+        gradeLevel ===
+          "second_secondary"
+      ) {
+        if (!educationSystem) {
+          throw new Error(
+            "لم يتم تحديد نظام التعليم"
+          );
+        }
 
-      if (sectionError) {
-        throw sectionError;
-      }
-
-      if (!sectionData) {
-        throw new Error(
-          `لم يتم العثور على الشعبة "${studentSection}"`
-        );
-      }
-
-      /* -----------------------------------------------
-         Subjects
-      ------------------------------------------------ */
-
-      const {
-        data: subjectSectionsData,
-        error: subjectSectionsError,
-      } = await supabase
-        .from("subject_sections")
-        .select(`
-          subject_id,
-          section_id,
-          subjects (
-            id,
-            name,
-            subtitle,
-            type,
-            icon,
-            icon_class,
-            is_active,
-            slug
+        let query = supabase
+          .from(
+            "subject_curriculum_access"
           )
-        `)
-        .eq(
-          "section_id",
-          sectionData.id
+          .select(`
+            subject_id,
+            grade_level,
+            education_system,
+            track,
+            subjects (
+              id,
+              name,
+              subtitle,
+              type,
+              icon,
+              icon_class,
+              is_active,
+              slug
+            )
+          `)
+          .eq(
+            "grade_level",
+            gradeLevel
+          )
+          .eq(
+            "education_system",
+            educationSystem
+          );
+
+        /*
+          لو الطالب عنده Track:
+          نجيب المواد الخاصة بالـ track
+          بالإضافة للمواد العامة track = null
+        */
+
+        if (track) {
+          query = query.or(
+            `track.eq.${track},track.is.null`
+          );
+        } else {
+          query = query.is(
+            "track",
+            null
+          );
+        }
+
+        const {
+          data: accessData,
+          error: accessError,
+        } = await query;
+
+        if (accessError) {
+          throw accessError;
+        }
+
+        const subjectsMap =
+          new Map();
+
+        (accessData || []).forEach(
+          (item) => {
+            const subject =
+              item.subjects;
+
+            if (
+              !subject ||
+              !subject.is_active
+            ) {
+              return;
+            }
+
+            subjectsMap.set(
+              subject.id,
+              subject
+            );
+          }
         );
 
-      if (subjectSectionsError) {
-        throw subjectSectionsError;
+        return Array.from(
+          subjectsMap.values()
+        ).sort((a, b) =>
+          String(
+            a.name || ""
+          ).localeCompare(
+            String(
+              b.name || ""
+            ),
+            "ar"
+          )
+        );
       }
 
-      const subjectsMap = new Map();
+      /* =================================================
+        THIRD SECONDARY
+        
+        القديم:
+        sections + subject_sections
+      ================================================= */
 
-      (subjectSectionsData || []).forEach(
-        (item) => {
+      if (
+        gradeLevel ===
+        "third_secondary"
+      ) {
+        const studentSection =
+          profileData.section?.trim();
+
+        if (!studentSection) {
+          throw new Error(
+            "لم يتم تحديد شعبة الطالب"
+          );
+        }
+
+        /* -----------------------------------------------
+          Section
+        ------------------------------------------------ */
+
+        const {
+          data: sectionData,
+          error: sectionError,
+        } = await supabase
+          .from("sections")
+          .select(`
+            id,
+            name
+          `)
+          .eq(
+            "name",
+            studentSection
+          )
+          .maybeSingle();
+
+        if (sectionError) {
+          throw sectionError;
+        }
+
+        if (!sectionData) {
+          throw new Error(
+            `لم يتم العثور على الشعبة "${studentSection}"`
+          );
+        }
+
+        /* -----------------------------------------------
+          Subjects
+        ------------------------------------------------ */
+
+        const {
+          data: subjectSectionsData,
+          error: subjectSectionsError,
+        } = await supabase
+          .from("subject_sections")
+          .select(`
+            subject_id,
+            section_id,
+            subjects (
+              id,
+              name,
+              subtitle,
+              type,
+              icon,
+              icon_class,
+              is_active,
+              slug
+            )
+          `)
+          .eq(
+            "section_id",
+            sectionData.id
+          );
+
+        if (
+          subjectSectionsError
+        ) {
+          throw subjectSectionsError;
+        }
+
+        const subjectsMap =
+          new Map();
+
+        (
+          subjectSectionsData || []
+        ).forEach((item) => {
           const subject =
             item.subjects;
 
@@ -464,16 +614,24 @@ const Tasks = () => {
             subject.id,
             subject
           );
-        }
-      );
+        });
 
-      return Array.from(
-        subjectsMap.values()
-      ).sort((a, b) =>
-        String(a.name || "").localeCompare(
-          String(b.name || ""),
-          "ar"
-        )
+        return Array.from(
+          subjectsMap.values()
+        ).sort((a, b) =>
+          String(
+            a.name || ""
+          ).localeCompare(
+            String(
+              b.name || ""
+            ),
+            "ar"
+          )
+        );
+      }
+
+      throw new Error(
+        "نوع الصف الدراسي غير مدعوم."
       );
     },
     []

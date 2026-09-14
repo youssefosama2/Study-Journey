@@ -214,12 +214,18 @@ const Notes = () => {
       // =========================
       // STUDENT PROFILE
       // =========================
-      const { data: profileData, error: profileError } = await supabase
+      const {
+        data: profileData,
+        error: profileError,
+      } = await supabase
         .from("student_profiles")
         .select(`
           id,
           user_id,
-          section
+          section,
+          grade_level,
+          education_system,
+          track
         `)
         .eq("user_id", currentUser.id)
         .maybeSingle();
@@ -233,85 +239,183 @@ const Notes = () => {
         throw new Error("لم يتم العثور على بيانات الطالب");
       }
 
-      const studentSection = profileData.section?.trim();
+      const gradeLevel = profileData.grade_level?.trim();
+      const educationSystem = profileData.education_system?.trim();
+      const track = profileData.track?.trim();
 
-      if (!studentSection) {
-        throw new Error("لم يتم تحديد شعبة الطالب");
+      if (!gradeLevel) {
+        throw new Error("لم يتم تحديد الصف الدراسي");
       }
 
-      // =========================
-      // SECTION
-      // =========================
-      const { data: sectionData, error: sectionError } = await supabase
-        .from("sections")
-        .select(`
-          id,
-          name
-        `)
-        .eq("name", studentSection)
-        .maybeSingle();
+      let subjectsData = [];
 
-      if (sectionError) {
-        console.error("Section error:", sectionError);
-        throw sectionError;
-      }
+      // =====================================================
+      // FIRST + SECOND SECONDARY
+      // curriculum access
+      // =====================================================
+      if (
+        gradeLevel === "first_secondary" ||
+        gradeLevel === "second_secondary"
+      ) {
+        if (!educationSystem) {
+          throw new Error("لم يتم تحديد نظام التعليم");
+        }
 
-      if (!sectionData) {
-        throw new Error(
-          `لم يتم العثور على الشعبة "${studentSection}"`
-        );
-      }
+        let subjectQuery = supabase
+          .from("subject_curriculum_access")
+          .select(`
+            subject_id,
+            grade_level,
+            education_system,
+            track,
+            subjects (
+              id,
+              name,
+              subtitle,
+              type,
+              icon,
+              icon_class,
+              is_active,
+              slug
+            )
+          `)
+          .eq("grade_level", gradeLevel)
+          .eq("education_system", educationSystem);
 
-      // =========================
-      // SUBJECTS BY SECTION
-      // =========================
-      const {
-        data: subjectSectionsData,
-        error: subjectSectionsError,
-      } = await supabase
-        .from("subject_sections")
-        .select(`
-          subject_id,
-          section_id,
-          subjects (
-            id,
-            name,
-            subtitle,
-            type,
-            icon,
-            icon_class,
-            is_active,
-            slug
+        // لو الطالب عنده Track
+        // هات المواد الخاصة بالـ Track
+        // + المواد العامة التي track فيها null
+        if (track) {
+          subjectQuery = subjectQuery.or(
+            `track.eq.${track},track.is.null`
+          );
+        } else {
+          subjectQuery = subjectQuery.is("track", null);
+        }
+
+        const {
+          data: accessData,
+          error: accessError,
+        } = await subjectQuery;
+
+        if (accessError) {
+          console.error(
+            "Curriculum access error:",
+            accessError
+          );
+          throw accessError;
+        }
+
+        const subjectsMap = new Map();
+
+        (accessData || []).forEach((item) => {
+          const subject = item.subjects;
+
+          if (!subject || !subject.is_active) return;
+
+          subjectsMap.set(subject.id, subject);
+        });
+
+        subjectsData = Array.from(
+          subjectsMap.values()
+        ).sort((a, b) =>
+          String(a.name || "").localeCompare(
+            String(b.name || ""),
+            "ar"
           )
-        `)
-        .eq("section_id", sectionData.id);
-
-      if (subjectSectionsError) {
-        console.error(
-          "Subject sections error:",
-          subjectSectionsError
         );
-        throw subjectSectionsError;
       }
 
-      const subjectsMap = new Map();
+      // =====================================================
+      // THIRD SECONDARY
+      // section + subject_sections
+      // =====================================================
+      else if (gradeLevel === "third_secondary") {
+        const studentSection = profileData.section?.trim();
 
-      (subjectSectionsData || []).forEach((item) => {
-        const subject = item.subjects;
+        if (!studentSection) {
+          throw new Error("لم يتم تحديد شعبة الطالب");
+        }
 
-        if (!subject || !subject.is_active) return;
+        // =========================
+        // SECTION
+        // =========================
+        const {
+          data: sectionData,
+          error: sectionError,
+        } = await supabase
+          .from("sections")
+          .select(`
+            id,
+            name
+          `)
+          .eq("name", studentSection)
+          .maybeSingle();
 
-        subjectsMap.set(subject.id, subject);
-      });
+        if (sectionError) {
+          console.error("Section error:", sectionError);
+          throw sectionError;
+        }
 
-      const subjectsData = Array.from(
-        subjectsMap.values()
-      ).sort((a, b) =>
-        String(a.name || "").localeCompare(
-          String(b.name || ""),
-          "ar"
-        )
-      );
+        if (!sectionData) {
+          throw new Error(
+            `لم يتم العثور على الشعبة "${studentSection}"`
+          );
+        }
+
+        // =========================
+        // SUBJECTS BY SECTION
+        // =========================
+        const {
+          data: subjectSectionsData,
+          error: subjectSectionsError,
+        } = await supabase
+          .from("subject_sections")
+          .select(`
+            subject_id,
+            section_id,
+            subjects (
+              id,
+              name,
+              subtitle,
+              type,
+              icon,
+              icon_class,
+              is_active,
+              slug
+            )
+          `)
+          .eq("section_id", sectionData.id);
+
+        if (subjectSectionsError) {
+          console.error(
+            "Subject sections error:",
+            subjectSectionsError
+          );
+          throw subjectSectionsError;
+        }
+
+        const subjectsMap = new Map();
+
+        (subjectSectionsData || []).forEach((item) => {
+          const subject = item.subjects;
+
+          if (!subject || !subject.is_active) return;
+
+          subjectsMap.set(subject.id, subject);
+        });
+
+        subjectsData = Array.from(
+          subjectsMap.values()
+        ).sort((a, b) =>
+          String(a.name || "").localeCompare(
+            String(b.name || ""),
+            "ar"
+          )
+        );
+      } else {
+        throw new Error("نوع الصف الدراسي غير مدعوم.");
+      }
 
       // =========================
       // UNITS
@@ -323,7 +427,10 @@ const Notes = () => {
       let unitsData = [];
 
       if (subjectIds.length) {
-        const { data, error } = await supabase
+        const {
+          data,
+          error,
+        } = await supabase
           .from("units")
           .select(`
             id,
@@ -357,7 +464,10 @@ const Notes = () => {
       let lessonsData = [];
 
       if (unitIds.length) {
-        const { data, error } = await supabase
+        const {
+          data,
+          error,
+        } = await supabase
           .from("lessons")
           .select(`
             id,

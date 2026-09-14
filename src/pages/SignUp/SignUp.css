@@ -1,6 +1,6 @@
 .signup-page {
   min-height: 100vh;
-  height: 100vh;
+  /* height: 100vh; */
   background: var(--bg-primary, #f8faff);
   display: flex;
   align-items: center;

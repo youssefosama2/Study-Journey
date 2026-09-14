@@ -150,6 +150,23 @@ const SubjectDetails = () => {
   const [userId, setUserId] = useState(null);
 
   /* =========================================================
+     CURRICULUM MODE
+
+     أولى / تانية / تالتة:
+     curriculum tables
+     units / lessons
+
+     الفرق:
+     أولى / تانية:
+     access = subject_curriculum_access
+
+     تالتة:
+     access = subject_sections
+  ========================================================= */
+
+  const [isNewCurriculum, setIsNewCurriculum] = useState(false);
+
+  /* =========================================================
      SUBJECT
   ========================================================= */
 
@@ -178,14 +195,6 @@ const SubjectDetails = () => {
   const [activeTab, setActiveTab] = useState("lessons");
 
   const [openUnits, setOpenUnits] = useState([]);
-
-  const toggleChildUnit = (unitId) => {
-    setOpenUnits((prev) =>
-      prev.includes(unitId)
-        ? prev.filter((id) => id !== unitId)
-        : [...prev, unitId]
-    );
-  };
 
   /* =========================================================
      EXAM MODAL
@@ -234,6 +243,62 @@ const SubjectDetails = () => {
         setUserId(user.id);
 
         /* =====================================================
+           STUDENT PROFILE
+        ===================================================== */
+
+        const {
+          data: profileData,
+          error: profileError,
+        } = await supabase
+          .from("student_profiles")
+          .select(`
+            section,
+            grade_level,
+            education_system,
+            track
+          `)
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (profileError) {
+          throw profileError;
+        }
+
+        if (!profileData) {
+          throw new Error("تعذر العثور على بيانات الطالب.");
+        }
+
+        const gradeLevel =
+          profileData.grade_level || "third_secondary";
+
+        const educationSystem =
+          profileData.education_system || "general";
+
+        const currentTrack =
+          profileData.track || null;
+
+        /*
+          مهم:
+
+          isNewCurriculum هنا اسم قديم في الكود،
+          لكنه حاليًا معناه:
+
+          هل الطالب أولى / تانية؟
+
+          أما تالتة فهي أيضًا تستخدم
+          units / lessons لعرض المنهج،
+          لكن access مختلف.
+        */
+
+        const firstSecondCurriculum =
+          gradeLevel === "first_secondary" ||
+          gradeLevel === "second_secondary";
+
+        if (!mounted) return;
+
+        setIsNewCurriculum(firstSecondCurriculum);
+
+        /* =====================================================
            SUBJECT
         ===================================================== */
 
@@ -263,14 +328,151 @@ const SubjectDetails = () => {
         }
 
         /* =====================================================
-           UNITS + LESSONS
-           
-           المصدر الأساسي للمنهج:
-           
-           units
-              ↓
-           lessons
+           CHECK SUBJECT ACCESS
         ===================================================== */
+
+        if (firstSecondCurriculum) {
+          /* ===================================================
+             أولى / تانية
+
+             subject_curriculum_access
+          =================================================== */
+
+          let accessQuery = supabase
+            .from("subject_curriculum_access")
+            .select(`
+              id,
+              subject_id,
+              grade_level,
+              education_system,
+              track
+            `)
+            .eq("subject_id", subjectData.id)
+            .eq("grade_level", gradeLevel)
+            .eq("education_system", educationSystem);
+
+          if (educationSystem === "general") {
+            accessQuery = accessQuery.is("track", null);
+          } else if (educationSystem === "baccalaureate") {
+            if (
+              gradeLevel === "first_secondary" ||
+              !currentTrack
+            ) {
+              accessQuery = accessQuery.is("track", null);
+            } else {
+              accessQuery = accessQuery.eq(
+                "track",
+                currentTrack
+              );
+            }
+          }
+
+          const {
+            data: accessData,
+            error: accessError,
+          } = await accessQuery.maybeSingle();
+
+          if (accessError) {
+            throw accessError;
+          }
+
+          if (!accessData) {
+            throw new Error(
+              "هذه المادة غير متاحة لمنهجك الدراسي الحالي."
+            );
+          }
+        } else {
+          /* ===================================================
+             تالتة ثانوي
+
+             هنا لا نستخدم subject_curriculum_access
+             لتحديد الوصول.
+
+             نستخدم:
+
+             student_profiles.section
+                    ↓
+             sections
+                    ↓
+             subject_sections
+          =================================================== */
+
+          const sectionName = profileData.section;
+
+          if (!sectionName) {
+            throw new Error(
+              "لم يتم تحديد شعبة الطالب في الملف الشخصي."
+            );
+          }
+
+          const {
+            data: sectionData,
+            error: sectionError,
+          } = await supabase
+            .from("sections")
+            .select(`
+              id,
+              name
+            `)
+            .eq("name", sectionName)
+            .maybeSingle();
+
+          if (sectionError) {
+            throw sectionError;
+          }
+
+          if (!sectionData) {
+            throw new Error(
+              `لم يتم العثور على الشعبة: ${sectionName}`
+            );
+          }
+
+          const {
+            data: sectionSubjectData,
+            error: sectionSubjectError,
+          } = await supabase
+            .from("subject_sections")
+            .select(`
+              id,
+              subject_id,
+              section_id
+            `)
+            .eq("subject_id", subjectData.id)
+            .eq("section_id", sectionData.id)
+            .maybeSingle();
+
+          if (sectionSubjectError) {
+            throw sectionSubjectError;
+          }
+
+          if (!sectionSubjectData) {
+            throw new Error(
+              `مادة ${subjectData.name} غير متاحة لشعبة ${sectionName}.`
+            );
+          }
+        }
+
+        /* =====================================================
+           CURRICULUM
+           
+           مهم جدًا:
+
+           كل المناهج الموجودة حاليًا في قاعدة البيانات
+           يتم تحميلها من:
+
+           units
+             ↓
+           lessons
+
+           بما فيها تالتة ثانوي.
+
+           تالتة فقط تختلف في طريقة التحقق من المادة:
+           subject_sections
+        ===================================================== */
+
+        let formattedUnits = [];
+
+        let lessonIds = [];
 
         const {
           data: unitsData,
@@ -303,91 +505,200 @@ const SubjectDetails = () => {
         }
 
         /* =====================================================
-           FORMAT CURRICULUM
-           
-           يدعم:
-           
-           وحدة رئيسية
-              ↓
-           وحدة فرعية
-              ↓
-           دروس
+           ACTIVE UNITS
         ===================================================== */
 
-        const activeUnits = (unitsData || []).filter(
-          (unit) => unit.is_active
-        );
+        const activeUnits = (unitsData || [])
+          .filter(
+            (unit) =>
+              unit.is_active === true
+          )
+          .sort(
+            (a, b) =>
+              Number(a.sort_order || 0) -
+              Number(b.sort_order || 0)
+          );
 
-        const formattedUnits = (unitsData || [])
-          .filter((unit) => !unit.parent_unit_id)
+        /* =====================================================
+           FORMAT CURRICULUM
+
+           Top-level units
+                ↓
+           Child units
+                ↓
+           Lessons
+        ===================================================== */
+
+        formattedUnits = activeUnits
+          .filter(
+            (unit) =>
+              !unit.parent_unit_id
+          )
           .map((unit) => {
-            const childUnits = (unitsData || [])
+            /* ===============================================
+               CHILD UNITS
+            =============================================== */
+
+            const childUnits = activeUnits
               .filter(
                 (child) =>
-                  child.parent_unit_id === unit.id &&
+                  child.parent_unit_id ===
+                    unit.id &&
                   child.is_active
               )
-              .sort((a, b) => a.sort_order - b.sort_order)
+              .sort(
+                (a, b) =>
+                  Number(
+                    a.sort_order || 0
+                  ) -
+                  Number(
+                    b.sort_order || 0
+                  )
+              )
               .map((child) => ({
                 id: child.id,
-                unitNumber: child.sort_order,
+
+                unitNumber:
+                  child.sort_order,
+
                 title: child.title,
 
-                lessons: (child.lessons || [])
-                  .filter((lesson) => lesson.is_active)
-                  .sort((a, b) => a.sort_order - b.sort_order)
-                  .map((lesson) => ({
-                    id: lesson.id,
-                    lessonNumber: lesson.sort_order,
-                    title: lesson.title,
-                  })),
+                lessons: (
+                  child.lessons || []
+                )
+                  .filter(
+                    (lesson) =>
+                      lesson.is_active === true
+                  )
+                  .sort(
+                    (a, b) =>
+                      Number(
+                        a.sort_order || 0
+                      ) -
+                      Number(
+                        b.sort_order || 0
+                      )
+                  )
+                  .map(
+                    (lesson) => ({
+                      id: lesson.id,
+
+                      lessonNumber:
+                        lesson.sort_order,
+
+                      title: lesson.title,
+                    })
+                  ),
               }));
 
-            const directLessons = (unit.lessons || [])
-              .filter((lesson) => lesson.is_active)
-              .sort((a, b) => a.sort_order - b.sort_order)
-              .map((lesson) => ({
-                id: lesson.id,
-                lessonNumber: lesson.sort_order,
-                title: lesson.title,
-              }));
+            /* ===============================================
+               DIRECT LESSONS
+            =============================================== */
+
+            const directLessons =
+              (unit.lessons || [])
+                .filter(
+                  (lesson) =>
+                    lesson.is_active === true
+                )
+                .sort(
+                  (a, b) =>
+                    Number(
+                      a.sort_order || 0
+                    ) -
+                    Number(
+                      b.sort_order || 0
+                    )
+                )
+                .map(
+                  (lesson) => ({
+                    id: lesson.id,
+
+                    lessonNumber:
+                      lesson.sort_order,
+
+                    title: lesson.title,
+                  })
+                );
 
             return {
               id: unit.id,
-              unitNumber: unit.sort_order,
+
+              unitNumber:
+                unit.sort_order,
+
               title: unit.title,
-              lessons: directLessons,
+
+              lessons:
+                directLessons,
+
               childUnits,
             };
           });
 
         /* =====================================================
-           COLLECT ALL LESSON IDS
+           ALL CURRICULUM LESSON IDS
         ===================================================== */
 
-        const lessonIds = formattedUnits.flatMap((unit) => [
-          ...unit.lessons.map((lesson) => lesson.id),
+        lessonIds =
+          formattedUnits.flatMap(
+            (unit) => [
+              ...unit.lessons.map(
+                (lesson) =>
+                  lesson.id
+              ),
 
-          ...unit.childUnits.flatMap((child) =>
-            child.lessons.map((lesson) => lesson.id)
-          ),
-        ]);
+              ...unit.childUnits.flatMap(
+                (child) =>
+                  child.lessons.map(
+                    (lesson) =>
+                      lesson.id
+                  )
+              ),
+            ]
+          );
+
+        /* =====================================================
+           DEBUG
+
+           تقدر تشوف في Console:
+
+           subject
+           units
+           lessons
+        ===================================================== */
+
+        console.log(
+          "SubjectDetails subject:",
+          subjectData
+        );
+
+        console.log(
+          "SubjectDetails units:",
+          formattedUnits
+        );
+
+        console.log(
+          "SubjectDetails lessonIds:",
+          lessonIds
+        );
 
         /* =====================================================
            STUDY RECORDS
            
-           IMPORTANT:
-           
-           نستخدم curriculum_lesson_id
-           لأنه مربوط بـ lessons.id
+           كل المنهج الحالي يستخدم
+           curriculum_lesson_id.
+
+           وندعم أيضًا السجلات القديمة لتالتة
+           لو كانت موجودة بالفعل في lesson_id.
         ===================================================== */
 
         let studyData = [];
 
         if (lessonIds.length > 0) {
           const {
-            data,
-            error: studyError,
+            data: curriculumStudyData,
+            error: curriculumStudyError,
           } = await supabase
             .from("student_lesson_study")
             .select(`
@@ -407,33 +718,94 @@ const SubjectDetails = () => {
             `)
             .eq("user_id", user.id)
             .eq("subject_id", subjectData.id)
-            .in("curriculum_lesson_id", lessonIds)
+            .in(
+              "curriculum_lesson_id",
+              lessonIds
+            )
             .order("created_at", {
               ascending: false,
             });
 
-          if (studyError) {
-            throw studyError;
+          if (curriculumStudyError) {
+            throw curriculumStudyError;
           }
 
-          studyData = data || [];
+          studyData =
+            curriculumStudyData || [];
+
+          /*
+            في حالة تالتة ثانوي فقط:
+
+            نحاول أيضًا جلب السجلات القديمة
+            التي تستخدم lesson_id.
+
+            لن نستخدمها إذا كانت IDs مختلفة
+            عن المنهج الحالي، لكنها لا تضر.
+          */
+
+          if (!firstSecondCurriculum) {
+            const {
+              data: oldStudyData,
+              error: oldStudyError,
+            } = await supabase
+              .from(
+                "student_lesson_study"
+              )
+              .select(`
+                id,
+                user_id,
+                subject_id,
+                unit_id,
+                lesson_id,
+                curriculum_lesson_id,
+                curriculum_unit_id,
+                studied_at,
+                study_minutes,
+                score,
+                exam_total,
+                notes,
+                created_at
+              `)
+              .eq("user_id", user.id)
+              .eq(
+                "subject_id",
+                subjectData.id
+              )
+              .in(
+                "lesson_id",
+                lessonIds
+              )
+              .order("created_at", {
+                ascending: false,
+              });
+
+            if (oldStudyError) {
+              throw oldStudyError;
+            }
+
+            if (oldStudyData?.length) {
+              studyData = [
+                ...studyData,
+                ...oldStudyData,
+              ];
+            }
+          }
         }
 
         /* =====================================================
            REVIEWS
-           
-           نستخدم curriculum_lesson_id
-           لأنه مربوط بـ lessons.id
         ===================================================== */
 
         let reviewsData = [];
 
         if (lessonIds.length > 0) {
           const {
-            data,
-            error: reviewsError,
+            data: curriculumReviewsData,
+            error: curriculumReviewsError,
           } = await supabase
-            .from("student_lesson_reviews")
+            .from(
+              "student_lesson_reviews"
+            )
             .select(`
               id,
               user_id,
@@ -459,12 +831,72 @@ const SubjectDetails = () => {
               ascending: true,
             });
 
-          if (reviewsError) {
-            throw reviewsError;
+          if (curriculumReviewsError) {
+            throw curriculumReviewsError;
           }
 
-          reviewsData = data || [];
+          reviewsData =
+            curriculumReviewsData || [];
+
+          /* ===============================================
+             OLD THIRD SECONDARY REVIEWS
+          =============================================== */
+
+          if (!firstSecondCurriculum) {
+            const {
+              data: oldReviewsData,
+              error: oldReviewsError,
+            } = await supabase
+              .from(
+                "student_lesson_reviews"
+              )
+              .select(`
+                id,
+                user_id,
+                lesson_id,
+                curriculum_lesson_id,
+                study_id,
+                review_number,
+                scheduled_at,
+                completed_at,
+                status,
+                memory_score,
+                difficulty,
+                notes,
+                created_at,
+                updated_at
+              `)
+              .eq(
+                "user_id",
+                user.id
+              )
+              .in(
+                "lesson_id",
+                lessonIds
+              )
+              .order(
+                "scheduled_at",
+                {
+                  ascending: true,
+                }
+              );
+
+            if (oldReviewsError) {
+              throw oldReviewsError;
+            }
+
+            if (oldReviewsData?.length) {
+              reviewsData = [
+                ...reviewsData,
+                ...oldReviewsData,
+              ];
+            }
+          }
         }
+
+        /* =====================================================
+           SET DATA
+        ===================================================== */
 
         if (!mounted) return;
 
@@ -523,20 +955,53 @@ const SubjectDetails = () => {
 
   /* =========================================================
      LATEST STUDY PER LESSON
+     
+     مهم:
+     كل المناهج الجديدة والحالية
+     تعتمد على curriculum_lesson_id.
+
+     ونسمح أيضًا بقراءة lesson_id
+     للسجلات القديمة.
   ========================================================= */
 
   const latestStudyMap = useMemo(() => {
     const map = {};
 
     studyRecords.forEach((record) => {
-      const lessonId = record.curriculum_lesson_id;
+      /*
+        الأولوية لـ curriculum_lesson_id
+      */
 
-      if (!lessonId) {
-        return;
+      const curriculumLessonId =
+        record.curriculum_lesson_id;
+
+      const legacyLessonId =
+        record.lesson_id;
+
+      /*
+        سجل حديث
+      */
+
+      if (curriculumLessonId) {
+        if (
+          !map[curriculumLessonId]
+        ) {
+          map[curriculumLessonId] =
+            record;
+        }
       }
 
-      if (!map[lessonId]) {
-        map[lessonId] = record;
+      /*
+        سجل قديم
+      */
+
+      if (legacyLessonId) {
+        if (
+          !map[legacyLessonId]
+        ) {
+          map[legacyLessonId] =
+            record;
+        }
       }
     });
 
@@ -550,49 +1015,64 @@ const SubjectDetails = () => {
   const latestReviewMap = useMemo(() => {
     const map = {};
 
-    reviewRecords.forEach((review) => {
-      const lessonId =
-        review.curriculum_lesson_id;
+    reviewRecords.forEach(
+      (review) => {
+        const ids = [
+          review.curriculum_lesson_id,
+          review.lesson_id,
+        ].filter(Boolean);
 
-      if (!lessonId) {
-        return;
-      }
+        ids.forEach((lessonId) => {
+          const existing =
+            map[lessonId];
 
-      const existing = map[lessonId];
+          if (!existing) {
+            map[lessonId] =
+              review;
 
-      if (!existing) {
-        map[lessonId] = review;
-        return;
-      }
+            return;
+          }
 
-      const existingTime = existing.scheduled_at
-        ? new Date(
+          const existingTime =
             existing.scheduled_at
-          ).getTime()
-        : Infinity;
+              ? new Date(
+                  existing.scheduled_at
+                ).getTime()
+              : Infinity;
 
-      const currentTime = review.scheduled_at
-        ? new Date(
+          const currentTime =
             review.scheduled_at
-          ).getTime()
-        : Infinity;
+              ? new Date(
+                  review.scheduled_at
+                ).getTime()
+              : Infinity;
 
-      if (
-        review.status !== "completed" &&
-        existing.status === "completed"
-      ) {
-        map[lessonId] = review;
-        return;
-      }
+          if (
+            review.status !==
+              "completed" &&
+            existing.status ===
+              "completed"
+          ) {
+            map[lessonId] =
+              review;
 
-      if (
-        review.status !== "completed" &&
-        existing.status !== "completed" &&
-        currentTime < existingTime
-      ) {
-        map[lessonId] = review;
+            return;
+          }
+
+          if (
+            review.status !==
+              "completed" &&
+            existing.status !==
+              "completed" &&
+            currentTime <
+              existingTime
+          ) {
+            map[lessonId] =
+              review;
+          }
+        });
       }
-    });
+    );
 
     return map;
   }, [reviewRecords]);
@@ -602,147 +1082,221 @@ const SubjectDetails = () => {
   ========================================================= */
 
   const allLessons = useMemo(() => {
-  const result = [];
+    const result = [];
 
-  units.forEach((unit) => {
-    // دروس الوحدة الرئيسية
-    unit.lessons.forEach((lesson) => {
-      const state = latestStudyMap[lesson.id] || null;
+    units.forEach((unit) => {
+      /* ===============================================
+         DIRECT LESSONS
+      =============================================== */
 
-      const hasScore =
-        state?.score !== null &&
-        state?.score !== undefined;
+      unit.lessons.forEach(
+        (lesson) => {
+          const state =
+            latestStudyMap[
+              lesson.id
+            ] || null;
 
-      const total =
-        state?.exam_total !== null &&
-        state?.exam_total !== undefined
-          ? Number(state.exam_total)
-          : hasScore
-          ? 10
-          : null;
+          const hasScore =
+            state?.score !== null &&
+            state?.score !== undefined;
 
-      result.push({
-        id: lesson.id,
+          const total =
+            state?.exam_total !==
+              null &&
+            state?.exam_total !==
+              undefined
+              ? Number(
+                  state.exam_total
+                )
+              : hasScore
+              ? 10
+              : null;
 
-        unitId: unit.id,
-        unitTitle: unit.title,
-        unitNumber: unit.unitNumber,
+          result.push({
+            id: lesson.id,
 
-        parentUnitId: null,
-        parentUnitTitle: null,
+            unitId: unit.id,
 
-        lessonNumber: lesson.lessonNumber,
-        title: lesson.title,
+            unitTitle:
+              unit.title,
 
-        studyId: state?.id || null,
+            unitNumber:
+              unit.unitNumber,
 
-        completed:
-          Number(state?.study_minutes || 0) > 0,
+            parentUnitId: null,
 
-        studyMinutes:
-          Number(state?.study_minutes || 0),
+            parentUnitTitle: null,
 
-        score: hasScore
-          ? Number(state.score)
-          : null,
+            lessonNumber:
+              lesson.lessonNumber,
 
-        total:
-          hasScore && total
-            ? Number(total)
-            : null,
+            title: lesson.title,
 
-        studiedAt:
-          state?.studied_at || null,
+            studyId:
+              state?.id || null,
 
-        createdAt:
-          state?.created_at || null,
+            completed:
+              Number(
+                state?.study_minutes ||
+                  0
+              ) > 0,
 
-        latestReview:
-          latestReviewMap[lesson.id] || null,
-      });
-    });
+            studyMinutes:
+              Number(
+                state?.study_minutes ||
+                  0
+              ),
 
-    // دروس الوحدات الفرعية
-    unit.childUnits.forEach((childUnit) => {
-      childUnit.lessons.forEach((lesson) => {
-        const state =
-          latestStudyMap[lesson.id] || null;
-
-        const hasScore =
-          state?.score !== null &&
-          state?.score !== undefined;
-
-        const total =
-          state?.exam_total !== null &&
-          state?.exam_total !== undefined
-            ? Number(state.exam_total)
-            : hasScore
-            ? 10
-            : null;
-
-        result.push({
-          id: lesson.id,
-
-          unitId: childUnit.id,
-          unitTitle: childUnit.title,
-          unitNumber: childUnit.unitNumber,
-
-          parentUnitId: unit.id,
-          parentUnitTitle: unit.title,
-
-          lessonNumber: lesson.lessonNumber,
-          title: lesson.title,
-
-          studyId: state?.id || null,
-
-          completed:
-            Number(state?.study_minutes || 0) > 0,
-
-          studyMinutes:
-            Number(state?.study_minutes || 0),
-
-          score: hasScore
-            ? Number(state.score)
-            : null,
-
-          total:
-            hasScore && total
-              ? Number(total)
+            score: hasScore
+              ? Number(state.score)
               : null,
 
-          studiedAt:
-            state?.studied_at || null,
+            total:
+              hasScore && total
+                ? Number(total)
+                : null,
 
-          createdAt:
-            state?.created_at || null,
+            studiedAt:
+              state?.studied_at ||
+              null,
 
-          latestReview:
-            latestReviewMap[lesson.id] || null,
-        });
-      });
+            createdAt:
+              state?.created_at ||
+              null,
+
+            latestReview:
+              latestReviewMap[
+                lesson.id
+              ] || null,
+          });
+        }
+      );
+
+      /* ===============================================
+         CHILD UNIT LESSONS
+      =============================================== */
+
+      unit.childUnits.forEach(
+        (childUnit) => {
+          childUnit.lessons.forEach(
+            (lesson) => {
+              const state =
+                latestStudyMap[
+                  lesson.id
+                ] || null;
+
+              const hasScore =
+                state?.score !== null &&
+                state?.score !== undefined;
+
+              const total =
+                state?.exam_total !==
+                  null &&
+                state?.exam_total !==
+                  undefined
+                  ? Number(
+                      state.exam_total
+                    )
+                  : hasScore
+                  ? 10
+                  : null;
+
+              result.push({
+                id: lesson.id,
+
+                unitId:
+                  childUnit.id,
+
+                unitTitle:
+                  childUnit.title,
+
+                unitNumber:
+                  childUnit.unitNumber,
+
+                parentUnitId:
+                  unit.id,
+
+                parentUnitTitle:
+                  unit.title,
+
+                lessonNumber:
+                  lesson.lessonNumber,
+
+                title: lesson.title,
+
+                studyId:
+                  state?.id || null,
+
+                completed:
+                  Number(
+                    state?.study_minutes ||
+                      0
+                  ) > 0,
+
+                studyMinutes:
+                  Number(
+                    state?.study_minutes ||
+                      0
+                  ),
+
+                score: hasScore
+                  ? Number(
+                      state.score
+                    )
+                  : null,
+
+                total:
+                  hasScore && total
+                    ? Number(total)
+                    : null,
+
+                studiedAt:
+                  state?.studied_at ||
+                  null,
+
+                createdAt:
+                  state?.created_at ||
+                  null,
+
+                latestReview:
+                  latestReviewMap[
+                    lesson.id
+                  ] || null,
+              });
+            }
+          );
+        }
+      );
     });
-  });
 
-  return result;
-  }, [units, latestStudyMap, latestReviewMap]);
+    return result;
+  }, [
+    units,
+    latestStudyMap,
+    latestReviewMap,
+  ]);
 
   /* =========================================================
      STATISTICS
   ========================================================= */
 
   const statistics = useMemo(() => {
-    const total = allLessons.length;
+    const total =
+      allLessons.length;
 
-    const completed = allLessons.filter(
-      (lesson) => lesson.completed
-    ).length;
+    const completed =
+      allLessons.filter(
+        (lesson) =>
+          lesson.completed
+      ).length;
 
-    const exams = allLessons.filter(
-      (lesson) =>
-        lesson.score !== null &&
-        lesson.total !== null &&
-        lesson.total > 0
-    );
+    const exams =
+      allLessons.filter(
+        (lesson) =>
+          lesson.score !== null &&
+          lesson.total !== null &&
+          lesson.total > 0
+      );
 
     const average =
       exams.length > 0
@@ -756,33 +1310,39 @@ const SubjectDetails = () => {
           ) / exams.length
         : 0;
 
-    const urgentLessons = exams.filter(
-      (lesson) =>
-        lesson.score / lesson.total <
-        0.5
-    );
+    const urgentLessons =
+      exams.filter(
+        (lesson) =>
+          lesson.score /
+            lesson.total <
+          0.5
+      );
 
     const now = new Date();
 
     const dueReviews =
-      reviewRecords.filter((review) => {
-        if (
-          review.status === "completed" ||
-          review.status === "skipped"
-        ) {
-          return false;
-        }
+      reviewRecords.filter(
+        (review) => {
+          if (
+            review.status ===
+              "completed" ||
+            review.status ===
+              "skipped"
+          ) {
+            return false;
+          }
 
-        if (!review.scheduled_at) {
-          return false;
-        }
+          if (!review.scheduled_at) {
+            return false;
+          }
 
-        return (
-          new Date(
-            review.scheduled_at
-          ) <= now
-        );
-      });
+          return (
+            new Date(
+              review.scheduled_at
+            ) <= now
+          );
+        }
+      );
 
     return {
       total,
@@ -795,13 +1355,17 @@ const SubjectDetails = () => {
       progress:
         total > 0
           ? Math.round(
-              (completed / total) * 100
+              (completed /
+                total) *
+                100
             )
           : 0,
 
-      exams: exams.length,
+      exams:
+        exams.length,
 
-      average: Math.round(average),
+      average:
+        Math.round(average),
 
       reviewCount:
         dueReviews.length,
@@ -825,57 +1389,70 @@ const SubjectDetails = () => {
     const now = new Date();
 
     const dueReviews =
-      reviewRecords.filter((review) => {
-        if (
-          review.status === "completed" ||
-          review.status === "skipped"
-        ) {
-          return false;
-        }
+      reviewRecords.filter(
+        (review) => {
+          if (
+            review.status ===
+              "completed" ||
+            review.status ===
+              "skipped"
+          ) {
+            return false;
+          }
 
-        if (!review.scheduled_at) {
-          return false;
-        }
+          if (!review.scheduled_at) {
+            return false;
+          }
 
-        return (
-          new Date(
-            review.scheduled_at
-          ) <= now
-        );
-      });
+          return (
+            new Date(
+              review.scheduled_at
+            ) <= now
+          );
+        }
+      );
 
     const uniqueLessonIds =
       new Set();
 
     const result = [];
 
-    dueReviews.forEach((review) => {
-      const lessonId =
-        review.curriculum_lesson_id;
+    dueReviews.forEach(
+      (review) => {
+        const lessonId =
+          review.curriculum_lesson_id ||
+          review.lesson_id;
 
-      if (
-        uniqueLessonIds.has(lessonId)
-      ) {
-        return;
-      }
+        if (
+          !lessonId ||
+          uniqueLessonIds.has(
+            lessonId
+          )
+        ) {
+          return;
+        }
 
-      const lesson =
-        allLessons.find(
-          (item) =>
-            item.id === lessonId
+        const lesson =
+          allLessons.find(
+            (item) =>
+              item.id ===
+              lessonId
+          );
+
+        if (!lesson) {
+          return;
+        }
+
+        uniqueLessonIds.add(
+          lessonId
         );
 
-      if (!lesson) {
-        return;
+        result.push({
+          ...lesson,
+          review,
+        });
       }
-
-      uniqueLessonIds.add(lessonId);
-
-      result.push({
-        ...lesson,
-        review,
-      });
-    });
+    );
 
     /*
       لو مفيش مراجعات مستحقة حاليًا،
@@ -886,8 +1463,10 @@ const SubjectDetails = () => {
       return allLessons
         .filter(
           (lesson) =>
-            lesson.score !== null &&
-            lesson.total !== null &&
+            lesson.score !==
+              null &&
+            lesson.total !==
+              null &&
             lesson.total > 0 &&
             lesson.score /
               lesson.total <
@@ -895,21 +1474,25 @@ const SubjectDetails = () => {
         )
         .sort(
           (a, b) =>
-            a.score / a.total -
-            b.score / b.total
+            a.score /
+              a.total -
+            b.score /
+              b.total
         );
     }
 
     return result.sort(
       (a, b) => {
         const aOverdue =
-          a.review?.scheduled_at &&
+          a.review
+            ?.scheduled_at &&
           new Date(
             a.review.scheduled_at
           ) < now;
 
         const bOverdue =
-          b.review?.scheduled_at &&
+          b.review
+            ?.scheduled_at &&
           new Date(
             b.review.scheduled_at
           ) < now;
@@ -935,8 +1518,10 @@ const SubjectDetails = () => {
           b.total > 0
         ) {
           return (
-            a.score / a.total -
-            b.score / b.total
+            a.score /
+              a.total -
+            b.score /
+              b.total
           );
         }
 
@@ -950,58 +1535,68 @@ const SubjectDetails = () => {
 
   /* =========================================================
      GET OR CREATE STUDY RECORD
-     
-     IMPORTANT:
-     
-     curriculum_lesson_id
-     هو الـ FK الجديد إلى lessons.id
   ========================================================= */
 
   const getOrCreateStudyRecord =
     async (lesson) => {
-      if (!userId || !subject) {
+      if (
+        !userId ||
+        !subject
+      ) {
         throw new Error(
           "بيانات المستخدم أو المادة غير متاحة."
         );
       }
 
       const existing =
-        latestStudyMap[lesson.id];
+        latestStudyMap[
+          lesson.id
+        ];
 
       if (existing) {
         return existing;
       }
 
+      /*
+        كل المنهج الموجود حاليًا في
+        units / lessons يستخدم:
+
+        curriculum_unit_id
+        curriculum_lesson_id
+      */
+
+      const insertData = {
+        user_id: userId,
+
+        subject_id:
+          subject.id,
+
+        unit_id: null,
+
+        lesson_id: null,
+
+        curriculum_unit_id:
+          lesson.unitId,
+
+        curriculum_lesson_id:
+          lesson.id,
+
+        studied_at:
+          new Date().toISOString(),
+
+        study_minutes: 0,
+      };
+
       const {
         data,
         error,
       } = await supabase
-        .from("student_lesson_study")
-        .insert({
-          user_id: userId,
-
-          subject_id: subject.id,
-
-          unit_id: null,
-
-          curriculum_unit_id:
-            lesson.unitId,
-
-          /*
-            مهم:
-            lesson_id القديم أصبح NULL
-          */
-
-          lesson_id: null,
-
-          curriculum_lesson_id:
-            lesson.id,
-
-          studied_at:
-            new Date().toISOString(),
-
-          study_minutes: 0,
-        })
+        .from(
+          "student_lesson_study"
+        )
+        .insert(
+          insertData
+        )
         .select(`
           id,
           user_id,
@@ -1037,96 +1632,52 @@ const SubjectDetails = () => {
      TOGGLE LESSON
   ========================================================= */
 
-  const toggleLesson =
-    async (lesson) => {
-      if (
-        saving ||
-        !lesson ||
-        !userId ||
-        !subject
-      ) {
-        return;
-      }
+  const toggleLesson = async (
+    lesson
+  ) => {
+    if (
+      saving ||
+      !lesson ||
+      !userId ||
+      !subject
+    ) {
+      return;
+    }
 
-      try {
-        setSaving(true);
+    try {
+      setSaving(true);
 
-        const existing =
-          latestStudyMap[lesson.id];
+      const existing =
+        latestStudyMap[
+          lesson.id
+        ];
 
-        /* =====================================================
-           FIRST STUDY
-        ===================================================== */
+      /* =====================================================
+         FIRST STUDY
+      ===================================================== */
 
-        if (!existing) {
-          const {
-            data,
-            error,
-          } = await supabase
-            .from(
-              "student_lesson_study"
-            )
-            .insert({
-              user_id: userId,
+      if (!existing) {
+        const insertData = {
+          user_id: userId,
 
-              subject_id:
-                subject.id,
+          subject_id:
+            subject.id,
 
-              unit_id: null,
+          unit_id: null,
 
-              curriculum_unit_id:
-                lesson.unitId,
+          lesson_id: null,
 
-              lesson_id: null,
+          curriculum_unit_id:
+            lesson.unitId,
 
-              curriculum_lesson_id:
-                lesson.id,
+          curriculum_lesson_id:
+            lesson.id,
 
-              studied_at:
-                new Date().toISOString(),
+          studied_at:
+            new Date().toISOString(),
 
-              study_minutes: 1,
-            })
-            .select(`
-              id,
-              user_id,
-              subject_id,
-              unit_id,
-              lesson_id,
-              curriculum_lesson_id,
-              curriculum_unit_id,
-              studied_at,
-              study_minutes,
-              score,
-              exam_total,
-              notes,
-              created_at
-            `)
-            .single();
-
-          if (error) {
-            throw error;
-          }
-
-          setStudyRecords(
-            (prev) => [
-              data,
-              ...prev,
-            ]
-          );
-
-          return;
-        }
-
-        /* =====================================================
-           TOGGLE
-        ===================================================== */
-
-        const isCompleted =
-          Number(
-            existing.study_minutes ||
-              0
-          ) > 0;
+          study_minutes: 1,
+        };
 
         const {
           data,
@@ -1135,22 +1686,8 @@ const SubjectDetails = () => {
           .from(
             "student_lesson_study"
           )
-          .update({
-            study_minutes:
-              isCompleted
-                ? 0
-                : 1,
-
-            studied_at:
-              new Date().toISOString(),
-          })
-          .eq(
-            "id",
-            existing.id
-          )
-          .eq(
-            "user_id",
-            userId
+          .insert(
+            insertData
           )
           .select(`
             id,
@@ -1174,80 +1711,150 @@ const SubjectDetails = () => {
         }
 
         setStudyRecords(
-          (prev) =>
-            prev.map(
-              (record) =>
-                record.id ===
-                data.id
-                  ? data
-                  : record
-            )
-        );
-      } catch (error) {
-        console.error(
-          "toggleLesson error:",
-          error
+          (prev) => [
+            data,
+            ...prev,
+          ]
         );
 
-        Swal.fire({
-          icon: "error",
-          title: "حدث خطأ",
-          text:
-            error?.message ||
-            "تعذر تحديث حالة الدرس.",
-          confirmButtonText:
-            "حسنًا",
-        });
-      } finally {
-        setSaving(false);
+        return;
       }
-    };
+
+      /* =====================================================
+         TOGGLE
+      ===================================================== */
+
+      const isCompleted =
+        Number(
+          existing.study_minutes ||
+            0
+        ) > 0;
+
+      const {
+        data,
+        error,
+      } = await supabase
+        .from(
+          "student_lesson_study"
+        )
+        .update({
+          study_minutes:
+            isCompleted
+              ? 0
+              : 1,
+
+          studied_at:
+            new Date().toISOString(),
+        })
+        .eq(
+          "id",
+          existing.id
+        )
+        .eq(
+          "user_id",
+          userId
+        )
+        .select(`
+          id,
+          user_id,
+          subject_id,
+          unit_id,
+          lesson_id,
+          curriculum_lesson_id,
+          curriculum_unit_id,
+          studied_at,
+          study_minutes,
+          score,
+          exam_total,
+          notes,
+          created_at
+        `)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      setStudyRecords(
+        (prev) =>
+          prev.map(
+            (record) =>
+              record.id ===
+              data.id
+                ? data
+                : record
+          )
+      );
+    } catch (error) {
+      console.error(
+        "toggleLesson error:",
+        error
+      );
+
+      Swal.fire({
+        icon: "error",
+        title: "حدث خطأ",
+        text:
+          error?.message ||
+          "تعذر تحديث حالة الدرس.",
+        confirmButtonText:
+          "حسنًا",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   /* =========================================================
      OPEN EXAM MODAL
   ========================================================= */
 
-  const openExamModal =
-    (lesson) => {
-      if (!lesson) {
-        return;
-      }
+  const openExamModal = (
+    lesson
+  ) => {
+    if (!lesson) {
+      return;
+    }
 
-      const current =
-        latestStudyMap[lesson.id];
+    const current =
+      latestStudyMap[
+        lesson.id
+      ];
 
-      const total =
-        current?.exam_total !==
-          null &&
-        current?.exam_total !==
-          undefined &&
-        Number(
-          current.exam_total
-        ) > 0
-          ? Number(
-              current.exam_total
-            )
-          : 10;
+    const total =
+      current?.exam_total !==
+        null &&
+      current?.exam_total !==
+        undefined &&
+      Number(
+        current.exam_total
+      ) > 0
+        ? Number(
+            current.exam_total
+          )
+        : 10;
 
-      setSelectedLesson(lesson);
+    setSelectedLesson(
+      lesson
+    );
 
-      setExamScore(
+    setExamScore(
+      current?.score !==
+        null &&
         current?.score !==
-          null &&
-          current?.score !==
-            undefined
-          ? String(
-              current.score
-            )
-          : ""
-      );
+          undefined
+        ? String(
+            current.score
+          )
+        : ""
+    );
 
-      setExamTotal(
-        String(total)
-      );
+    setExamTotal(
+      String(total)
+    );
 
-      setShowExamModal(true);
-    };
+    setShowExamModal(true);
+  };
 
   /* =========================================================
      SAVE EXAM
@@ -1268,20 +1875,21 @@ const SubjectDetails = () => {
       const total =
         Number(examTotal);
 
-      /* =====================================================
-         VALIDATE
-      ===================================================== */
-
       if (
-        !Number.isFinite(score) ||
-        !Number.isFinite(total) ||
+        !Number.isFinite(
+          score
+        ) ||
+        !Number.isFinite(
+          total
+        ) ||
         total <= 0 ||
         score < 0 ||
         score > total
       ) {
         Swal.fire({
           icon: "warning",
-          title: "بيانات غير صحيحة",
+          title:
+            "بيانات غير صحيحة",
           text:
             "تأكد أن الدرجة بين 0 والدرجة النهائية.",
           confirmButtonText:
@@ -1299,20 +1907,12 @@ const SubjectDetails = () => {
             selectedLesson.id
           ];
 
-        /* =====================================================
-           CREATE STUDY RECORD
-        ===================================================== */
-
         if (!studyRecord) {
           studyRecord =
             await getOrCreateStudyRecord(
               selectedLesson
             );
         }
-
-        /* =====================================================
-           SAVE EXAM
-        ===================================================== */
 
         const {
           data,
@@ -1378,7 +1978,9 @@ const SubjectDetails = () => {
             )
         );
 
-        setShowExamModal(false);
+        setShowExamModal(
+          false
+        );
 
         setSelectedLesson(
           null
@@ -1390,7 +1992,8 @@ const SubjectDetails = () => {
 
         Swal.fire({
           icon: "success",
-          title: "تم حفظ النتيجة",
+          title:
+            "تم حفظ النتيجة",
           text:
             "تم تحديث نتيجة الاختبار والإحصائيات.",
           timer: 1600,
@@ -1471,12 +2074,13 @@ const SubjectDetails = () => {
           return;
         }
 
-        /* =====================================================
+        /* ===============================================
            DELETE REVIEWS
-        ===================================================== */
+        =============================================== */
 
         const {
-          error: reviewError,
+          error:
+            reviewError,
         } = await supabase
           .from(
             "student_lesson_reviews"
@@ -1495,9 +2099,9 @@ const SubjectDetails = () => {
           throw reviewError;
         }
 
-        /* =====================================================
-           REMOVE EXAM
-        ===================================================== */
+        /* ===============================================
+           REMOVE EXAM SCORE
+        =============================================== */
 
         const {
           data,
@@ -1509,7 +2113,8 @@ const SubjectDetails = () => {
           .update({
             score: null,
 
-            exam_total: null,
+            exam_total:
+              null,
           })
           .eq(
             "id",
@@ -1540,10 +2145,6 @@ const SubjectDetails = () => {
           throw error;
         }
 
-        /* =====================================================
-           UPDATE STATE
-        ===================================================== */
-
         setStudyRecords(
           (prev) =>
             prev.map(
@@ -1564,7 +2165,9 @@ const SubjectDetails = () => {
             )
         );
 
-        setShowExamModal(false);
+        setShowExamModal(
+          false
+        );
 
         setSelectedLesson(
           null
@@ -1604,35 +2207,47 @@ const SubjectDetails = () => {
      UNIT TOGGLE
   ========================================================= */
 
-  const toggleUnit =
-    (unitId) => {
+  const toggleUnit = (
+    unitId
+  ) => {
+    setOpenUnits(
+      (prev) =>
+        prev.includes(unitId)
+          ? prev.filter(
+              (id) =>
+                id !== unitId
+            )
+          : [
+              ...prev,
+              unitId,
+            ]
+    );
+  };
+
+  const openAllUnits =
+    () => {
+      const allIds = [];
+
+      units.forEach(
+        (unit) => {
+          allIds.push(
+            unit.id
+          );
+
+          unit.childUnits?.forEach(
+            (childUnit) => {
+              allIds.push(
+                childUnit.id
+              );
+            }
+          );
+        }
+      );
+
       setOpenUnits(
-        (prev) =>
-          prev.includes(unitId)
-            ? prev.filter(
-                (id) =>
-                  id !== unitId
-              )
-            : [
-                ...prev,
-                unitId,
-              ]
+        allIds
       );
     };
-
-  const openAllUnits = () => {
-    const allIds = [];
-
-    units.forEach((unit) => {
-      allIds.push(unit.id);
-
-      unit.childUnits?.forEach((childUnit) => {
-        allIds.push(childUnit.id);
-      });
-    });
-
-    setOpenUnits(allIds);
-  };
 
   const closeAllUnits =
     () => {
@@ -1736,12 +2351,21 @@ const SubjectDetails = () => {
 
             <div className="big-progress-row">
               <strong>
-                {statistics.progress}%
+                {
+                  statistics.progress
+                }
+                %
               </strong>
 
               <span>
-                {statistics.completed} من{" "}
-                {statistics.total} درس
+                {
+                  statistics.completed
+                }{" "}
+                من{" "}
+                {
+                  statistics.total
+                }{" "}
+                درس
               </span>
             </div>
 
@@ -1771,7 +2395,9 @@ const SubjectDetails = () => {
               </span>
 
               <strong>
-                {statistics.total}
+                {
+                  statistics.total
+                }
               </strong>
 
               <small>
@@ -1791,7 +2417,9 @@ const SubjectDetails = () => {
               </span>
 
               <strong>
-                {statistics.completed}
+                {
+                  statistics.completed
+                }
               </strong>
 
               <small>
@@ -1811,7 +2439,9 @@ const SubjectDetails = () => {
               </span>
 
               <strong>
-                {statistics.exams}
+                {
+                  statistics.exams
+                }
               </strong>
 
               <small>
@@ -1850,7 +2480,8 @@ const SubjectDetails = () => {
         <nav className="subject-tabs">
           <button
             className={
-              activeTab === "lessons"
+              activeTab ===
+              "lessons"
                 ? "active"
                 : ""
             }
@@ -1866,7 +2497,8 @@ const SubjectDetails = () => {
 
           <button
             className={
-              activeTab === "review"
+              activeTab ===
+              "review"
                 ? "active"
                 : ""
             }
@@ -1931,13 +2563,18 @@ const SubjectDetails = () => {
               <div className="sidebar-progress">
                 <div className="sidebar-progress-circle">
                   <strong>
-                    {statistics.progress}%
+                    {
+                      statistics.progress
+                    }
+                    %
                   </strong>
                 </div>
 
                 <div>
                   <strong>
-                    {statistics.completed}
+                    {
+                      statistics.completed
+                    }
                   </strong>
 
                   <span>
@@ -1952,7 +2589,9 @@ const SubjectDetails = () => {
                 </span>
 
                 <strong>
-                  {statistics.remaining}
+                  {
+                    statistics.remaining
+                  }
                 </strong>
               </div>
 
@@ -1962,7 +2601,9 @@ const SubjectDetails = () => {
                 </span>
 
                 <strong>
-                  {statistics.exams}
+                  {
+                    statistics.exams
+                  }
                 </strong>
               </div>
             </div>
@@ -1994,7 +2635,9 @@ const SubjectDetails = () => {
                   {reviewLessons
                     .slice(0, 5)
                     .map(
-                      (lesson) => {
+                      (
+                        lesson
+                      ) => {
                         const percentage =
                           lesson.score !==
                             null &&
@@ -2056,7 +2699,10 @@ const SubjectDetails = () => {
                             <span
                               className={`review-pill ${review.type}`}
                             >
-                              {percentage}%
+                              {
+                                percentage
+                              }
+                              %
                             </span>
                           </div>
                         );
@@ -2167,10 +2813,6 @@ const SubjectDetails = () => {
                   </div>
                 </div>
 
-                {/* =================================================
-                    UNITS
-                ================================================== */}
-
                 <div className="units-list">
                   {units.length ===
                   0 ? (
@@ -2180,13 +2822,12 @@ const SubjectDetails = () => {
                       </div>
 
                       <h3>
-                        لا توجد دروس
+                        المنهج غير متاح حاليًا
                       </h3>
 
                       <p>
-                        لم يتم إضافة
-                        منهج لهذه المادة
-                        بعد.
+                        لم يتم إضافة منهج هذه المادة بعد.
+                        سنضيف المنهج قريبًا.
                       </p>
                     </div>
                   ) : (
@@ -2197,11 +2838,6 @@ const SubjectDetails = () => {
                             unit.id
                           );
 
-                        /*
-                          الدروس المباشرة
-                          داخل الوحدة
-                        */
-
                         const directLessons =
                           allLessons.filter(
                             (lesson) =>
@@ -2209,11 +2845,6 @@ const SubjectDetails = () => {
                                 unit.id &&
                               !lesson.parentUnitId
                           );
-
-                        /*
-                          كل الدروس
-                          المباشرة + الفرعية
-                        */
 
                         const allUnitLessons =
                           allLessons.filter(
@@ -2255,10 +2886,10 @@ const SubjectDetails = () => {
                                 ? "open"
                                 : ""
                             }`}
-                            key={unit.id}
+                            key={
+                              unit.id
+                            }
                           >
-                            {/* UNIT HEADER */}
-
                             <button
                               className="unit-header"
                               onClick={() =>
@@ -2318,148 +2949,172 @@ const SubjectDetails = () => {
                               </div>
                             </button>
 
-                            {/* =================================================
-                                UNIT CONTENT
-                            ================================================== */}
-
                             {isOpen && (
                               <div className="lessons-list">
-                                {/* =================================================
-                                    DIRECT LESSONS
-                                ================================================== */}
-
                                 {directLessons.map(
                                   (
                                     lesson
+                                  ) => (
+                                    <LessonRow
+                                      key={
+                                        lesson.id
+                                      }
+                                      lesson={
+                                        lesson
+                                      }
+                                      fullLesson={
+                                        lesson
+                                      }
+                                      latestReviewMap={
+                                        latestReviewMap
+                                      }
+                                      onToggle={
+                                        toggleLesson
+                                      }
+                                      onExam={
+                                        openExamModal
+                                      }
+                                    />
+                                  )
+                                )}
+
+                                {unit.childUnits?.map(
+                                  (
+                                    childUnit
                                   ) => {
+                                    const isChildOpen =
+                                      openUnits.includes(
+                                        childUnit.id
+                                      );
+
+                                    const childLessons =
+                                      allLessons.filter(
+                                        (lesson) =>
+                                          lesson.unitId ===
+                                          childUnit.id
+                                      );
+
+                                    const childCompleted =
+                                      childLessons.filter(
+                                        (lesson) =>
+                                          lesson.completed
+                                      ).length;
+
+                                    const childProgress =
+                                      childLessons.length >
+                                      0
+                                        ? Math.round(
+                                            (childCompleted /
+                                              childLessons.length) *
+                                              100
+                                          )
+                                        : 0;
+
                                     return (
-                                      <LessonRow
+                                      <article
+                                        className={`unit-card child-unit-card ${
+                                          isChildOpen
+                                            ? "open"
+                                            : ""
+                                        }`}
                                         key={
-                                          lesson.id
+                                          childUnit.id
                                         }
-                                        lesson={
-                                          lesson
-                                        }
-                                        fullLesson={
-                                          lesson
-                                        }
-                                        latestReviewMap={
-                                          latestReviewMap
-                                        }
-                                        onToggle={
-                                          toggleLesson
-                                        }
-                                        onExam={
-                                          openExamModal
-                                        }
-                                      />
+                                      >
+                                        <button
+                                          type="button"
+                                          className="unit-header"
+                                          onClick={() =>
+                                            toggleUnit(
+                                              childUnit.id
+                                            )
+                                          }
+                                        >
+                                          <div className="unit-arrow">
+                                            {isChildOpen ? (
+                                              <FaChevronUp />
+                                            ) : (
+                                              <FaChevronDown />
+                                            )}
+                                          </div>
+
+                                          <div className="unit-number">
+                                            {
+                                              childUnit.unitNumber
+                                            }
+                                          </div>
+
+                                          <div className="unit-info">
+                                            <h2>
+                                              {
+                                                childUnit.title
+                                              }
+                                            </h2>
+
+                                            <div className="unit-meta">
+                                              <span>
+                                                {
+                                                  childCompleted
+                                                }{" "}
+                                                من{" "}
+                                                {
+                                                  childLessons.length
+                                                }{" "}
+                                                دروس
+                                              </span>
+
+                                              <div className="unit-progress">
+                                                <span
+                                                  style={{
+                                                    width: `${childProgress}%`,
+                                                  }}
+                                                />
+                                              </div>
+
+                                              <strong>
+                                                {
+                                                  childProgress
+                                                }
+                                                %
+                                              </strong>
+                                            </div>
+                                          </div>
+                                        </button>
+
+                                        {isChildOpen && (
+                                          <div className="lessons-list child-lessons-list">
+                                            {childLessons.map(
+                                              (
+                                                lesson
+                                              ) => (
+                                                <LessonRow
+                                                  key={
+                                                    lesson.id
+                                                  }
+                                                  lesson={
+                                                    lesson
+                                                  }
+                                                  fullLesson={
+                                                    lesson
+                                                  }
+                                                  latestReviewMap={
+                                                    latestReviewMap
+                                                  }
+                                                  onToggle={
+                                                    toggleLesson
+                                                  }
+                                                  onExam={
+                                                    openExamModal
+                                                  }
+                                                />
+                                              )
+                                            )}
+                                          </div>
+                                        )}
+                                      </article>
                                     );
                                   }
                                 )}
-                              {/* =================================================
-                                  CHILD UNITS
-                              ================================================== */}
-                              {unit.childUnits?.map((childUnit) => {
-                                const isChildOpen = openUnits.includes(
-                                  childUnit.id
-                                );
-
-                                const childLessons = allLessons.filter(
-                                  (lesson) =>
-                                    lesson.unitId === childUnit.id
-                                );
-
-                                const childCompleted =
-                                  childLessons.filter(
-                                    (lesson) => lesson.completed
-                                  ).length;
-
-                                const childProgress =
-                                  childLessons.length > 0
-                                    ? Math.round(
-                                        (childCompleted /
-                                          childLessons.length) *
-                                          100
-                                      )
-                                    : 0;
-
-                                return (
-                                  <article
-                                    className={`unit-card child-unit-card ${
-                                      isChildOpen ? "open" : ""
-                                    }`}
-                                    key={childUnit.id}
-                                  >
-                                    {/* =========================================
-                                        CHILD UNIT HEADER
-                                    ========================================== */}
-
-                                    <button
-                                      type="button"
-                                      className="unit-header"
-                                      onClick={() =>
-                                        toggleChildUnit(childUnit.id)
-                                      }
-                                    >
-                                      <div className="unit-arrow">
-                                        {isChildOpen ? (
-                                          <FaChevronUp />
-                                        ) : (
-                                          <FaChevronDown />
-                                        )}
-                                      </div>
-
-                                      <div className="unit-number">
-                                        {childUnit.unitNumber}
-                                      </div>
-
-                                      <div className="unit-info">
-                                        <h2>{childUnit.title}</h2>
-
-                                        <div className="unit-meta">
-                                          <span>
-                                            {childCompleted} من{" "}
-                                            {childLessons.length} دروس
-                                          </span>
-
-                                          <div className="unit-progress">
-                                            <span
-                                              style={{
-                                                width: `${childProgress}%`,
-                                              }}
-                                            />
-                                          </div>
-
-                                          <strong>
-                                            {childProgress}%
-                                          </strong>
-                                        </div>
-                                      </div>
-                                    </button>
-
-                                    {/* =========================================
-                                        CHILD UNIT LESSONS
-                                    ========================================== */}
-
-                                    {isChildOpen && (
-                                      <div className="lessons-list child-lessons-list">
-                                        {childLessons.map((lesson) => (
-                                          <LessonRow
-                                            key={lesson.id}
-                                            lesson={lesson}
-                                            fullLesson={lesson}
-                                            latestReviewMap={
-                                              latestReviewMap
-                                            }
-                                            onToggle={toggleLesson}
-                                            onExam={openExamModal}
-                                          />
-                                        ))}
-                                      </div>
-                                    )}
-                                  </article>
-                                );
-                              })}
                               </div>
                             )}
                           </article>
@@ -2800,9 +3455,7 @@ const SubjectDetails = () => {
                   <input
                     type="number"
                     min="0"
-                    value={
-                      examScore
-                    }
+                    value={examScore}
                     onChange={(e) =>
                       setExamScore(
                         e.target.value
@@ -2825,9 +3478,7 @@ const SubjectDetails = () => {
                   <input
                     type="number"
                     min="1"
-                    value={
-                      examTotal
-                    }
+                    value={examTotal}
                     onChange={(e) =>
                       setExamTotal(
                         e.target.value
@@ -2912,13 +3563,14 @@ const LessonRow = ({
       undefined &&
     fullLesson?.total > 0;
 
-  const percentage = hasExam
-    ? Math.round(
-        (fullLesson.score /
-          fullLesson.total) *
-          100
-      )
-    : null;
+  const percentage =
+    hasExam
+      ? Math.round(
+          (fullLesson.score /
+            fullLesson.total) *
+            100
+        )
+      : null;
 
   const review = hasExam
     ? getReviewInfo(
@@ -2997,9 +3649,7 @@ const LessonRow = ({
             <button
               className={`subject-score-box ${review.type}`}
               onClick={() =>
-                onExam(
-                  fullLesson
-                )
+                onExam(fullLesson)
               }
             >
               <strong>
@@ -3019,16 +3669,17 @@ const LessonRow = ({
             <span
               className={`subject-score-label ${review.type}`}
             >
-              {percentage}%
+              {
+                percentage
+              }
+              %
             </span>
           </div>
         ) : (
           <button
             className="subject-add-exam-button"
             onClick={() =>
-              onExam(
-                fullLesson
-              )
+              onExam(fullLesson)
             }
           >
             <FaClipboardCheck />

@@ -62,8 +62,8 @@ const getChallengeTypeData = (type) => {
       icon: FaFire,
       theme: "orange",
       reward: 100,
-      unit: "دقيقة",
-      defaultTarget: 300,
+      unit: "ساعة",
+      defaultTarget: 5,
     },
     lessons: {
       label: "دروس",
@@ -90,6 +90,7 @@ const getChallengeTypeData = (type) => {
       defaultTarget: 7,
     },
   };
+
   return types[type] || types.focus;
 };
 const getChallengeDuration = (startDate, endDate) => {
@@ -100,6 +101,25 @@ const getChallengeDuration = (startDate, endDate) => {
     (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
   );
   return Math.max(1, diff + 1);
+};
+const getChallengeDisplayValue = (value, type) => {
+  const numeric = Number(value || 0);
+
+  if (type === "focus") {
+    return Number((numeric / 60).toFixed(1));
+  }
+
+  return numeric;
+};
+
+const getChallengeDbValue = (value, type) => {
+  const numeric = Number(value || 0);
+
+  if (type === "focus") {
+    return Math.round(numeric * 60);
+  }
+
+  return numeric;
 };
 /* =========================================================
    Component
@@ -139,7 +159,7 @@ const Friends = () => {
     title: "",
     type: "focus",
     duration: "7",
-    target: "300",
+    target: "5",
   });
   const [selectedInviteFriends, setSelectedInviteFriends] = useState([]);
   /* =======================================================
@@ -147,7 +167,7 @@ const Friends = () => {
   ======================================================= */
   const [duelForm, setDuelForm] = useState({
     friendId: "",
-    goal: "30",
+    goal: "1",
   });
   /* =========================================================
      Load Current User
@@ -437,36 +457,12 @@ const Friends = () => {
           `
           )
           .in("challenge_id", challengeIds);
-        if (memberError) {
-          console.error("DUEL MEMBERS ERROR FULL:", memberError);
-          console.error("CODE:", memberError.code);
-          console.error("MESSAGE:", memberError.message);
-          console.error("DETAILS:", memberError.details);
-          console.error("HINT:", memberError.hint);
-
-          await supabase
-            .from("friend_challenges")
-            .delete()
-            .eq("id", challenge.id);
-
-          Swal.fire({
-            icon: "error",
-            title: "خطأ في إرسال التحدي",
-            html: `
-              <div style="text-align:right;direction:rtl">
-                <p><strong>الرسالة:</strong></p>
-                <p>${memberError.message || "خطأ غير معروف"}</p>
-                ${
-                  memberError.code
-                    ? `<p><strong>Code:</strong> ${memberError.code}</p>`
-                    : ""
-                }
-              </div>
-            `,
-          });
-        } else {
-          memberRows = data || [];
-        }
+          if (memberError) {
+            console.error("challenge members error:", memberError);
+            memberRows = [];
+          } else {
+            memberRows = data || [];
+          }
       }
       setChallenges(challengeRows || []);
       setChallengeMembers(memberRows);
@@ -638,11 +634,14 @@ const Friends = () => {
           invitationStatus === "accepted";
         const pending =
           invitationStatus === "pending";
-        const progressValue = Number(
-          ownMember?.current_value || 0
+        const progressValue = getChallengeDisplayValue(
+          ownMember?.current_value,
+          challenge.challenge_type
         );
-        const targetValue = Number(
-          challenge.target_value || 0
+
+        const targetValue = getChallengeDisplayValue(
+          challenge.target_value,
+          challenge.challenge_type
         );
         const progress =
           targetValue > 0
@@ -871,78 +870,80 @@ const Friends = () => {
     await loadAllData(false);
   };
   /* =========================================================
-     Search Student
+    Search Student By Code Or Phone
   ========================================================= */
   const handleSearchStudent = async () => {
-    const code = studentCode.trim();
+    const searchValue = studentCode.trim();
+
     setSearchedStudent(null);
     setSearchMessage("");
     setRequestSent(false);
-    if (!code) {
-      setSearchMessage(
-        "اكتب كود الطالب أولاً"
-      );
+
+    if (!searchValue) {
+      setSearchMessage("اكتب كود الطالب أو رقم الموبايل أولاً");
       return;
     }
+
     if (!userId) {
-      setSearchMessage(
-        "لم يتم تسجيل الدخول"
-      );
+      setSearchMessage("لم يتم تسجيل الدخول");
       return;
     }
-    const { data: profile, error } =
-      await supabase
-        .from("student_profiles")
-        .select(
-          "user_id,student_code,full_name,avatar_url,section"
-        )
-        .eq("student_code", code)
-        .maybeSingle();
+
+    const { data: profiles, error } = await supabase
+      .from("student_profiles")
+      .select(
+        "user_id,student_code,full_name,avatar_url,section,phone"
+      )
+      .or(
+        `student_code.eq.${searchValue},phone.eq.${searchValue}`
+      )
+      .limit(2);
+
     if (error) {
-      console.error(
-        "student search error:",
-        error
-      );
+      console.error("student search error:", error);
+      setSearchMessage("حدث خطأ أثناء البحث");
+      return;
+    }
+
+    if (!profiles || profiles.length === 0) {
       setSearchMessage(
-        "حدث خطأ أثناء البحث"
+        "لم يتم العثور على طالب بهذا الكود أو رقم الموبايل"
       );
       return;
     }
-    if (!profile) {
+
+    /*
+    * المفروض الكود والموبايل يكونوا Unique،
+    * لكن لو حصل تطابق لأكثر من طالب نوقف البحث.
+    */
+    if (profiles.length > 1) {
       setSearchMessage(
-        "لم يتم العثور على طالب بهذا الكود"
+        "تم العثور على أكثر من طالب، استخدم كود الطالب للبحث بدقة"
       );
       return;
     }
+
+    const profile = profiles[0];
+
     if (profile.user_id === userId) {
-      setSearchMessage(
-        "لا يمكنك إضافة نفسك كصديق"
-      );
+      setSearchMessage("لا يمكنك إضافة نفسك كصديق");
       return;
     }
-    const existingFriendship =
-      friendships.find(
-        (friendship) =>
-          (friendship.requester_id === userId &&
-            friendship.addressee_id ===
-              profile.user_id) ||
-          (friendship.requester_id ===
-            profile.user_id &&
-            friendship.addressee_id ===
-              userId)
-      );
+
+    const existingFriendship = friendships.find(
+      (friendship) =>
+        (friendship.requester_id === userId &&
+          friendship.addressee_id === profile.user_id) ||
+        (friendship.requester_id === profile.user_id &&
+          friendship.addressee_id === userId)
+    );
+
     if (existingFriendship) {
-      if (
-        existingFriendship.status ===
-        "accepted"
-      ) {
+      if (existingFriendship.status === "accepted") {
         setSearchMessage(
           "هذا الطالب موجود بالفعل في قائمة أصدقائك"
         );
-      } else if (
-        existingFriendship.requester_id ===
-        userId
-      ) {
+      } else if (existingFriendship.requester_id === userId) {
         setSearchMessage(
           "تم إرسال طلب صداقة لهذا الطالب بالفعل"
         );
@@ -953,11 +954,13 @@ const Friends = () => {
         );
       }
     }
+
     setSearchedStudent({
       id: profile.user_id,
       userId: profile.user_id,
       name: profile.full_name,
       code: profile.student_code,
+      phone: profile.phone,
       avatar: getAvatar(profile),
       section: profile.section,
     });
@@ -1077,8 +1080,10 @@ const Friends = () => {
         challengeForm.type;
       const duration =
         Number(challengeForm.duration);
-      const target =
-        Number(challengeForm.target);
+      const target = getChallengeDbValue(
+        challengeForm.target,
+        type
+      );
       if (!title) {
         Swal.fire({
           icon: "warning",
@@ -1205,7 +1210,7 @@ const Friends = () => {
         title: "",
         type: "focus",
         duration: "7",
-        target: "300",
+        target: "5",
       });
       setSelectedInviteFriends([]);
       Swal.fire({
@@ -1355,8 +1360,19 @@ const Friends = () => {
       });
       return;
     }
-    const goal =
-      Number(duelForm.goal);
+    let goal = Number(duelForm.goal);
+    if (
+      !Number.isFinite(goal) ||
+      goal <= 0
+    ) {
+      Swal.fire({
+        icon: "warning",
+        title: "الهدف غير صحيح",
+        text: "أدخل عدد ساعات صحيح",
+      });
+      return;
+    }
+    goal = goal * 60;
     if (
       !Number.isFinite(goal) ||
       goal <= 0
@@ -1448,7 +1464,7 @@ const Friends = () => {
     }
     setDuelForm({
       friendId: "",
-      goal: "30",
+      goal: "1",
     });
     Swal.fire({
       icon: "success",
@@ -1758,7 +1774,7 @@ const Friends = () => {
               <div className="add-friend-icon"><FaUserPlus /></div>
               <div>
                 <h2>أضف صديقًا جديدًا</h2>
-                <p>ابحث باستخدام كود الطالب الخاص به</p>
+                <p>ابحث باستخدام كود الطالب أو رقم الموبايل</p>
               </div>
             </div>
             <div className="add-friend-form">
@@ -1766,7 +1782,7 @@ const Friends = () => {
                 <FaSearch />
                 <input
                   type="text"
-                  placeholder="مثال: STU1001"
+                  placeholder="كود الطالب أو رقم الموبايل"
                   value={studentCode}
                   onChange={(event) => setStudentCode(event.target.value)}
                   onKeyDown={(event) => {
@@ -1948,14 +1964,17 @@ const Friends = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>الهدف</label>
-                  <input
-                    type="number"
-                    min="1"
-                    name="target"
-                    value={challengeForm.target}
-                    onChange={handleChallengeFormChange}
-                  />
+                <label>
+                  الهدف {challengeForm.type === "focus" ? "بالساعات" : ""}
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  step={challengeForm.type === "focus" ? "0.5" : "1"}
+                  name="target"
+                  value={challengeForm.target}
+                  onChange={handleChallengeFormChange}
+                />
                 </div>
               </div>
               <div className="form-group">
@@ -2052,11 +2071,10 @@ const Friends = () => {
                   const isCurrentUser =
                     member.user_id ===
                     userId;
-                  const value =
-                    Number(
-                      member.current_value ||
-                        0
-                    );
+                  const value = getChallengeDisplayValue(
+                    member.current_value,
+                    selectedChallenge.challenge_type
+                  );
                   const percentage =
                     Number(
                       selectedChallenge.target ||
@@ -2205,10 +2223,11 @@ const Friends = () => {
               </select>
             </div>
             <div className="form-group">
-              <label>الهدف بالدقائق</label>
+              <label>الهدف بالساعات</label>
               <input
                 type="number"
                 min="1"
+                step="0.5"
                 name="goal"
                 value={duelForm.goal}
                 onChange={handleDuelFormChange}
