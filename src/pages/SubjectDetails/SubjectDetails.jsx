@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-
 import {
   FaBook,
   FaCheck,
@@ -16,70 +15,50 @@ import {
   FaTimes,
   FaTrophy,
 } from "react-icons/fa";
-
 import { FiRefreshCw } from "react-icons/fi";
-
 import Swal from "sweetalert2";
-
 import Header from "../../components/Header/Header";
 import { supabase } from "../../utils/supabaseClient";
-
 import "./SubjectDetails.css";
-
 /* =========================================================
    HELPERS
 ========================================================= */
-
 const getReviewInfo = (score, total) => {
-  if (
-    score === null ||
-    score === undefined ||
-    total === null ||
-    total === undefined ||
-    !total
-  ) {
+  if (score === null || score === undefined || total === null || total === undefined || !total) {
     return {
       type: "none",
       label: "لم يتم الاختبار",
     };
   }
-
   const percentage = (Number(score) / Number(total)) * 100;
-
   if (percentage < 50) {
     return {
       type: "urgent",
       label: "مراجعة عاجلة",
     };
   }
-
   if (percentage < 70) {
     return {
       type: "soon",
       label: "تحتاج مراجعة",
     };
   }
-
   if (percentage < 85) {
     return {
       type: "normal",
       label: "مراجعة قريبة",
     };
   }
-
   return {
     type: "good",
     label: "مستوى جيد",
   };
 };
-
 /* =========================================================
    REVIEW DATE
 ========================================================= */
-
 const formatReviewDate = (date) => {
   if (!date) return "";
-
   try {
     return new Intl.DateTimeFormat("ar-EG", {
       day: "numeric",
@@ -90,65 +69,52 @@ const formatReviewDate = (date) => {
     return "";
   }
 };
-
 const getReviewDateStatus = (review) => {
   if (!review?.scheduled_at) {
     return null;
   }
-
   const today = new Date();
   const scheduled = new Date(review.scheduled_at);
-
   today.setHours(0, 0, 0, 0);
   scheduled.setHours(0, 0, 0, 0);
-
   if (review.status === "completed") {
     return {
       type: "completed",
       label: "تمت المراجعة",
     };
   }
-
   if (review.status === "skipped") {
     return {
       type: "skipped",
       label: "تم تخطي المراجعة",
     };
   }
-
   if (scheduled < today) {
     return {
       type: "overdue",
       label: "مراجعة متأخرة",
     };
   }
-
   if (scheduled.getTime() === today.getTime()) {
     return {
       type: "today",
       label: "مراجعة اليوم",
     };
   }
-
   return {
     type: "upcoming",
     label: "مراجعة قادمة",
   };
 };
-
 /* =========================================================
    COMPONENT
 ========================================================= */
-
 const SubjectDetails = () => {
   const { subjectId } = useParams();
-
   /* =========================================================
      USER
   ========================================================= */
-
   const [userId, setUserId] = useState(null);
-
   /* =========================================================
      CURRICULUM MODE
 
@@ -163,55 +129,37 @@ const SubjectDetails = () => {
      تالتة:
      access = subject_sections
   ========================================================= */
-
   const [isNewCurriculum, setIsNewCurriculum] = useState(false);
-
   /* =========================================================
      SUBJECT
   ========================================================= */
-
   const [subject, setSubject] = useState(null);
   const [units, setUnits] = useState([]);
-
   /* =========================================================
      STUDY
   ========================================================= */
-
   const [studyRecords, setStudyRecords] = useState([]);
-
   /* =========================================================
      REVIEWS
   ========================================================= */
-
   const [reviewRecords, setReviewRecords] = useState([]);
-
   /* =========================================================
      UI
   ========================================================= */
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
   const [activeTab, setActiveTab] = useState("lessons");
-
   const [openUnits, setOpenUnits] = useState([]);
-
   /* =========================================================
      EXAM MODAL
   ========================================================= */
-
   const [showExamModal, setShowExamModal] = useState(false);
-
   const [selectedLesson, setSelectedLesson] = useState(null);
-
   const [examScore, setExamScore] = useState("");
-
   const [examTotal, setExamTotal] = useState("10");
-
   /* =========================================================
      LOAD DATA
   ========================================================= */
-
   useEffect(() => {
     let mounted = true;
 
@@ -220,7 +168,7 @@ const SubjectDetails = () => {
         setLoading(true);
 
         /* =====================================================
-           AUTH USER
+          AUTH USER
         ===================================================== */
 
         const {
@@ -243,7 +191,7 @@ const SubjectDetails = () => {
         setUserId(user.id);
 
         /* =====================================================
-           STUDENT PROFILE
+          STUDENT PROFILE
         ===================================================== */
 
         const {
@@ -278,16 +226,11 @@ const SubjectDetails = () => {
           profileData.track || null;
 
         /*
-          مهم:
+          أولى / تانية ثانوي
+          تستخدم نظام المنهج الجديد.
 
-          isNewCurriculum هنا اسم قديم في الكود،
-          لكنه حاليًا معناه:
-
-          هل الطالب أولى / تانية؟
-
-          أما تالتة فهي أيضًا تستخدم
-          units / lessons لعرض المنهج،
-          لكن access مختلف.
+          تالتة ثانوي لها طريقة وصول مختلفة
+          لكنها ما زالت تستخدم units / lessons.
         */
 
         const firstSecondCurriculum =
@@ -299,7 +242,7 @@ const SubjectDetails = () => {
         setIsNewCurriculum(firstSecondCurriculum);
 
         /* =====================================================
-           SUBJECT
+          SUBJECT
         ===================================================== */
 
         const {
@@ -328,14 +271,14 @@ const SubjectDetails = () => {
         }
 
         /* =====================================================
-           CHECK SUBJECT ACCESS
+          CHECK SUBJECT ACCESS
         ===================================================== */
 
         if (firstSecondCurriculum) {
           /* ===================================================
-             أولى / تانية
+            أولى / تانية ثانوي
 
-             subject_curriculum_access
+            subject_curriculum_access
           =================================================== */
 
           let accessQuery = supabase
@@ -351,15 +294,83 @@ const SubjectDetails = () => {
             .eq("grade_level", gradeLevel)
             .eq("education_system", educationSystem);
 
+          /* ===================================================
+            النظام العام
+          =================================================== */
+
           if (educationSystem === "general") {
-            accessQuery = accessQuery.is("track", null);
-          } else if (educationSystem === "baccalaureate") {
+            /* -----------------------------------------------
+              أولى ثانوي عام
+              مشترك
+            ----------------------------------------------- */
+
+            if (gradeLevel === "first_secondary") {
+              accessQuery = accessQuery.is(
+                "track",
+                null
+              );
+            }
+
+            /* -----------------------------------------------
+              تانية ثانوي عام
+
+              section في student_profiles
+              يحتوي على:
+
+              science
+              literary
+
+              بينما جدول subject_curriculum_access
+              يخزنهم داخل track.
+            ----------------------------------------------- */
+
+            else if (
+              gradeLevel === "second_secondary"
+            ) {
+              const currentSection =
+                profileData.section || null;
+
+              if (!currentSection) {
+                throw new Error(
+                  "لم يتم تحديد شعبة الطالب."
+                );
+              }
+
+              accessQuery = accessQuery.eq(
+                "track",
+                currentSection
+              );
+            }
+          }
+
+          /* ===================================================
+            البكالوريا المصرية
+          =================================================== */
+
+          else if (
+            educationSystem === "baccalaureate"
+          ) {
+            /* -----------------------------------------------
+              أولى بكالوريا
+              مشترك
+            ----------------------------------------------- */
+
             if (
               gradeLevel === "first_secondary" ||
               !currentTrack
             ) {
-              accessQuery = accessQuery.is("track", null);
-            } else {
+              accessQuery = accessQuery.is(
+                "track",
+                null
+              );
+            }
+
+            /* -----------------------------------------------
+              تانية بكالوريا
+              حسب المسار
+            ----------------------------------------------- */
+
+            else {
               accessQuery = accessQuery.eq(
                 "track",
                 currentTrack
@@ -381,23 +392,23 @@ const SubjectDetails = () => {
               "هذه المادة غير متاحة لمنهجك الدراسي الحالي."
             );
           }
-        } else {
-          /* ===================================================
-             تالتة ثانوي
+        }
 
-             هنا لا نستخدم subject_curriculum_access
-             لتحديد الوصول.
+        /* =====================================================
+          THIRD SECONDARY ACCESS
 
-             نستخدم:
+          تالتة ثانوي تفضل بنفس النظام القديم:
 
-             student_profiles.section
-                    ↓
-             sections
-                    ↓
-             subject_sections
-          =================================================== */
+          student_profiles.section
+                      ↓
+                  sections
+                      ↓
+              subject_sections
+        ===================================================== */
 
-          const sectionName = profileData.section;
+        else {
+          const sectionName =
+            profileData.section;
 
           if (!sectionName) {
             throw new Error(
@@ -453,25 +464,19 @@ const SubjectDetails = () => {
         }
 
         /* =====================================================
-           CURRICULUM
-           
-           مهم جدًا:
+          CURRICULUM
 
-           كل المناهج الموجودة حاليًا في قاعدة البيانات
-           يتم تحميلها من:
+          كل المناهج تستخدم:
 
-           units
-             ↓
-           lessons
+          units
+              ↓
+          lessons
 
-           بما فيها تالتة ثانوي.
-
-           تالتة فقط تختلف في طريقة التحقق من المادة:
-           subject_sections
+          الاختلاف فقط في طريقة تحديد
+          الوحدات المسموح بها.
         ===================================================== */
 
         let formattedUnits = [];
-
         let lessonIds = [];
 
         /* =====================================================
@@ -504,45 +509,94 @@ const SubjectDetails = () => {
         /* =====================================================
           أولى / تانية ثانوي
 
-          لازم الوحدة نفسها تكون مرتبطة
-          بمنهج الطالب الحالي
+          الوحدة لازم تكون موجودة في
+          unit_curriculum_access
+          للمنهج الحالي.
         ===================================================== */
 
         if (firstSecondCurriculum) {
-          const { data: unitAccessData, error: unitAccessError } =
-            await supabase
-              .from("unit_curriculum_access")
-              .select(`
-                unit_id,
-                grade_level,
-                education_system,
-                track
-              `)
-              .eq("grade_level", gradeLevel)
-              .eq("education_system", educationSystem);
+          const {
+            data: unitAccessData,
+            error: unitAccessError,
+          } = await supabase
+            .from("unit_curriculum_access")
+            .select(`
+              unit_id,
+              grade_level,
+              education_system,
+              track
+            `)
+            .eq("grade_level", gradeLevel)
+            .eq("education_system", educationSystem);
 
           if (unitAccessError) {
             throw unitAccessError;
           }
 
-          /*
-            نحدد الـ track المناسب
-          */
+          let filteredUnitAccess =
+            unitAccessData || [];
 
-          let filteredUnitAccess = unitAccessData || [];
+          /* ===================================================
+            النظام العام
+          =================================================== */
 
           if (educationSystem === "general") {
-            filteredUnitAccess =
-              filteredUnitAccess.filter(
-                (item) => item.track === null
-              );
+            /* -----------------------------------------------
+              أولى ثانوي عام
+              مشترك
+            ----------------------------------------------- */
+
+            if (
+              gradeLevel === "first_secondary"
+            ) {
+              filteredUnitAccess =
+                filteredUnitAccess.filter(
+                  (item) =>
+                    item.track === null
+                );
+            }
+
+            /* -----------------------------------------------
+              تانية ثانوي عام
+
+              section:
+              science / literary
+
+              موجود في unit_curriculum_access
+              داخل track.
+            ----------------------------------------------- */
+
+            else if (
+              gradeLevel === "second_secondary"
+            ) {
+              const currentSection =
+                profileData.section || null;
+
+              if (!currentSection) {
+                throw new Error(
+                  "لم يتم تحديد شعبة الطالب."
+                );
+              }
+
+              filteredUnitAccess =
+                filteredUnitAccess.filter(
+                  (item) =>
+                    item.track === currentSection
+                );
+            }
           }
 
-          if (educationSystem === "baccalaureate") {
-            /*
-              أولى ثانوي بكالوريا:
-              مفيش تخصص لسه
-            */
+          /* ===================================================
+            البكالوريا المصرية
+          =================================================== */
+
+          else if (
+            educationSystem === "baccalaureate"
+          ) {
+            /* -----------------------------------------------
+              أولى بكالوريا
+              مشترك
+            ----------------------------------------------- */
 
             if (
               gradeLevel === "first_secondary" ||
@@ -550,9 +604,17 @@ const SubjectDetails = () => {
             ) {
               filteredUnitAccess =
                 filteredUnitAccess.filter(
-                  (item) => item.track === null
+                  (item) =>
+                    item.track === null
                 );
-            } else {
+            }
+
+            /* -----------------------------------------------
+              تانية بكالوريا
+              حسب المسار
+            ----------------------------------------------- */
+
+            else {
               filteredUnitAccess =
                 filteredUnitAccess.filter(
                   (item) =>
@@ -561,9 +623,9 @@ const SubjectDetails = () => {
             }
           }
 
-          /*
-            IDs الوحدات المسموح بها
-          */
+          /* ===================================================
+            ALLOWED UNIT IDS
+          =================================================== */
 
           const allowedUnitIds = [
             ...new Set(
@@ -575,7 +637,7 @@ const SubjectDetails = () => {
 
           /*
             لو مفيش وحدات مرتبطة بالمنهج الحالي
-            نرجع بمنهج فارغ بدل ما نعرض منهج غلط.
+            نرجع بمنهج فارغ بدل عرض منهج غلط.
           */
 
           if (allowedUnitIds.length === 0) {
@@ -589,10 +651,7 @@ const SubjectDetails = () => {
         }
 
         /* =====================================================
-          تالتة ثانوي
-
-          تفضل بالطريقة القديمة:
-          subject_sections هو المسؤول عن الوصول
+          LOAD UNITS
         ===================================================== */
 
         const {
@@ -609,12 +668,8 @@ const SubjectDetails = () => {
           throw unitsError;
         }
 
-        if (unitsError) {
-          throw unitsError;
-        }
-
         /* =====================================================
-           ACTIVE UNITS
+          ACTIVE UNITS
         ===================================================== */
 
         const activeUnits = (unitsData || [])
@@ -629,13 +684,13 @@ const SubjectDetails = () => {
           );
 
         /* =====================================================
-           FORMAT CURRICULUM
+          FORMAT CURRICULUM
 
-           Top-level units
-                ↓
-           Child units
-                ↓
-           Lessons
+          Top-level units
+                  ↓
+          Child units
+                  ↓
+          Lessons
         ===================================================== */
 
         formattedUnits = activeUnits
@@ -643,41 +698,81 @@ const SubjectDetails = () => {
             (unit) =>
               !unit.parent_unit_id
           )
-          .map((unit, unitIndex) => {
-            /* ===============================================
-               CHILD UNITS
-            =============================================== */
+          .map(
+            (unit, unitIndex) => {
+              /* =============================================
+                CHILD UNITS
+              ============================================= */
 
-            const childUnits = activeUnits
-              .filter(
-                (child) =>
-                  child.parent_unit_id ===
-                    unit.id &&
-                  child.is_active
-              )
-              .sort(
-                (a, b) =>
-                  Number(
-                    a.sort_order || 0
-                  ) -
-                  Number(
-                    b.sort_order || 0
-                  )
-              )
-              .map((child, childIndex) => ({
-                id: child.id,
-
-                unitNumber:
-                  childIndex + 1,
-
-                title: child.title,
-
-                lessons: (
-                  child.lessons || []
+              const childUnits = activeUnits
+                .filter(
+                  (child) =>
+                    child.parent_unit_id ===
+                      unit.id &&
+                    child.is_active
                 )
+                .sort(
+                  (a, b) =>
+                    Number(
+                      a.sort_order || 0
+                    ) -
+                    Number(
+                      b.sort_order || 0
+                    )
+                )
+                .map(
+                  (
+                    child,
+                    childIndex
+                  ) => ({
+                    id: child.id,
+
+                    unitNumber:
+                      childIndex + 1,
+
+                    title: child.title,
+
+                    lessons: (
+                      child.lessons || []
+                    )
+                      .filter(
+                        (lesson) =>
+                          lesson.is_active ===
+                          true
+                      )
+                      .sort(
+                        (a, b) =>
+                          Number(
+                            a.sort_order || 0
+                          ) -
+                          Number(
+                            b.sort_order || 0
+                          )
+                      )
+                      .map(
+                        (lesson) => ({
+                          id: lesson.id,
+
+                          lessonNumber:
+                            lesson.sort_order,
+
+                          title:
+                            lesson.title,
+                        })
+                      ),
+                  })
+                );
+
+              /* =============================================
+                DIRECT LESSONS
+              ============================================= */
+
+              const directLessons =
+                (unit.lessons || [])
                   .filter(
                     (lesson) =>
-                      lesson.is_active === true
+                      lesson.is_active ===
+                      true
                   )
                   .sort(
                     (a, b) =>
@@ -695,66 +790,36 @@ const SubjectDetails = () => {
                       lessonNumber:
                         lesson.sort_order,
 
-                      title: lesson.title,
+                      title:
+                        lesson.title,
                     })
-                  ),
-              }));
+                  );
 
-            /* ===============================================
-               DIRECT LESSONS
-            =============================================== */
+              return {
+                id: unit.id,
 
-            const directLessons =
-              (unit.lessons || [])
-                .filter(
-                  (lesson) =>
-                    lesson.is_active === true
-                )
-                .sort(
-                  (a, b) =>
-                    Number(
-                      a.sort_order || 0
-                    ) -
-                    Number(
-                      b.sort_order || 0
-                    )
-                )
-                .map(
-                  (lesson) => ({
-                    id: lesson.id,
+                unitNumber:
+                  unitIndex + 1,
 
-                    lessonNumber:
-                      lesson.sort_order,
+                title: unit.title,
 
-                    title: lesson.title,
-                  })
-                );
+                lessons:
+                  directLessons,
 
-            return {
-              id: unit.id,
-
-              unitNumber:
-                unitIndex + 1,
-
-              title: unit.title,
-
-              lessons:
-                directLessons,
-
-              childUnits,
-            };
-          });
+                childUnits,
+              };
+            }
+          );
 
         /* =====================================================
-           ALL CURRICULUM LESSON IDS
+          ALL CURRICULUM LESSON IDS
         ===================================================== */
 
         lessonIds =
           formattedUnits.flatMap(
             (unit) => [
               ...unit.lessons.map(
-                (lesson) =>
-                  lesson.id
+                (lesson) => lesson.id
               ),
 
               ...unit.childUnits.flatMap(
@@ -768,18 +833,32 @@ const SubjectDetails = () => {
           );
 
         /* =====================================================
-           DEBUG
-
-           تقدر تشوف في Console:
-
-           subject
-           units
-           lessons
+          DEBUG
         ===================================================== */
 
         console.log(
           "SubjectDetails subject:",
           subjectData
+        );
+
+        console.log(
+          "SubjectDetails grade:",
+          gradeLevel
+        );
+
+        console.log(
+          "SubjectDetails system:",
+          educationSystem
+        );
+
+        console.log(
+          "SubjectDetails section:",
+          profileData.section
+        );
+
+        console.log(
+          "SubjectDetails track:",
+          currentTrack
         );
 
         console.log(
@@ -793,13 +872,7 @@ const SubjectDetails = () => {
         );
 
         /* =====================================================
-           STUDY RECORDS
-           
-           كل المنهج الحالي يستخدم
-           curriculum_lesson_id.
-
-           وندعم أيضًا السجلات القديمة لتالتة
-           لو كانت موجودة بالفعل في lesson_id.
+          STUDY RECORDS
         ===================================================== */
 
         let studyData = [];
@@ -826,7 +899,10 @@ const SubjectDetails = () => {
               created_at
             `)
             .eq("user_id", user.id)
-            .eq("subject_id", subjectData.id)
+            .eq(
+              "subject_id",
+              subjectData.id
+            )
             .in(
               "curriculum_lesson_id",
               lessonIds
@@ -842,24 +918,16 @@ const SubjectDetails = () => {
           studyData =
             curriculumStudyData || [];
 
-          /*
-            في حالة تالتة ثانوي فقط:
-
-            نحاول أيضًا جلب السجلات القديمة
-            التي تستخدم lesson_id.
-
-            لن نستخدمها إذا كانت IDs مختلفة
-            عن المنهج الحالي، لكنها لا تضر.
-          */
+          /* =================================================
+            OLD THIRD SECONDARY RECORDS
+          ================================================= */
 
           if (!firstSecondCurriculum) {
             const {
               data: oldStudyData,
               error: oldStudyError,
             } = await supabase
-              .from(
-                "student_lesson_study"
-              )
+              .from("student_lesson_study")
               .select(`
                 id,
                 user_id,
@@ -892,7 +960,9 @@ const SubjectDetails = () => {
               throw oldStudyError;
             }
 
-            if (oldStudyData?.length) {
+            if (
+              oldStudyData?.length
+            ) {
               studyData = [
                 ...studyData,
                 ...oldStudyData,
@@ -902,7 +972,7 @@ const SubjectDetails = () => {
         }
 
         /* =====================================================
-           REVIEWS
+          REVIEWS
         ===================================================== */
 
         let reviewsData = [];
@@ -912,9 +982,7 @@ const SubjectDetails = () => {
             data: curriculumReviewsData,
             error: curriculumReviewsError,
           } = await supabase
-            .from(
-              "student_lesson_reviews"
-            )
+            .from("student_lesson_reviews")
             .select(`
               id,
               user_id,
@@ -947,18 +1015,16 @@ const SubjectDetails = () => {
           reviewsData =
             curriculumReviewsData || [];
 
-          /* ===============================================
-             OLD THIRD SECONDARY REVIEWS
-          =============================================== */
+          /* =================================================
+            OLD THIRD SECONDARY REVIEWS
+          ================================================= */
 
           if (!firstSecondCurriculum) {
             const {
               data: oldReviewsData,
               error: oldReviewsError,
             } = await supabase
-              .from(
-                "student_lesson_reviews"
-              )
+              .from("student_lesson_reviews")
               .select(`
                 id,
                 user_id,
@@ -975,26 +1041,22 @@ const SubjectDetails = () => {
                 created_at,
                 updated_at
               `)
-              .eq(
-                "user_id",
-                user.id
-              )
+              .eq("user_id", user.id)
               .in(
                 "lesson_id",
                 lessonIds
               )
-              .order(
-                "scheduled_at",
-                {
-                  ascending: true,
-                }
-              );
+              .order("scheduled_at", {
+                ascending: true,
+              });
 
             if (oldReviewsError) {
               throw oldReviewsError;
             }
 
-            if (oldReviewsData?.length) {
+            if (
+              oldReviewsData?.length
+            ) {
               reviewsData = [
                 ...reviewsData,
                 ...oldReviewsData,
@@ -1004,7 +1066,7 @@ const SubjectDetails = () => {
         }
 
         /* =====================================================
-           SET DATA
+          SET DATA
         ===================================================== */
 
         if (!mounted) return;
@@ -1053,15 +1115,12 @@ const SubjectDetails = () => {
       mounted = false;
     };
   }, [subjectId]);
-
   /* =========================================================
      SUBJECT ICON
   ========================================================= */
-
   const subjectIcon = useMemo(() => {
     return <FaBook />;
   }, []);
-
   /* =========================================================
      LATEST STUDY PER LESSON
      
@@ -1072,732 +1131,354 @@ const SubjectDetails = () => {
      ونسمح أيضًا بقراءة lesson_id
      للسجلات القديمة.
   ========================================================= */
-
   const latestStudyMap = useMemo(() => {
     const map = {};
-
     studyRecords.forEach((record) => {
       /*
         الأولوية لـ curriculum_lesson_id
       */
-
-      const curriculumLessonId =
-        record.curriculum_lesson_id;
-
-      const legacyLessonId =
-        record.lesson_id;
-
+      const curriculumLessonId = record.curriculum_lesson_id;
+      const legacyLessonId = record.lesson_id;
       /*
         سجل حديث
       */
-
       if (curriculumLessonId) {
-        if (
-          !map[curriculumLessonId]
-        ) {
-          map[curriculumLessonId] =
-            record;
+        if (!map[curriculumLessonId]) {
+          map[curriculumLessonId] = record;
         }
       }
-
       /*
         سجل قديم
       */
-
       if (legacyLessonId) {
-        if (
-          !map[legacyLessonId]
-        ) {
-          map[legacyLessonId] =
-            record;
+        if (!map[legacyLessonId]) {
+          map[legacyLessonId] = record;
         }
       }
     });
-
     return map;
   }, [studyRecords]);
-
   /* =========================================================
      LATEST REVIEW PER LESSON
   ========================================================= */
-
   const latestReviewMap = useMemo(() => {
     const map = {};
-
-    reviewRecords.forEach(
-      (review) => {
-        const ids = [
-          review.curriculum_lesson_id,
-          review.lesson_id,
-        ].filter(Boolean);
-
-        ids.forEach((lessonId) => {
-          const existing =
-            map[lessonId];
-
-          if (!existing) {
-            map[lessonId] =
-              review;
-
-            return;
-          }
-
-          const existingTime =
-            existing.scheduled_at
-              ? new Date(
-                  existing.scheduled_at
-                ).getTime()
-              : Infinity;
-
-          const currentTime =
-            review.scheduled_at
-              ? new Date(
-                  review.scheduled_at
-                ).getTime()
-              : Infinity;
-
-          if (
-            review.status !==
-              "completed" &&
-            existing.status ===
-              "completed"
-          ) {
-            map[lessonId] =
-              review;
-
-            return;
-          }
-
-          if (
-            review.status !==
-              "completed" &&
-            existing.status !==
-              "completed" &&
-            currentTime <
-              existingTime
-          ) {
-            map[lessonId] =
-              review;
-          }
-        });
-      }
-    );
-
+    reviewRecords.forEach((review) => {
+      const ids = [
+        review.curriculum_lesson_id,
+        review.lesson_id,
+      ].filter(Boolean);
+      ids.forEach((lessonId) => {
+        const existing = map[lessonId];
+        if (!existing) {
+          map[lessonId] = review;
+          return;
+        }
+        const existingTime = existing.scheduled_at
+          ? new Date(existing.scheduled_at).getTime()
+          : Infinity;
+        const currentTime = review.scheduled_at
+          ? new Date(review.scheduled_at).getTime()
+          : Infinity;
+        if (review.status !== "completed" && existing.status === "completed") {
+          map[lessonId] = review;
+          return;
+        }
+        if (
+          review.status !== "completed" &&
+          existing.status !== "completed" &&
+          currentTime < existingTime
+        ) {
+          map[lessonId] = review;
+        }
+      });
+    });
     return map;
   }, [reviewRecords]);
-
   /* =========================================================
      ALL LESSONS
   ========================================================= */
-
   const allLessons = useMemo(() => {
     const result = [];
-
     units.forEach((unit) => {
       /* ===============================================
          DIRECT LESSONS
       =============================================== */
-
-      unit.lessons.forEach(
-        (lesson) => {
-          const state =
-            latestStudyMap[
-              lesson.id
-            ] || null;
-
-          const hasScore =
-            state?.score !== null &&
-            state?.score !== undefined;
-
-          const total =
-            state?.exam_total !==
-              null &&
-            state?.exam_total !==
-              undefined
-              ? Number(
-                  state.exam_total
-                )
-              : hasScore
-              ? 10
-              : null;
-
-          result.push({
-            id: lesson.id,
-
-            unitId: unit.id,
-
-            unitTitle:
-              unit.title,
-
-            unitNumber:
-              unit.unitNumber,
-
-            parentUnitId: null,
-
-            parentUnitTitle: null,
-
-            lessonNumber:
-              lesson.lessonNumber,
-
-            title: lesson.title,
-
-            studyId:
-              state?.id || null,
-
-            completed:
-              Number(
-                state?.study_minutes ||
-                  0
-              ) > 0,
-
-            studyMinutes:
-              Number(
-                state?.study_minutes ||
-                  0
-              ),
-
-            score: hasScore
-              ? Number(state.score)
-              : null,
-
-            total:
-              hasScore && total
-                ? Number(total)
-                : null,
-
-            studiedAt:
-              state?.studied_at ||
-              null,
-
-            createdAt:
-              state?.created_at ||
-              null,
-
-            latestReview:
-              latestReviewMap[
-                lesson.id
-              ] || null,
-          });
-        }
-      );
-
+      unit.lessons.forEach((lesson) => {
+        const state = latestStudyMap[lesson.id] || null;
+        const hasScore = state?.score !== null && state?.score !== undefined;
+        const total =
+          state?.exam_total !== null && state?.exam_total !== undefined
+            ? Number(state.exam_total)
+            : hasScore
+            ? 10
+            : null;
+        result.push({
+          id: lesson.id,
+          unitId: unit.id,
+          unitTitle: unit.title,
+          unitNumber: unit.unitNumber,
+          parentUnitId: null,
+          parentUnitTitle: null,
+          lessonNumber: lesson.lessonNumber,
+          title: lesson.title,
+          studyId: state?.id || null,
+          completed: Number(state?.study_minutes || 0) > 0,
+          studyMinutes: Number(state?.study_minutes || 0),
+          score: hasScore ? Number(state.score) : null,
+          total: hasScore && total ? Number(total) : null,
+          studiedAt: state?.studied_at || null,
+          createdAt: state?.created_at || null,
+          latestReview: latestReviewMap[lesson.id] || null,
+        });
+      });
       /* ===============================================
          CHILD UNIT LESSONS
       =============================================== */
-
-      unit.childUnits.forEach(
-        (childUnit) => {
-          childUnit.lessons.forEach(
-            (lesson) => {
-              const state =
-                latestStudyMap[
-                  lesson.id
-                ] || null;
-
-              const hasScore =
-                state?.score !== null &&
-                state?.score !== undefined;
-
-              const total =
-                state?.exam_total !==
-                  null &&
-                state?.exam_total !==
-                  undefined
-                  ? Number(
-                      state.exam_total
-                    )
-                  : hasScore
-                  ? 10
-                  : null;
-
-              result.push({
-                id: lesson.id,
-
-                unitId:
-                  childUnit.id,
-
-                unitTitle:
-                  childUnit.title,
-
-                unitNumber:
-                  childUnit.unitNumber,
-
-                parentUnitId:
-                  unit.id,
-
-                parentUnitTitle:
-                  unit.title,
-
-                lessonNumber:
-                  lesson.lessonNumber,
-
-                title: lesson.title,
-
-                studyId:
-                  state?.id || null,
-
-                completed:
-                  Number(
-                    state?.study_minutes ||
-                      0
-                  ) > 0,
-
-                studyMinutes:
-                  Number(
-                    state?.study_minutes ||
-                      0
-                  ),
-
-                score: hasScore
-                  ? Number(
-                      state.score
-                    )
-                  : null,
-
-                total:
-                  hasScore && total
-                    ? Number(total)
-                    : null,
-
-                studiedAt:
-                  state?.studied_at ||
-                  null,
-
-                createdAt:
-                  state?.created_at ||
-                  null,
-
-                latestReview:
-                  latestReviewMap[
-                    lesson.id
-                  ] || null,
-              });
-            }
-          );
-        }
-      );
+      unit.childUnits.forEach((childUnit) => {
+        childUnit.lessons.forEach((lesson) => {
+          const state = latestStudyMap[lesson.id] || null;
+          const hasScore = state?.score !== null && state?.score !== undefined;
+          const total =
+            state?.exam_total !== null && state?.exam_total !== undefined
+              ? Number(state.exam_total)
+              : hasScore
+              ? 10
+              : null;
+          result.push({
+            id: lesson.id,
+            unitId: childUnit.id,
+            unitTitle: childUnit.title,
+            unitNumber: childUnit.unitNumber,
+            parentUnitId: unit.id,
+            parentUnitTitle: unit.title,
+            lessonNumber: lesson.lessonNumber,
+            title: lesson.title,
+            studyId: state?.id || null,
+            completed: Number(state?.study_minutes || 0) > 0,
+            studyMinutes: Number(state?.study_minutes || 0),
+            score: hasScore ? Number(state.score) : null,
+            total: hasScore && total ? Number(total) : null,
+            studiedAt: state?.studied_at || null,
+            createdAt: state?.created_at || null,
+            latestReview: latestReviewMap[lesson.id] || null,
+          });
+        });
+      });
     });
-
     return result;
-  }, [
-    units,
-    latestStudyMap,
-    latestReviewMap,
-  ]);
-
+  }, [units, latestStudyMap, latestReviewMap]);
   /* =========================================================
      STATISTICS
   ========================================================= */
-
   const statistics = useMemo(() => {
-    const total =
-      allLessons.length;
-
-    const completed =
-      allLessons.filter(
-        (lesson) =>
-          lesson.completed
-      ).length;
-
-    const exams =
-      allLessons.filter(
-        (lesson) =>
-          lesson.score !== null &&
-          lesson.total !== null &&
-          lesson.total > 0
-      );
-
+    const total = allLessons.length;
+    const completed = allLessons.filter((lesson) => lesson.completed).length;
+    const exams = allLessons.filter(
+      (lesson) =>
+        lesson.score !== null &&
+        lesson.total !== null &&
+        lesson.total > 0
+    );
     const average =
       exams.length > 0
         ? exams.reduce(
             (sum, lesson) =>
-              sum +
-              (lesson.score /
-                lesson.total) *
-                100,
+              sum + (lesson.score / lesson.total) * 100,
             0
           ) / exams.length
         : 0;
-
-    const urgentLessons =
-      exams.filter(
-        (lesson) =>
-          lesson.score /
-            lesson.total <
-          0.5
-      );
-
+    const urgentLessons = exams.filter(
+      (lesson) => lesson.score / lesson.total < 0.5
+    );
     const now = new Date();
-
-    const dueReviews =
-      reviewRecords.filter(
-        (review) => {
-          if (
-            review.status ===
-              "completed" ||
-            review.status ===
-              "skipped"
-          ) {
-            return false;
-          }
-
-          if (!review.scheduled_at) {
-            return false;
-          }
-
-          return (
-            new Date(
-              review.scheduled_at
-            ) <= now
-          );
-        }
-      );
-
+    const dueReviews = reviewRecords.filter((review) => {
+      if (review.status === "completed" || review.status === "skipped") {
+        return false;
+      }
+      if (!review.scheduled_at) {
+        return false;
+      }
+      return new Date(review.scheduled_at) <= now;
+    });
     return {
       total,
-
       completed,
-
-      remaining:
-        total - completed,
-
+      remaining: total - completed,
       progress:
         total > 0
-          ? Math.round(
-              (completed /
-                total) *
-                100
-            )
+          ? Math.round((completed / total) * 100)
           : 0,
-
-      exams:
-        exams.length,
-
-      average:
-        Math.round(average),
-
-      reviewCount:
-        dueReviews.length,
-
-      urgentCount:
-        urgentLessons.length,
-
-      dueReviewsCount:
-        dueReviews.length,
+      exams: exams.length,
+      average: Math.round(average),
+      reviewCount: dueReviews.length,
+      urgentCount: urgentLessons.length,
+      dueReviewsCount: dueReviews.length,
     };
-  }, [
-    allLessons,
-    reviewRecords,
-  ]);
-
+  }, [allLessons, reviewRecords]);
   /* =========================================================
      REVIEW LESSONS
   ========================================================= */
-
   const reviewLessons = useMemo(() => {
     const now = new Date();
-
-    const dueReviews =
-      reviewRecords.filter(
-        (review) => {
-          if (
-            review.status ===
-              "completed" ||
-            review.status ===
-              "skipped"
-          ) {
-            return false;
-          }
-
-          if (!review.scheduled_at) {
-            return false;
-          }
-
-          return (
-            new Date(
-              review.scheduled_at
-            ) <= now
-          );
-        }
-      );
-
-    const uniqueLessonIds =
-      new Set();
-
-    const result = [];
-
-    dueReviews.forEach(
-      (review) => {
-        const lessonId =
-          review.curriculum_lesson_id ||
-          review.lesson_id;
-
-        if (
-          !lessonId ||
-          uniqueLessonIds.has(
-            lessonId
-          )
-        ) {
-          return;
-        }
-
-        const lesson =
-          allLessons.find(
-            (item) =>
-              item.id ===
-              lessonId
-          );
-
-        if (!lesson) {
-          return;
-        }
-
-        uniqueLessonIds.add(
-          lessonId
-        );
-
-        result.push({
-          ...lesson,
-          review,
-        });
+    const dueReviews = reviewRecords.filter((review) => {
+      if (review.status === "completed" || review.status === "skipped") {
+        return false;
       }
-    );
-
+      if (!review.scheduled_at) {
+        return false;
+      }
+      return new Date(review.scheduled_at) <= now;
+    });
+    const uniqueLessonIds = new Set();
+    const result = [];
+    dueReviews.forEach((review) => {
+      const lessonId = review.curriculum_lesson_id || review.lesson_id;
+      if (!lessonId || uniqueLessonIds.has(lessonId)) {
+        return;
+      }
+      const lesson = allLessons.find((item) => item.id === lessonId);
+      if (!lesson) {
+        return;
+      }
+      uniqueLessonIds.add(lessonId);
+      result.push({
+        ...lesson,
+        review,
+      });
+    });
     /*
       لو مفيش مراجعات مستحقة حاليًا،
       نعرض الدروس الضعيفة.
     */
-
     if (result.length === 0) {
       return allLessons
         .filter(
           (lesson) =>
-            lesson.score !==
-              null &&
-            lesson.total !==
-              null &&
+            lesson.score !== null &&
+            lesson.total !== null &&
             lesson.total > 0 &&
-            lesson.score /
-              lesson.total <
-              0.85
+            lesson.score / lesson.total < 0.85
         )
         .sort(
           (a, b) =>
-            a.score /
-              a.total -
-            b.score /
-              b.total
+            a.score / a.total -
+            b.score / b.total
         );
     }
-
-    return result.sort(
-      (a, b) => {
-        const aOverdue =
-          a.review
-            ?.scheduled_at &&
-          new Date(
-            a.review.scheduled_at
-          ) < now;
-
-        const bOverdue =
-          b.review
-            ?.scheduled_at &&
-          new Date(
-            b.review.scheduled_at
-          ) < now;
-
-        if (
-          aOverdue &&
-          !bOverdue
-        ) {
-          return -1;
-        }
-
-        if (
-          !aOverdue &&
-          bOverdue
-        ) {
-          return 1;
-        }
-
-        if (
-          a.score !== null &&
-          b.score !== null &&
-          a.total > 0 &&
-          b.total > 0
-        ) {
-          return (
-            a.score /
-              a.total -
-            b.score /
-              b.total
-          );
-        }
-
-        return 0;
+    return result.sort((a, b) => {
+      const aOverdue =
+        a.review?.scheduled_at &&
+        new Date(a.review.scheduled_at) < now;
+      const bOverdue =
+        b.review?.scheduled_at &&
+        new Date(b.review.scheduled_at) < now;
+      if (aOverdue && !bOverdue) {
+        return -1;
       }
-    );
-  }, [
-    reviewRecords,
-    allLessons,
-  ]);
-
+      if (!aOverdue && bOverdue) {
+        return 1;
+      }
+      if (
+        a.score !== null &&
+        b.score !== null &&
+        a.total > 0 &&
+        b.total > 0
+      ) {
+        return (
+          a.score / a.total -
+          b.score / b.total
+        );
+      }
+      return 0;
+    });
+  }, [reviewRecords, allLessons]);
   /* =========================================================
      GET OR CREATE STUDY RECORD
   ========================================================= */
+  const getOrCreateStudyRecord = async (lesson) => {
+    if (!userId || !subject) {
+      throw new Error("بيانات المستخدم أو المادة غير متاحة.");
+    }
+    const existing = latestStudyMap[lesson.id];
+    if (existing) {
+      return existing;
+    }
+    /*
+      كل المنهج الموجود حاليًا في
+      units / lessons يستخدم:
 
-  const getOrCreateStudyRecord =
-    async (lesson) => {
-      if (
-        !userId ||
-        !subject
-      ) {
-        throw new Error(
-          "بيانات المستخدم أو المادة غير متاحة."
-        );
-      }
-
-      const existing =
-        latestStudyMap[
-          lesson.id
-        ];
-
-      if (existing) {
-        return existing;
-      }
-
-      /*
-        كل المنهج الموجود حاليًا في
-        units / lessons يستخدم:
-
-        curriculum_unit_id
-        curriculum_lesson_id
-      */
-
-      const insertData = {
-        user_id: userId,
-
-        subject_id:
-          subject.id,
-
-        unit_id: null,
-
-        lesson_id: null,
-
-        curriculum_unit_id:
-          lesson.unitId,
-
-        curriculum_lesson_id:
-          lesson.id,
-
-        studied_at:
-          new Date().toISOString(),
-
-        study_minutes: 0,
-      };
-
-      const {
-        data,
-        error,
-      } = await supabase
-        .from(
-          "student_lesson_study"
-        )
-        .insert(
-          insertData
-        )
-        .select(`
-          id,
-          user_id,
-          subject_id,
-          unit_id,
-          lesson_id,
-          curriculum_lesson_id,
-          curriculum_unit_id,
-          studied_at,
-          study_minutes,
-          score,
-          exam_total,
-          notes,
-          created_at
-        `)
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      setStudyRecords(
-        (prev) => [
-          data,
-          ...prev,
-        ]
-      );
-
-      return data;
+      curriculum_unit_id
+      curriculum_lesson_id
+    */
+    const insertData = {
+      user_id: userId,
+      subject_id: subject.id,
+      unit_id: null,
+      lesson_id: null,
+      curriculum_unit_id: lesson.unitId,
+      curriculum_lesson_id: lesson.id,
+      studied_at: new Date().toISOString(),
+      study_minutes: 0,
     };
-
+    const {
+      data,
+      error,
+    } = await supabase
+      .from("student_lesson_study")
+      .insert(insertData)
+      .select(`
+        id,
+        user_id,
+        subject_id,
+        unit_id,
+        lesson_id,
+        curriculum_lesson_id,
+        curriculum_unit_id,
+        studied_at,
+        study_minutes,
+        score,
+        exam_total,
+        notes,
+        created_at
+      `)
+      .single();
+    if (error) {
+      throw error;
+    }
+    setStudyRecords((prev) => [data, ...prev]);
+    return data;
+  };
   /* =========================================================
      TOGGLE LESSON
   ========================================================= */
-
-  const toggleLesson = async (
-    lesson
-  ) => {
-    if (
-      saving ||
-      !lesson ||
-      !userId ||
-      !subject
-    ) {
+  const toggleLesson = async (lesson) => {
+    if (saving || !lesson || !userId || !subject) {
       return;
     }
-
     try {
       setSaving(true);
-
-      const existing =
-        latestStudyMap[
-          lesson.id
-        ];
-
+      const existing = latestStudyMap[lesson.id];
       /* =====================================================
          FIRST STUDY
       ===================================================== */
-
       if (!existing) {
         const insertData = {
           user_id: userId,
-
-          subject_id:
-            subject.id,
-
+          subject_id: subject.id,
           unit_id: null,
-
           lesson_id: null,
-
-          curriculum_unit_id:
-            lesson.unitId,
-
-          curriculum_lesson_id:
-            lesson.id,
-
-          studied_at:
-            new Date().toISOString(),
-
+          curriculum_unit_id: lesson.unitId,
+          curriculum_lesson_id: lesson.id,
+          studied_at: new Date().toISOString(),
           study_minutes: 1,
         };
-
         const {
           data,
           error,
         } = await supabase
-          .from(
-            "student_lesson_study"
-          )
-          .insert(
-            insertData
-          )
+          .from("student_lesson_study")
+          .insert(insertData)
           .select(`
             id,
             user_id,
@@ -1814,55 +1495,27 @@ const SubjectDetails = () => {
             created_at
           `)
           .single();
-
         if (error) {
           throw error;
         }
-
-        setStudyRecords(
-          (prev) => [
-            data,
-            ...prev,
-          ]
-        );
-
+        setStudyRecords((prev) => [data, ...prev]);
         return;
       }
-
       /* =====================================================
          TOGGLE
       ===================================================== */
-
-      const isCompleted =
-        Number(
-          existing.study_minutes ||
-            0
-        ) > 0;
-
+      const isCompleted = Number(existing.study_minutes || 0) > 0;
       const {
         data,
         error,
       } = await supabase
-        .from(
-          "student_lesson_study"
-        )
+        .from("student_lesson_study")
         .update({
-          study_minutes:
-            isCompleted
-              ? 0
-              : 1,
-
-          studied_at:
-            new Date().toISOString(),
+          study_minutes: isCompleted ? 0 : 1,
+          studied_at: new Date().toISOString(),
         })
-        .eq(
-          "id",
-          existing.id
-        )
-        .eq(
-          "user_id",
-          userId
-        )
+        .eq("id", existing.id)
+        .eq("user_id", userId)
         .select(`
           id,
           user_id,
@@ -1879,1775 +1532,1068 @@ const SubjectDetails = () => {
           created_at
         `)
         .single();
-
       if (error) {
         throw error;
       }
-
-      setStudyRecords(
-        (prev) =>
-          prev.map(
-            (record) =>
-              record.id ===
-              data.id
-                ? data
-                : record
-          )
+      setStudyRecords((prev) =>
+        prev.map((record) =>
+          record.id === data.id
+            ? data
+            : record
+        )
       );
     } catch (error) {
-      console.error(
-        "toggleLesson error:",
-        error
-      );
-
+      console.error("toggleLesson error:", error);
       Swal.fire({
         icon: "error",
         title: "حدث خطأ",
-        text:
-          error?.message ||
-          "تعذر تحديث حالة الدرس.",
-        confirmButtonText:
-          "حسنًا",
+        text: error?.message || "تعذر تحديث حالة الدرس.",
+        confirmButtonText: "حسنًا",
       });
     } finally {
       setSaving(false);
     }
   };
-
   /* =========================================================
      OPEN EXAM MODAL
   ========================================================= */
-
-  const openExamModal = (
-    lesson
-  ) => {
+  const openExamModal = (lesson) => {
     if (!lesson) {
       return;
     }
-
-    const current =
-      latestStudyMap[
-        lesson.id
-      ];
-
+    const current = latestStudyMap[lesson.id];
     const total =
-      current?.exam_total !==
-        null &&
-      current?.exam_total !==
-        undefined &&
-      Number(
-        current.exam_total
-      ) > 0
-        ? Number(
-            current.exam_total
-          )
+      current?.exam_total !== null &&
+      current?.exam_total !== undefined &&
+      Number(current.exam_total) > 0
+        ? Number(current.exam_total)
         : 10;
-
-    setSelectedLesson(
-      lesson
-    );
-
+    setSelectedLesson(lesson);
     setExamScore(
-      current?.score !==
-        null &&
-        current?.score !==
-          undefined
-        ? String(
-            current.score
-          )
+      current?.score !== null &&
+      current?.score !== undefined
+        ? String(current.score)
         : ""
     );
-
-    setExamTotal(
-      String(total)
-    );
-
+    setExamTotal(String(total));
     setShowExamModal(true);
   };
-
   /* =========================================================
      SAVE EXAM
   ========================================================= */
-
-  const saveExam =
-    async () => {
-      if (
-        !selectedLesson ||
-        saving
-      ) {
-        return;
+  const saveExam = async () => {
+    if (!selectedLesson || saving) {
+      return;
+    }
+    const score = Number(examScore);
+    const total = Number(examTotal);
+    if (
+      !Number.isFinite(score) ||
+      !Number.isFinite(total) ||
+      total <= 0 ||
+      score < 0 ||
+      score > total
+    ) {
+      Swal.fire({
+        icon: "warning",
+        title: "بيانات غير صحيحة",
+        text: "تأكد أن الدرجة بين 0 والدرجة النهائية.",
+        confirmButtonText: "حسنًا",
+      });
+      return;
+    }
+    try {
+      setSaving(true);
+      let studyRecord = latestStudyMap[selectedLesson.id];
+      if (!studyRecord) {
+        studyRecord = await getOrCreateStudyRecord(selectedLesson);
       }
-
-      const score =
-        Number(examScore);
-
-      const total =
-        Number(examTotal);
-
-      if (
-        !Number.isFinite(
-          score
-        ) ||
-        !Number.isFinite(
-          total
-        ) ||
-        total <= 0 ||
-        score < 0 ||
-        score > total
-      ) {
-        Swal.fire({
-          icon: "warning",
-          title:
-            "بيانات غير صحيحة",
-          text:
-            "تأكد أن الدرجة بين 0 والدرجة النهائية.",
-          confirmButtonText:
-            "حسنًا",
-        });
-
-        return;
+      const {
+        data,
+        error,
+      } = await supabase
+        .from("student_lesson_study")
+        .update({
+          score,
+          exam_total: total,
+          study_minutes:
+            Number(studyRecord.study_minutes || 0) > 0
+              ? studyRecord.study_minutes
+              : 1,
+          studied_at: new Date().toISOString(),
+        })
+        .eq("id", studyRecord.id)
+        .eq("user_id", userId)
+        .select(`
+          id,
+          user_id,
+          subject_id,
+          unit_id,
+          lesson_id,
+          curriculum_lesson_id,
+          curriculum_unit_id,
+          studied_at,
+          study_minutes,
+          score,
+          exam_total,
+          notes,
+          created_at
+        `)
+        .single();
+      if (error) {
+        throw error;
       }
-
-      try {
-        setSaving(true);
-
-        let studyRecord =
-          latestStudyMap[
-            selectedLesson.id
-          ];
-
-        if (!studyRecord) {
-          studyRecord =
-            await getOrCreateStudyRecord(
-              selectedLesson
-            );
-        }
-
-        const {
-          data,
-          error,
-        } = await supabase
-          .from(
-            "student_lesson_study"
-          )
-          .update({
-            score,
-
-            exam_total:
-              total,
-
-            study_minutes:
-              Number(
-                studyRecord.study_minutes ||
-                  0
-              ) > 0
-                ? studyRecord.study_minutes
-                : 1,
-
-            studied_at:
-              new Date().toISOString(),
-          })
-          .eq(
-            "id",
-            studyRecord.id
-          )
-          .eq(
-            "user_id",
-            userId
-          )
-          .select(`
-            id,
-            user_id,
-            subject_id,
-            unit_id,
-            lesson_id,
-            curriculum_lesson_id,
-            curriculum_unit_id,
-            studied_at,
-            study_minutes,
-            score,
-            exam_total,
-            notes,
-            created_at
-          `)
-          .single();
-
-        if (error) {
-          throw error;
-        }
-
-        setStudyRecords(
-          (prev) =>
-            prev.map(
-              (record) =>
-                record.id ===
-                data.id
-                  ? data
-                  : record
-            )
-        );
-
-        setShowExamModal(
-          false
-        );
-
-        setSelectedLesson(
-          null
-        );
-
-        setExamScore("");
-
-        setExamTotal("10");
-
-        Swal.fire({
-          icon: "success",
-          title:
-            "تم حفظ النتيجة",
-          text:
-            "تم تحديث نتيجة الاختبار والإحصائيات.",
-          timer: 1600,
-          showConfirmButton:
-            false,
-        });
-      } catch (error) {
-        console.error(
-          "saveExam error:",
-          error
-        );
-
-        Swal.fire({
-          icon: "error",
-          title: "حدث خطأ",
-          text:
-            error?.message ||
-            "تعذر حفظ نتيجة الاختبار.",
-          confirmButtonText:
-            "حسنًا",
-        });
-      } finally {
-        setSaving(false);
-      }
-    };
-
+      setStudyRecords((prev) =>
+        prev.map((record) =>
+          record.id === data.id
+            ? data
+            : record
+        )
+      );
+      setShowExamModal(false);
+      setSelectedLesson(null);
+      setExamScore("");
+      setExamTotal("10");
+      Swal.fire({
+        icon: "success",
+        title: "تم حفظ النتيجة",
+        text: "تم تحديث نتيجة الاختبار والإحصائيات.",
+        timer: 1600,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("saveExam error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "حدث خطأ",
+        text: error?.message || "تعذر حفظ نتيجة الاختبار.",
+        confirmButtonText: "حسنًا",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
   /* =========================================================
      REMOVE EXAM
   ========================================================= */
-
-  const removeExam =
-    async () => {
-      if (
-        !selectedLesson ||
-        saving
-      ) {
+  const removeExam = async () => {
+    if (!selectedLesson || saving) {
+      return;
+    }
+    const confirmed = await Swal.fire({
+      icon: "warning",
+      title: "حذف النتيجة؟",
+      text: "سيتم حذف نتيجة الاختبار والمراجعات المرتبطة به.",
+      showCancelButton: true,
+      confirmButtonText: "حذف",
+      cancelButtonText: "إلغاء",
+      reverseButtons: true,
+    });
+    if (!confirmed.isConfirmed) {
+      return;
+    }
+    try {
+      setSaving(true);
+      const existing = latestStudyMap[selectedLesson.id];
+      if (!existing) {
         return;
       }
-
-      const confirmed =
-        await Swal.fire({
-          icon: "warning",
-
-          title:
-            "حذف النتيجة؟",
-
-          text:
-            "سيتم حذف نتيجة الاختبار والمراجعات المرتبطة به.",
-
-          showCancelButton:
-            true,
-
-          confirmButtonText:
-            "حذف",
-
-          cancelButtonText:
-            "إلغاء",
-
-          reverseButtons:
-            true,
-        });
-
-      if (
-        !confirmed.isConfirmed
-      ) {
-        return;
+      /* ===============================================
+         DELETE REVIEWS
+      =============================================== */
+      const {
+        error: reviewError,
+      } = await supabase
+        .from("student_lesson_reviews")
+        .delete()
+        .eq("study_id", existing.id)
+        .eq("user_id", userId);
+      if (reviewError) {
+        throw reviewError;
       }
-
-      try {
-        setSaving(true);
-
-        const existing =
-          latestStudyMap[
-            selectedLesson.id
-          ];
-
-        if (!existing) {
-          return;
-        }
-
-        /* ===============================================
-           DELETE REVIEWS
-        =============================================== */
-
-        const {
-          error:
-            reviewError,
-        } = await supabase
-          .from(
-            "student_lesson_reviews"
-          )
-          .delete()
-          .eq(
-            "study_id",
-            existing.id
-          )
-          .eq(
-            "user_id",
-            userId
-          );
-
-        if (reviewError) {
-          throw reviewError;
-        }
-
-        /* ===============================================
-           REMOVE EXAM SCORE
-        =============================================== */
-
-        const {
-          data,
-          error,
-        } = await supabase
-          .from(
-            "student_lesson_study"
-          )
-          .update({
-            score: null,
-
-            exam_total:
-              null,
-          })
-          .eq(
-            "id",
-            existing.id
-          )
-          .eq(
-            "user_id",
-            userId
-          )
-          .select(`
-            id,
-            user_id,
-            subject_id,
-            unit_id,
-            lesson_id,
-            curriculum_lesson_id,
-            curriculum_unit_id,
-            studied_at,
-            study_minutes,
-            score,
-            exam_total,
-            notes,
-            created_at
-          `)
-          .single();
-
-        if (error) {
-          throw error;
-        }
-
-        setStudyRecords(
-          (prev) =>
-            prev.map(
-              (record) =>
-                record.id ===
-                data.id
-                  ? data
-                  : record
-            )
-        );
-
-        setReviewRecords(
-          (prev) =>
-            prev.filter(
-              (review) =>
-                review.study_id !==
-                existing.id
-            )
-        );
-
-        setShowExamModal(
-          false
-        );
-
-        setSelectedLesson(
-          null
-        );
-
-        Swal.fire({
-          icon: "success",
-          title:
-            "تم حذف النتيجة",
-          text:
-            "تم حذف نتيجة الاختبار والمراجعات المرتبطة به.",
-          timer: 1600,
-          showConfirmButton:
-            false,
-        });
-      } catch (error) {
-        console.error(
-          "removeExam error:",
-          error
-        );
-
-        Swal.fire({
-          icon: "error",
-          title: "حدث خطأ",
-          text:
-            error?.message ||
-            "تعذر حذف نتيجة الاختبار.",
-          confirmButtonText:
-            "حسنًا",
-        });
-      } finally {
-        setSaving(false);
+      /* ===============================================
+         REMOVE EXAM SCORE
+      =============================================== */
+      const {
+        data,
+        error,
+      } = await supabase
+        .from("student_lesson_study")
+        .update({
+          score: null,
+          exam_total: null,
+        })
+        .eq("id", existing.id)
+        .eq("user_id", userId)
+        .select(`
+          id,
+          user_id,
+          subject_id,
+          unit_id,
+          lesson_id,
+          curriculum_lesson_id,
+          curriculum_unit_id,
+          studied_at,
+          study_minutes,
+          score,
+          exam_total,
+          notes,
+          created_at
+        `)
+        .single();
+      if (error) {
+        throw error;
       }
-    };
-
+      setStudyRecords((prev) =>
+        prev.map((record) =>
+          record.id === data.id
+            ? data
+            : record
+        )
+      );
+      setReviewRecords((prev) =>
+        prev.filter(
+          (review) =>
+            review.study_id !== existing.id
+        )
+      );
+      setShowExamModal(false);
+      setSelectedLesson(null);
+      Swal.fire({
+        icon: "success",
+        title: "تم حذف النتيجة",
+        text: "تم حذف نتيجة الاختبار والمراجعات المرتبطة به.",
+        timer: 1600,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("removeExam error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "حدث خطأ",
+        text: error?.message || "تعذر حذف نتيجة الاختبار.",
+        confirmButtonText: "حسنًا",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
   /* =========================================================
      UNIT TOGGLE
   ========================================================= */
-
-  const toggleUnit = (
-    unitId
-  ) => {
-    setOpenUnits(
-      (prev) =>
-        prev.includes(unitId)
-          ? prev.filter(
-              (id) =>
-                id !== unitId
-            )
-          : [
-              ...prev,
-              unitId,
-            ]
+  const toggleUnit = (unitId) => {
+    setOpenUnits((prev) =>
+      prev.includes(unitId)
+        ? prev.filter((id) => id !== unitId)
+        : [...prev, unitId]
     );
   };
+  const openAllUnits = () => {
+    const allIds = [];
+    units.forEach((unit) => {
+      allIds.push(unit.id);
+      unit.childUnits?.forEach((childUnit) => {
+        allIds.push(childUnit.id);
+      });
+    });
+    setOpenUnits(allIds);
+  };
+  const closeAllUnits = () => {
+    setOpenUnits([]);
+  };
+/* =========================================================
+   LOADING
+========================================================= */
 
-  const openAllUnits =
-    () => {
-      const allIds = [];
-
-      units.forEach(
-        (unit) => {
-          allIds.push(
-            unit.id
-          );
-
-          unit.childUnits?.forEach(
-            (childUnit) => {
-              allIds.push(
-                childUnit.id
-              );
-            }
-          );
-        }
-      );
-
-      setOpenUnits(
-        allIds
-      );
-    };
-
-  const closeAllUnits =
-    () => {
-      setOpenUnits([]);
-    };
-
-  /* =========================================================
-     LOADING
-  ========================================================= */
-
-  if (loading) {
-    return (
-      <main className="subject-details-page">
-        <Header />
-
-        <div className="page-loading">
-          <div className="page-loading-spinner">
-            <FiRefreshCw />
-          </div>
-
-          <h3>
-            جاري تجهيز المادة...
-          </h3>
-
-          <p>
-            بنحمّل دروسك وتقدمك
-            وآخر مراجعاتك.
-          </p>
-        </div>
-      </main>
-    );
-  }
-
-  /* =========================================================
-     SUBJECT NOT FOUND
-  ========================================================= */
-
-  if (!subject) {
-    return (
-      <main className="subject-details-page">
-        <Header />
-
-        <div className="empty-state">
-          <div>
-            <FaExclamationTriangle />
-          </div>
-
-          <h3>
-            المادة غير موجودة
-          </h3>
-
-          <p>
-            لم نتمكن من العثور
-            على المادة المطلوبة.
-          </p>
-        </div>
-      </main>
-    );
-  }
-
-  /* =========================================================
-     RENDER
-  ========================================================= */
-
+if (loading) {
   return (
-    <>
-      <main className="subject-details-page">
-        <Header />
+    <main className="subject-details-page">
+      <Header />
+      <div className="page-loading">
+        <div className="page-loading-spinner">
+          <FiRefreshCw />
+        </div>
+        <h3>جاري تجهيز المادة...</h3>
+        <p>بنحمّل دروسك وتقدمك وآخر مراجعاتك.</p>
+      </div>
+    </main>
+  );
+}
 
-        {/* =====================================================
-            SUBJECT HEADER
-        ===================================================== */}
+/* =========================================================
+   SUBJECT NOT FOUND
+========================================================= */
 
-        <section className="subject-page-header">
-          <div className="subject-page-title">
-            <div
-              className={`large-subject-icon ${
-                subject.icon_class ||
-                "arabic-icon"
-              }`}
-            >
-              {subjectIcon}
-            </div>
+if (!subject) {
+  return (
+    <main className="subject-details-page">
+      <Header />
+      <div className="empty-state">
+        <div>
+          <FaExclamationTriangle />
+        </div>
+        <h3>المادة غير موجودة</h3>
+        <p>لم نتمكن من العثور على المادة المطلوبة.</p>
+      </div>
+    </main>
+  );
+}
 
-            <div>
-              <h1>
-                {subject.name}
-              </h1>
+/* =========================================================
+   RENDER
+========================================================= */
 
-              <p>
-                {subject.subtitle ||
-                  "تابع دروسك وسجل نتائجك مع المدرس"}
-              </p>
-            </div>
-          </div>
+return (
+  <>
+    <main className="subject-details-page">
+      <Header />
 
-          <div className="subject-overall-progress">
-            <div className="progress-title">
-              تقدمك في المادة
-            </div>
+      {/* =====================================================
+          SUBJECT HEADER
+      ===================================================== */}
 
-            <div className="big-progress-row">
-              <strong>
-                {
-                  statistics.progress
-                }
-                %
-              </strong>
-
-              <span>
-                {
-                  statistics.completed
-                }{" "}
-                من{" "}
-                {
-                  statistics.total
-                }{" "}
-                درس
-              </span>
-            </div>
-
-            <div className="big-progress-bar">
-              <span
-                style={{
-                  width: `${statistics.progress}%`,
-                }}
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* =====================================================
-            STATS
-        ===================================================== */}
-
-        <section className="subject-stats">
-          <div className="subject-info-card">
-            <div className="stat-icon blue">
-              <FaBook />
-            </div>
-
-            <div>
-              <span>
-                إجمالي الدروس
-              </span>
-
-              <strong>
-                {
-                  statistics.total
-                }
-              </strong>
-
-              <small>
-                درس
-              </small>
-            </div>
-          </div>
-
-          <div className="subject-info-card">
-            <div className="stat-icon green">
-              <FaCheckCircle />
-            </div>
-
-            <div>
-              <span>
-                الدروس المكتملة
-              </span>
-
-              <strong>
-                {
-                  statistics.completed
-                }
-              </strong>
-
-              <small>
-                درس
-              </small>
-            </div>
-          </div>
-
-          <div className="subject-info-card">
-            <div className="stat-icon orange">
-              <FaClipboardCheck />
-            </div>
-
-            <div>
-              <span>
-                الاختبارات المسجلة
-              </span>
-
-              <strong>
-                {
-                  statistics.exams
-                }
-              </strong>
-
-              <small>
-                اختبار مع المدرس
-              </small>
-            </div>
-          </div>
-
-          <div className="subject-info-card">
-            <div className="stat-icon purple">
-              <FaTrophy />
-            </div>
-
-            <div>
-              <span>
-                متوسط النتائج
-              </span>
-
-              <strong>
-                {statistics.exams
-                  ? `${statistics.average}%`
-                  : "--"}
-              </strong>
-
-              <small>
-                من الاختبارات المسجلة
-              </small>
-            </div>
-          </div>
-        </section>
-
-        {/* =====================================================
-            TABS
-        ===================================================== */}
-
-        <nav className="subject-tabs">
-          <button
-            className={
-              activeTab ===
-              "lessons"
-                ? "active"
-                : ""
-            }
-            onClick={() =>
-              setActiveTab(
-                "lessons"
-              )
-            }
+      <section className="subject-page-header">
+        <div className="subject-page-title">
+          <div
+            className={`large-subject-icon ${
+              subject.icon_class || "arabic-icon"
+            }`}
           >
+            {subjectIcon}
+          </div>
+
+          <div>
+            <h1>{subject.name}</h1>
+            <p>{subject.subtitle || "تابع دروسك وسجل نتائجك مع المدرس"}</p>
+          </div>
+        </div>
+
+        <div className="subject-overall-progress">
+          <div className="progress-title">تقدمك في المادة</div>
+
+          <div className="big-progress-row">
+            <strong>
+              {statistics.progress}%
+            </strong>
+
+            <span>{statistics.completed} من {statistics.total} درس</span>
+          </div>
+
+          <div className="big-progress-bar">
+            <span
+              style={{
+                width: `${statistics.progress}%`,
+              }}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================
+          STATS
+      ===================================================== */}
+
+      <section className="subject-stats">
+        <div className="subject-info-card">
+          <div className="stat-icon blue">
             <FaBook />
-            المنهج
-          </button>
+          </div>
 
-          <button
-            className={
-              activeTab ===
-              "review"
-                ? "active"
-                : ""
-            }
-            onClick={() =>
-              setActiveTab(
-                "review"
-              )
-            }
-          >
-            <FaRedo />
-            المراجعة المقترحة
+          <div>
+            <span>إجمالي الدروس</span>
+            <strong>{statistics.total}</strong>
+            <small>درس</small>
+          </div>
+        </div>
 
-            {statistics.reviewCount >
-              0 && (
-              <span className="tab-badge">
-                {
-                  statistics.reviewCount
-                }
-              </span>
-            )}
-          </button>
+        <div className="subject-info-card">
+          <div className="stat-icon green">
+            <FaCheckCircle />
+          </div>
 
-          <button
-            className={
-              activeTab ===
-              "statistics"
-                ? "active"
-                : ""
-            }
-            onClick={() =>
-              setActiveTab(
-                "statistics"
-              )
-            }
-          >
-            <FaGraduationCap />
-            إحصائيات المادة
-          </button>
-        </nav>
+          <div>
+            <span>الدروس المكتملة</span>
+            <strong>{statistics.completed}</strong>
+            <small>درس</small>
+          </div>
+        </div>
 
-        {/* =====================================================
-            CONTENT
-        ===================================================== */}
+        <div className="subject-info-card">
+          <div className="stat-icon orange">
+            <FaClipboardCheck />
+          </div>
 
-        <section className="subject-content">
-          {/* ===================================================
-              SIDEBAR
-          ==================================================== */}
+          <div>
+            <span>الاختبارات المسجلة</span>
+            <strong>{statistics.exams}</strong>
+            <small>اختبار مع المدرس</small>
+          </div>
+        </div>
 
-          <aside className="subject-sidebar">
-            {/* SUMMARY */}
+        <div className="subject-info-card">
+          <div className="stat-icon purple">
+            <FaTrophy />
+          </div>
 
-            <div className="sidebar-card">
-              <div className="sidebar-card-title">
-                <FaBook />
+          <div>
+            <span>متوسط النتائج</span>
+            <strong>
+              {statistics.exams ? `${statistics.average}%` : "--"}
+            </strong>
+            <small>من الاختبارات المسجلة</small>
+          </div>
+        </div>
+      </section>
 
-                <h2>
-                  ملخص المادة
-                </h2>
+      {/* =====================================================
+          TABS
+      ===================================================== */}
+
+      <nav className="subject-tabs">
+        <button
+          className={activeTab === "lessons" ? "active" : ""}
+          onClick={() => setActiveTab("lessons")}
+        >
+          <FaBook />
+          المنهج
+        </button>
+
+        <button
+          className={activeTab === "review" ? "active" : ""}
+          onClick={() => setActiveTab("review")}
+        >
+          <FaRedo />
+          المراجعة المقترحة
+
+          {statistics.reviewCount > 0 && (
+            <span className="tab-badge">
+              {statistics.reviewCount}
+            </span>
+          )}
+        </button>
+
+        <button
+          className={activeTab === "statistics" ? "active" : ""}
+          onClick={() => setActiveTab("statistics")}
+        >
+          <FaGraduationCap />
+          إحصائيات المادة
+        </button>
+      </nav>
+
+      {/* =====================================================
+          CONTENT
+      ===================================================== */}
+
+      <section className="subject-content">
+        {/* ===================================================
+            SIDEBAR
+        ==================================================== */}
+
+        <aside className="subject-sidebar">
+          {/* SUMMARY */}
+
+          <div className="sidebar-card">
+            <div className="sidebar-card-title">
+              <FaBook />
+              <h2>ملخص المادة</h2>
+            </div>
+
+            <div className="sidebar-progress">
+              <div className="sidebar-progress-circle">
+                <strong>{statistics.progress}%</strong>
               </div>
 
-              <div className="sidebar-progress">
-                <div className="sidebar-progress-circle">
-                  <strong>
-                    {
-                      statistics.progress
-                    }
-                    %
-                  </strong>
-                </div>
-
-                <div>
-                  <strong>
-                    {
-                      statistics.completed
-                    }
-                  </strong>
-
-                  <span>
-                    درس مكتمل
-                  </span>
-                </div>
-              </div>
-
-              <div className="mini-stat-row">
-                <span>
-                  متبقي
-                </span>
-
-                <strong>
-                  {
-                    statistics.remaining
-                  }
-                </strong>
-              </div>
-
-              <div className="mini-stat-row">
-                <span>
-                  اختبارات مسجلة
-                </span>
-
-                <strong>
-                  {
-                    statistics.exams
-                  }
-                </strong>
+              <div>
+                <strong>{statistics.completed}</strong>
+                <span>درس مكتمل</span>
               </div>
             </div>
 
-            {/* REVIEW */}
+            <div className="mini-stat-row">
+              <span>متبقي</span>
+              <strong>{statistics.remaining}</strong>
+            </div>
 
-            <div className="sidebar-card">
-              <div className="sidebar-card-title">
-                <FaExclamationTriangle />
+            <div className="mini-stat-row">
+              <span>اختبارات مسجلة</span>
+              <strong>{statistics.exams}</strong>
+            </div>
+          </div>
 
-                <h2>
-                  تحتاج مراجعة
-                </h2>
+          {/* REVIEW */}
+
+          <div className="sidebar-card">
+            <div className="sidebar-card-title">
+              <FaExclamationTriangle />
+              <h2>تحتاج مراجعة</h2>
+            </div>
+
+            {reviewLessons.length === 0 ? (
+              <div className="no-review">
+                <FaCheckCircle />
+                <span>ممتاز! لا توجد دروس تحتاج مراجعة حالياً.</span>
+              </div>
+            ) : (
+              <div className="review-mini-list">
+                {reviewLessons.slice(0, 5).map((lesson) => {
+                  const percentage =
+                    lesson.score !== null && lesson.total
+                      ? Math.round((lesson.score / lesson.total) * 100)
+                      : 0;
+
+                  const review =
+                    lesson.score !== null && lesson.total
+                      ? getReviewInfo(lesson.score, lesson.total)
+                      : {
+                          type: "soon",
+                          label: "مراجعة مستحقة",
+                        };
+
+                  return (
+                    <div
+                      className="review-mini-item"
+                      key={`${lesson.id}-${lesson.review?.id || "score"}`}
+                    >
+                      <div>
+                        <strong>{lesson.title}</strong>
+
+                        <small>
+                          {lesson.score !== null && lesson.total
+                            ? `${lesson.score}/${lesson.total}`
+                            : "مراجعة مستحقة"}
+
+                          {lesson.review?.scheduled_at && (
+                            <>
+                              {" • "}
+                              {formatReviewDate(lesson.review.scheduled_at)}
+                            </>
+                          )}
+                        </small>
+                      </div>
+
+                      <span className={`review-pill ${review.type}`}>
+                        {percentage}%
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* LEGEND */}
+
+          <div className="sidebar-card">
+            <div className="sidebar-card-title">
+              <FaStar />
+              <h2>طريقة تحديد المراجعة</h2>
+            </div>
+
+            <div className="review-rules">
+              <div>
+                <span className="rule-dot urgent" />
+                أقل من 50%
+                <strong>عاجل</strong>
               </div>
 
-              {reviewLessons.length ===
-              0 ? (
-                <div className="no-review">
-                  <FaCheckCircle />
+              <div>
+                <span className="rule-dot soon" />
+                50% - 69%
+                <strong>يحتاج مراجعة</strong>
+              </div>
 
-                  <span>
-                    ممتاز! لا توجد
-                    دروس تحتاج مراجعة
-                    حالياً.
-                  </span>
+              <div>
+                <span className="rule-dot normal" />
+                70% - 84%
+                <strong>مراجعة قريبة</strong>
+              </div>
+
+              <div>
+                <span className="rule-dot good" />
+                85% فأكثر
+                <strong>جيد</strong>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* ===================================================
+            MAIN
+        ==================================================== */}
+
+        <div className="curriculum-section">
+          {/* =================================================
+              LESSONS TAB
+          ================================================== */}
+
+          {activeTab === "lessons" && (
+            <>
+              <div className="curriculum-toolbar">
+                <div>
+                  <h2>دروس المادة</h2>
+
+                  <p>
+                    علّم الدرس عند الانتهاء من مذاكرته، وسجل نتيجتك إذا اختبرت عليه.
+                  </p>
+                </div>
+
+                <div className="toolbar-actions">
+                  <button onClick={openAllUnits}>فتح الكل</button>
+                  <button onClick={closeAllUnits}>غلق الكل</button>
+                </div>
+              </div>
+
+              <div className="units-list">
+                {units.length === 0 ? (
+                  <div className="empty-state">
+                    <div>
+                      <FaBook />
+                    </div>
+
+                    <h3>المنهج غير متاح حاليًا</h3>
+
+                    <p>لم يتم إضافة منهج هذه المادة بعد. سنضيف المنهج قريبًا.</p>
+                  </div>
+                ) : (
+                  units.map((unit) => {
+                    const isOpen = openUnits.includes(unit.id);
+
+                    const directLessons = allLessons.filter(
+                      (lesson) =>
+                        lesson.unitId === unit.id && !lesson.parentUnitId
+                    );
+
+                    const allUnitLessons = allLessons.filter((lesson) => {
+                      if (lesson.unitId === unit.id) {
+                        return true;
+                      }
+
+                      return lesson.parentUnitId === unit.id;
+                    });
+
+                    const completedCount = allUnitLessons.filter(
+                      (lesson) => lesson.completed
+                    ).length;
+
+                    const unitProgress =
+                      allUnitLessons.length > 0
+                        ? Math.round(
+                            (completedCount / allUnitLessons.length) * 100
+                          )
+                        : 0;
+
+                    return (
+                      <article
+                        className={`unit-card ${isOpen ? "open" : ""}`}
+                        key={unit.id}
+                      >
+                        <button
+                          className="unit-header"
+                          onClick={() => toggleUnit(unit.id)}
+                        >
+                          <div className="unit-arrow">
+                            {isOpen ? (
+                              <FaChevronUp />
+                            ) : (
+                              <FaChevronDown />
+                            )}
+                          </div>
+
+                          <div className="unit-number">
+                            {unit.unitNumber}
+                          </div>
+
+                          <div className="unit-info">
+                            <h2>{unit.title}</h2>
+
+                            <div className="unit-meta">
+                              <span>
+                                {completedCount} من {allUnitLessons.length} دروس
+                              </span>
+
+                              <div className="unit-progress">
+                                <span
+                                  style={{
+                                    width: `${unitProgress}%`,
+                                  }}
+                                />
+                              </div>
+
+                              <strong>{unitProgress}%</strong>
+                            </div>
+                          </div>
+                        </button>
+
+                        {isOpen && (
+                          <div className="lessons-list">
+                            {directLessons.map((lesson) => (
+                              <LessonRow
+                                key={lesson.id}
+                                lesson={lesson}
+                                fullLesson={lesson}
+                                latestReviewMap={latestReviewMap}
+                                onToggle={toggleLesson}
+                                onExam={openExamModal}
+                              />
+                            ))}
+
+                            {unit.childUnits?.map((childUnit) => {
+                              const isChildOpen = openUnits.includes(
+                                childUnit.id
+                              );
+
+                              const childLessons = allLessons.filter(
+                                (lesson) => lesson.unitId === childUnit.id
+                              );
+
+                              const childCompleted = childLessons.filter(
+                                (lesson) => lesson.completed
+                              ).length;
+
+                              const childProgress =
+                                childLessons.length > 0
+                                  ? Math.round(
+                                      (childCompleted / childLessons.length) *
+                                        100
+                                    )
+                                  : 0;
+
+                              return (
+                                <article
+                                  className={`unit-card child-unit-card ${
+                                    isChildOpen ? "open" : ""
+                                  }`}
+                                  key={childUnit.id}
+                                >
+                                  <button
+                                    type="button"
+                                    className="unit-header"
+                                    onClick={() =>
+                                      toggleUnit(childUnit.id)
+                                    }
+                                  >
+                                    <div className="unit-arrow">
+                                      {isChildOpen ? (
+                                        <FaChevronUp />
+                                      ) : (
+                                        <FaChevronDown />
+                                      )}
+                                    </div>
+
+                                    <div className="unit-number">
+                                      {childUnit.unitNumber}
+                                    </div>
+
+                                    <div className="unit-info">
+                                      <h2>{childUnit.title}</h2>
+
+                                      <div className="unit-meta">
+                                        <span>
+                                          {childCompleted} من{" "}
+                                          {childLessons.length} دروس
+                                        </span>
+
+                                        <div className="unit-progress">
+                                          <span
+                                            style={{
+                                              width: `${childProgress}%`,
+                                            }}
+                                          />
+                                        </div>
+
+                                        <strong>{childProgress}%</strong>
+                                      </div>
+                                    </div>
+                                  </button>
+
+                                  {isChildOpen && (
+                                    <div className="lessons-list child-lessons-list">
+                                      {childLessons.map((lesson) => (
+                                        <LessonRow
+                                          key={lesson.id}
+                                          lesson={lesson}
+                                          fullLesson={lesson}
+                                          latestReviewMap={latestReviewMap}
+                                          onToggle={toggleLesson}
+                                          onExam={openExamModal}
+                                        />
+                                      ))}
+                                    </div>
+                                  )}
+                                </article>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </article>
+                    );
+                  })
+                )}
+              </div>
+            </>
+          )}
+
+          {/* =================================================
+              REVIEW TAB
+          ================================================== */}
+
+          {activeTab === "review" && (
+            <div className="tab-content-card">
+              <div className="tab-content-header">
+                <div>
+                  <h2>المراجعة المقترحة</h2>
+
+                  <p>
+                    المراجعات التي حان موعدها أو تأخرت، مع ترتيب الدروس الأضعف أولًا.
+                  </p>
+                </div>
+
+                <div className="review-count-large">
+                  {reviewLessons.length}
+                </div>
+              </div>
+
+              {reviewLessons.length === 0 ? (
+                <div className="empty-state">
+                  <div>
+                    <FaCheckCircle />
+                  </div>
+
+                  <h3>مفيش دروس تحتاج مراجعة</h3>
+
+                  <p>مفيش مراجعات مستحقة حاليًا.</p>
                 </div>
               ) : (
-                <div className="review-mini-list">
-                  {reviewLessons
-                    .slice(0, 5)
-                    .map(
-                      (
-                        lesson
-                      ) => {
-                        const percentage =
-                          lesson.score !==
-                            null &&
-                          lesson.total
-                            ? Math.round(
-                                (lesson.score /
-                                  lesson.total) *
-                                  100
-                              )
-                            : 0;
+                <div className="review-full-list">
+                  {reviewLessons.map((lesson, index) => {
+                    const percentage =
+                      lesson.score !== null && lesson.total
+                        ? Math.round((lesson.score / lesson.total) * 100)
+                        : 0;
 
-                        const review =
-                          lesson.score !==
-                            null &&
-                          lesson.total
-                            ? getReviewInfo(
-                                lesson.score,
-                                lesson.total
-                              )
-                            : {
-                                type: "soon",
-                                label:
-                                  "مراجعة مستحقة",
-                              };
+                    const review =
+                      lesson.score !== null && lesson.total
+                        ? getReviewInfo(lesson.score, lesson.total)
+                        : {
+                            type: "soon",
+                            label: "مراجعة مستحقة",
+                          };
 
-                        return (
-                          <div
-                            className="review-mini-item"
-                            key={`${lesson.id}-${lesson.review?.id || "score"}`}
-                          >
-                            <div>
+                    const reviewStatus = getReviewDateStatus(
+                      lesson.review
+                    );
+
+                    return (
+                      <div
+                        className="review-full-item"
+                        key={`${lesson.id}-${lesson.review?.id || "review"}`}
+                      >
+                        <div className="review-rank">{index + 1}</div>
+
+                        <div className="review-full-info">
+                          <strong>{lesson.title}</strong>
+                          <span>{lesson.unitTitle}</span>
+
+                          {lesson.review?.scheduled_at && (
+                            <small>
+                              موعد المراجعة:{" "}
+                              {formatReviewDate(
+                                lesson.review.scheduled_at
+                              )}
+                            </small>
+                          )}
+                        </div>
+
+                        <div className="review-full-score">
+                          {lesson.score !== null && lesson.total ? (
+                            <>
                               <strong>
-                                {
-                                  lesson.title
-                                }
+                                {lesson.score}/{lesson.total}
                               </strong>
 
-                              <small>
-                                {lesson.score !==
-                                  null &&
-                                lesson.total
-                                  ? `${lesson.score}/${lesson.total}`
-                                  : "مراجعة مستحقة"}
+                              <span>{percentage}%</span>
+                            </>
+                          ) : (
+                            <span>مراجعة</span>
+                          )}
+                        </div>
 
-                                {lesson.review
-                                  ?.scheduled_at && (
-                                  <>
-                                    {" • "}
-                                    {formatReviewDate(
-                                      lesson
-                                        .review
-                                        .scheduled_at
-                                    )}
-                                  </>
-                                )}
-                              </small>
-                            </div>
-
-                            <span
-                              className={`review-pill ${review.type}`}
-                            >
-                              {
-                                percentage
-                              }
-                              %
-                            </span>
-                          </div>
-                        );
-                      }
-                    )}
+                        <span
+                          className={`review-status ${
+                            reviewStatus?.type === "overdue"
+                              ? "urgent"
+                              : review.type
+                          }`}
+                        >
+                          {reviewStatus?.label || review.label}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
+          )}
 
-            {/* LEGEND */}
+          {/* =================================================
+              STATISTICS TAB
+          ================================================== */}
 
-            <div className="sidebar-card">
-              <div className="sidebar-card-title">
-                <FaStar />
+          {activeTab === "statistics" && (
+            <div className="statistics-grid">
+              <div className="big-stat-card">
+                <div className="big-stat-icon blue">
+                  <FaBook />
+                </div>
 
-                <h2>
-                  طريقة تحديد المراجعة
-                </h2>
+                <span>تقدم المنهج</span>
+
+                <strong>{statistics.progress}%</strong>
+
+                <div className="big-stat-bar">
+                  <span
+                    style={{
+                      width: `${statistics.progress}%`,
+                    }}
+                  />
+                </div>
+
+                <small>
+                  {statistics.completed} من {statistics.total} درس
+                </small>
               </div>
 
-              <div className="review-rules">
-                <div>
-                  <span className="rule-dot urgent" />
-
-                  أقل من 50%
-
-                  <strong>
-                    عاجل
-                  </strong>
+              <div className="big-stat-card">
+                <div className="big-stat-icon green">
+                  <FaClipboardCheck />
                 </div>
 
-                <div>
-                  <span className="rule-dot soon" />
+                <span>الاختبارات المسجلة</span>
 
-                  50% - 69%
+                <strong>{statistics.exams}</strong>
 
-                  <strong>
-                    يحتاج مراجعة
-                  </strong>
+                <small>اختبارات مع المدرس</small>
+              </div>
+
+              <div className="big-stat-card">
+                <div className="big-stat-icon orange">
+                  <FaTrophy />
                 </div>
 
-                <div>
-                  <span className="rule-dot normal" />
+                <span>متوسط النتائج</span>
 
-                  70% - 84%
+                <strong>
+                  {statistics.exams ? `${statistics.average}%` : "--"}
+                </strong>
 
-                  <strong>
-                    مراجعة قريبة
-                  </strong>
+                <small>من جميع الاختبارات المسجلة</small>
+              </div>
+
+              <div className="big-stat-card">
+                <div className="big-stat-icon red">
+                  <FaExclamationTriangle />
                 </div>
 
-                <div>
-                  <span className="rule-dot good" />
+                <span>تحتاج مراجعة</span>
 
-                  85% فأكثر
+                <strong>{statistics.reviewCount}</strong>
 
-                  <strong>
-                    جيد
-                  </strong>
-                </div>
+                <small>مراجعات مستحقة حاليًا</small>
               </div>
             </div>
-          </aside>
-
-          {/* ===================================================
-              MAIN
-          ==================================================== */}
-
-          <div className="curriculum-section">
-            {/* =================================================
-                LESSONS TAB
-            ================================================== */}
-
-            {activeTab ===
-              "lessons" && (
-              <>
-                <div className="curriculum-toolbar">
-                  <div>
-                    <h2>
-                      دروس المادة
-                    </h2>
-
-                    <p>
-                      علّم الدرس عند
-                      الانتهاء من
-                      مذاكرته، وسجل
-                      نتيجتك إذا
-                      اختبرت عليه.
-                    </p>
-                  </div>
-
-                  <div className="toolbar-actions">
-                    <button
-                      onClick={
-                        openAllUnits
-                      }
-                    >
-                      فتح الكل
-                    </button>
-
-                    <button
-                      onClick={
-                        closeAllUnits
-                      }
-                    >
-                      غلق الكل
-                    </button>
-                  </div>
-                </div>
-
-                <div className="units-list">
-                  {units.length ===
-                  0 ? (
-                    <div className="empty-state">
-                      <div>
-                        <FaBook />
-                      </div>
-
-                      <h3>
-                        المنهج غير متاح حاليًا
-                      </h3>
-
-                      <p>
-                        لم يتم إضافة منهج هذه المادة بعد.
-                        سنضيف المنهج قريبًا.
-                      </p>
-                    </div>
-                  ) : (
-                    units.map(
-                      (unit) => {
-                        const isOpen =
-                          openUnits.includes(
-                            unit.id
-                          );
-
-                        const directLessons =
-                          allLessons.filter(
-                            (lesson) =>
-                              lesson.unitId ===
-                                unit.id &&
-                              !lesson.parentUnitId
-                          );
-
-                        const allUnitLessons =
-                          allLessons.filter(
-                            (lesson) => {
-                              if (
-                                lesson.unitId ===
-                                unit.id
-                              ) {
-                                return true;
-                              }
-
-                              return (
-                                lesson.parentUnitId ===
-                                unit.id
-                              );
-                            }
-                          );
-
-                        const completedCount =
-                          allUnitLessons.filter(
-                            (lesson) =>
-                              lesson.completed
-                          ).length;
-
-                        const unitProgress =
-                          allUnitLessons.length >
-                          0
-                            ? Math.round(
-                                (completedCount /
-                                  allUnitLessons.length) *
-                                  100
-                              )
-                            : 0;
-
-                        return (
-                          <article
-                            className={`unit-card ${
-                              isOpen
-                                ? "open"
-                                : ""
-                            }`}
-                            key={
-                              unit.id
-                            }
-                          >
-                            <button
-                              className="unit-header"
-                              onClick={() =>
-                                toggleUnit(
-                                  unit.id
-                                )
-                              }
-                            >
-                              <div className="unit-arrow">
-                                {isOpen ? (
-                                  <FaChevronUp />
-                                ) : (
-                                  <FaChevronDown />
-                                )}
-                              </div>
-
-                              <div className="unit-number">
-                                {
-                                  unit.unitNumber
-                                }
-                              </div>
-
-                              <div className="unit-info">
-                                <h2>
-                                  {
-                                    unit.title
-                                  }
-                                </h2>
-
-                                <div className="unit-meta">
-                                  <span>
-                                    {
-                                      completedCount
-                                    }{" "}
-                                    من{" "}
-                                    {
-                                      allUnitLessons.length
-                                    }{" "}
-                                    دروس
-                                  </span>
-
-                                  <div className="unit-progress">
-                                    <span
-                                      style={{
-                                        width: `${unitProgress}%`,
-                                      }}
-                                    />
-                                  </div>
-
-                                  <strong>
-                                    {
-                                      unitProgress
-                                    }
-                                    %
-                                  </strong>
-                                </div>
-                              </div>
-                            </button>
-
-                            {isOpen && (
-                              <div className="lessons-list">
-                                {directLessons.map(
-                                  (
-                                    lesson
-                                  ) => (
-                                    <LessonRow
-                                      key={
-                                        lesson.id
-                                      }
-                                      lesson={
-                                        lesson
-                                      }
-                                      fullLesson={
-                                        lesson
-                                      }
-                                      latestReviewMap={
-                                        latestReviewMap
-                                      }
-                                      onToggle={
-                                        toggleLesson
-                                      }
-                                      onExam={
-                                        openExamModal
-                                      }
-                                    />
-                                  )
-                                )}
-
-                                {unit.childUnits?.map(
-                                  (
-                                    childUnit
-                                  ) => {
-                                    const isChildOpen =
-                                      openUnits.includes(
-                                        childUnit.id
-                                      );
-
-                                    const childLessons =
-                                      allLessons.filter(
-                                        (lesson) =>
-                                          lesson.unitId ===
-                                          childUnit.id
-                                      );
-
-                                    const childCompleted =
-                                      childLessons.filter(
-                                        (lesson) =>
-                                          lesson.completed
-                                      ).length;
-
-                                    const childProgress =
-                                      childLessons.length >
-                                      0
-                                        ? Math.round(
-                                            (childCompleted /
-                                              childLessons.length) *
-                                              100
-                                          )
-                                        : 0;
-
-                                    return (
-                                      <article
-                                        className={`unit-card child-unit-card ${
-                                          isChildOpen
-                                            ? "open"
-                                            : ""
-                                        }`}
-                                        key={
-                                          childUnit.id
-                                        }
-                                      >
-                                        <button
-                                          type="button"
-                                          className="unit-header"
-                                          onClick={() =>
-                                            toggleUnit(
-                                              childUnit.id
-                                            )
-                                          }
-                                        >
-                                          <div className="unit-arrow">
-                                            {isChildOpen ? (
-                                              <FaChevronUp />
-                                            ) : (
-                                              <FaChevronDown />
-                                            )}
-                                          </div>
-
-                                          <div className="unit-number">
-                                            {
-                                              childUnit.unitNumber
-                                            }
-                                          </div>
-
-                                          <div className="unit-info">
-                                            <h2>
-                                              {
-                                                childUnit.title
-                                              }
-                                            </h2>
-
-                                            <div className="unit-meta">
-                                              <span>
-                                                {
-                                                  childCompleted
-                                                }{" "}
-                                                من{" "}
-                                                {
-                                                  childLessons.length
-                                                }{" "}
-                                                دروس
-                                              </span>
-
-                                              <div className="unit-progress">
-                                                <span
-                                                  style={{
-                                                    width: `${childProgress}%`,
-                                                  }}
-                                                />
-                                              </div>
-
-                                              <strong>
-                                                {
-                                                  childProgress
-                                                }
-                                                %
-                                              </strong>
-                                            </div>
-                                          </div>
-                                        </button>
-
-                                        {isChildOpen && (
-                                          <div className="lessons-list child-lessons-list">
-                                            {childLessons.map(
-                                              (
-                                                lesson
-                                              ) => (
-                                                <LessonRow
-                                                  key={
-                                                    lesson.id
-                                                  }
-                                                  lesson={
-                                                    lesson
-                                                  }
-                                                  fullLesson={
-                                                    lesson
-                                                  }
-                                                  latestReviewMap={
-                                                    latestReviewMap
-                                                  }
-                                                  onToggle={
-                                                    toggleLesson
-                                                  }
-                                                  onExam={
-                                                    openExamModal
-                                                  }
-                                                />
-                                              )
-                                            )}
-                                          </div>
-                                        )}
-                                      </article>
-                                    );
-                                  }
-                                )}
-                              </div>
-                            )}
-                          </article>
-                        );
-                      }
-                    )
-                  )}
-                </div>
-              </>
-            )}
-
-            {/* =================================================
-                REVIEW TAB
-            ================================================== */}
-
-            {activeTab ===
-              "review" && (
-              <div className="tab-content-card">
-                <div className="tab-content-header">
-                  <div>
-                    <h2>
-                      المراجعة المقترحة
-                    </h2>
-
-                    <p>
-                      المراجعات التي حان
-                      موعدها أو تأخرت،
-                      مع ترتيب الدروس
-                      الأضعف أولًا.
-                    </p>
-                  </div>
-
-                  <div className="review-count-large">
-                    {
-                      reviewLessons.length
-                    }
-                  </div>
-                </div>
-
-                {reviewLessons.length ===
-                0 ? (
-                  <div className="empty-state">
-                    <div>
-                      <FaCheckCircle />
-                    </div>
-
-                    <h3>
-                      مفيش دروس تحتاج
-                      مراجعة
-                    </h3>
-
-                    <p>
-                      مفيش مراجعات مستحقة
-                      حاليًا.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="review-full-list">
-                    {reviewLessons.map(
-                      (
-                        lesson,
-                        index
-                      ) => {
-                        const percentage =
-                          lesson.score !==
-                            null &&
-                          lesson.total
-                            ? Math.round(
-                                (lesson.score /
-                                  lesson.total) *
-                                  100
-                              )
-                            : 0;
-
-                        const review =
-                          lesson.score !==
-                            null &&
-                          lesson.total
-                            ? getReviewInfo(
-                                lesson.score,
-                                lesson.total
-                              )
-                            : {
-                                type: "soon",
-                                label:
-                                  "مراجعة مستحقة",
-                              };
-
-                        const reviewStatus =
-                          getReviewDateStatus(
-                            lesson.review
-                          );
-
-                        return (
-                          <div
-                            className="review-full-item"
-                            key={`${lesson.id}-${lesson.review?.id || "review"}`}
-                          >
-                            <div className="review-rank">
-                              {
-                                index +
-                                1
-                              }
-                            </div>
-
-                            <div className="review-full-info">
-                              <strong>
-                                {
-                                  lesson.title
-                                }
-                              </strong>
-
-                              <span>
-                                {
-                                  lesson.unitTitle
-                                }
-                              </span>
-
-                              {lesson.review
-                                ?.scheduled_at && (
-                                <small>
-                                  موعد المراجعة:{" "}
-                                  {formatReviewDate(
-                                    lesson
-                                      .review
-                                      .scheduled_at
-                                  )}
-                                </small>
-                              )}
-                            </div>
-
-                            <div className="review-full-score">
-                              {lesson.score !==
-                                null &&
-                              lesson.total ? (
-                                <>
-                                  <strong>
-                                    {
-                                      lesson.score
-                                    }
-                                    /
-                                    {
-                                      lesson.total
-                                    }
-                                  </strong>
-
-                                  <span>
-                                    {
-                                      percentage
-                                    }
-                                    %
-                                  </span>
-                                </>
-                              ) : (
-                                <span>
-                                  مراجعة
-                                </span>
-                              )}
-                            </div>
-
-                            <span
-                              className={`review-status ${
-                                reviewStatus?.type ===
-                                "overdue"
-                                  ? "urgent"
-                                  : review.type
-                              }`}
-                            >
-                              {
-                                reviewStatus?.label ||
-                                review.label
-                              }
-                            </span>
-                          </div>
-                        );
-                      }
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* =================================================
-                STATISTICS TAB
-            ================================================== */}
-
-            {activeTab ===
-              "statistics" && (
-              <div className="statistics-grid">
-                <div className="big-stat-card">
-                  <div className="big-stat-icon blue">
-                    <FaBook />
-                  </div>
-
-                  <span>
-                    تقدم المنهج
-                  </span>
-
-                  <strong>
-                    {
-                      statistics.progress
-                    }
-                    %
-                  </strong>
-
-                  <div className="big-stat-bar">
-                    <span
-                      style={{
-                        width: `${statistics.progress}%`,
-                      }}
-                    />
-                  </div>
-
-                  <small>
-                    {
-                      statistics.completed
-                    }{" "}
-                    من{" "}
-                    {
-                      statistics.total
-                    }{" "}
-                    درس
-                  </small>
-                </div>
-
-                <div className="big-stat-card">
-                  <div className="big-stat-icon green">
-                    <FaClipboardCheck />
-                  </div>
-
-                  <span>
-                    الاختبارات المسجلة
-                  </span>
-
-                  <strong>
-                    {
-                      statistics.exams
-                    }
-                  </strong>
-
-                  <small>
-                    اختبارات مع المدرس
-                  </small>
-                </div>
-
-                <div className="big-stat-card">
-                  <div className="big-stat-icon orange">
-                    <FaTrophy />
-                  </div>
-
-                  <span>
-                    متوسط النتائج
-                  </span>
-
-                  <strong>
-                    {statistics.exams
-                      ? `${statistics.average}%`
-                      : "--"}
-                  </strong>
-
-                  <small>
-                    من جميع الاختبارات
-                    المسجلة
-                  </small>
-                </div>
-
-                <div className="big-stat-card">
-                  <div className="big-stat-icon red">
-                    <FaExclamationTriangle />
-                  </div>
-
-                  <span>
-                    تحتاج مراجعة
-                  </span>
-
-                  <strong>
-                    {
-                      statistics.reviewCount
-                    }
-                  </strong>
-
-                  <small>
-                    مراجعات مستحقة حاليًا
-                  </small>
-                </div>
-              </div>
-            )}
+          )}
+        </div>
+      </section>
+    </main>
+
+    {/* =======================================================
+        EXAM MODAL
+    ======================================================== */}
+
+    {showExamModal && selectedLesson && (
+      <div className="exam-modal-overlay">
+        <div className="exam-modal">
+          <button
+            className="modal-close"
+            onClick={() => {
+              if (!saving) {
+                setShowExamModal(false);
+                setSelectedLesson(null);
+              }
+            }}
+          >
+            <FaTimes />
+          </button>
+
+          <div className="modal-icon">
+            <FaClipboardCheck />
           </div>
-        </section>
-      </main>
 
-      {/* =======================================================
-          EXAM MODAL
-      ======================================================== */}
+          <h2>تسجيل نتيجة الاختبار</h2>
 
-      {showExamModal &&
-        selectedLesson && (
-          <div className="exam-modal-overlay">
-            <div className="exam-modal">
-              <button
-                className="modal-close"
-                onClick={() => {
-                  if (!saving) {
-                    setShowExamModal(
-                      false
-                    );
+          <p>{selectedLesson.title}</p>
 
-                    setSelectedLesson(
-                      null
-                    );
-                  }
-                }}
-              >
-                <FaTimes />
-              </button>
+          <div className="exam-inputs">
+            <div className="exam-input-group">
+              <label>الدرجة التي حصلت عليها</label>
 
-              <div className="modal-icon">
-                <FaClipboardCheck />
-              </div>
+              <input
+                type="number"
+                min="0"
+                value={examScore}
+                onChange={(e) => setExamScore(e.target.value)}
+                placeholder="مثال: 7"
+                disabled={saving}
+              />
+            </div>
 
-              <h2>
-                تسجيل نتيجة الاختبار
-              </h2>
+            <span className="exam-slash">/</span>
 
-              <p>
-                {
-                  selectedLesson.title
-                }
-              </p>
+            <div className="exam-input-group">
+              <label>الدرجة النهائية</label>
 
-              <div className="exam-inputs">
-                <div className="exam-input-group">
-                  <label>
-                    الدرجة التي حصلت
-                    عليها
-                  </label>
+              <input
+                type="number"
+                min="1"
+                value={examTotal}
+                onChange={(e) => setExamTotal(e.target.value)}
+                placeholder="مثال: 10"
+                disabled={saving}
+              />
+            </div>
+          </div>
 
-                  <input
-                    type="number"
-                    min="0"
-                    value={examScore}
-                    onChange={(e) =>
-                      setExamScore(
-                        e.target.value
-                      )
-                    }
-                    placeholder="مثال: 7"
-                    disabled={saving}
-                  />
-                </div>
+          <div className="modal-hint">
+            مثال: لو جبت <strong>7 / 10</strong> والنظام هيحسب مستوى الدرس تلقائيًا.
+          </div>
 
-                <span className="exam-slash">
-                  /
-                </span>
+          <div className="modal-actions">
+            <button
+              className="save-exam-button"
+              onClick={saveExam}
+              disabled={saving}
+            >
+              <FaCheck />
+              {saving ? "جاري الحفظ..." : "حفظ النتيجة"}
+            </button>
 
-                <div className="exam-input-group">
-                  <label>
-                    الدرجة النهائية
-                  </label>
-
-                  <input
-                    type="number"
-                    min="1"
-                    value={examTotal}
-                    onChange={(e) =>
-                      setExamTotal(
-                        e.target.value
-                      )
-                    }
-                    placeholder="مثال: 10"
-                    disabled={saving}
-                  />
-                </div>
-              </div>
-
-              <div className="modal-hint">
-                مثال: لو جبت{" "}
-                <strong>
-                  7 / 10
-                </strong>{" "}
-                والنظام هيحسب مستوى
-                الدرس تلقائيًا.
-              </div>
-
-              <div className="modal-actions">
+            {latestStudyMap[selectedLesson.id]?.score !== null &&
+              latestStudyMap[selectedLesson.id]?.score !== undefined && (
                 <button
-                  className="save-exam-button"
-                  onClick={
-                    saveExam
-                  }
+                  className="delete-exam-button"
+                  onClick={removeExam}
                   disabled={saving}
                 >
-                  <FaCheck />
-
-                  {saving
-                    ? "جاري الحفظ..."
-                    : "حفظ النتيجة"}
+                  حذف النتيجة
                 </button>
-
-                {latestStudyMap[
-                  selectedLesson.id
-                ]?.score !== null &&
-                  latestStudyMap[
-                    selectedLesson.id
-                  ]?.score !==
-                    undefined && (
-                    <button
-                      className="delete-exam-button"
-                      onClick={
-                        removeExam
-                      }
-                      disabled={
-                        saving
-                      }
-                    >
-                      حذف النتيجة
-                    </button>
-                  )}
-              </div>
-            </div>
+              )}
           </div>
-        )}
-    </>
-  );
+        </div>
+      </div>
+    )}
+  </>
+);
 };
 
 /* =========================================================
@@ -3662,24 +2608,17 @@ const LessonRow = ({
   onExam,
 }) => {
   const hasExam =
-    fullLesson?.score !==
-      null &&
-    fullLesson?.score !==
-      undefined &&
-    fullLesson?.total !==
-      null &&
-    fullLesson?.total !==
-      undefined &&
+    fullLesson?.score !== null &&
+    fullLesson?.score !== undefined &&
+    fullLesson?.total !== null &&
+    fullLesson?.total !== undefined &&
     fullLesson?.total > 0;
 
-  const percentage =
-    hasExam
-      ? Math.round(
-          (fullLesson.score /
-            fullLesson.total) *
-            100
-        )
-      : null;
+  const percentage = hasExam
+    ? Math.round(
+        (fullLesson.score / fullLesson.total) * 100
+      )
+    : null;
 
   const review = hasExam
     ? getReviewInfo(
@@ -3689,58 +2628,42 @@ const LessonRow = ({
     : null;
 
   const lessonReview =
-    latestReviewMap[
-      lesson.id
-    ] || null;
+    latestReviewMap[lesson.id] || null;
 
   const reviewDateStatus =
-    getReviewDateStatus(
-      lessonReview
-    );
+    getReviewDateStatus(lessonReview);
 
   return (
     <div
       className={`subject-lesson-row ${
-        fullLesson?.completed
-          ? "completed"
-          : ""
+        fullLesson?.completed ? "completed" : ""
       }`}
     >
       {/* COMPLETE */}
 
       <button
         className={`subject-lesson-check ${
-          fullLesson?.completed
-            ? "checked"
-            : ""
+          fullLesson?.completed ? "checked" : ""
         }`}
-        onClick={() =>
-          onToggle(fullLesson)
-        }
+        onClick={() => onToggle(fullLesson)}
         title={
           fullLesson?.completed
             ? "إلغاء إكمال الدرس"
             : "تحديد الدرس كمكتمل"
         }
       >
-        {fullLesson?.completed && (
-          <FaCheck />
-        )}
+        {fullLesson?.completed && <FaCheck />}
       </button>
 
       {/* NAME */}
 
       <div className="subject-lesson-info">
         <span className="subject-lesson-number">
-          {
-            lesson.lessonNumber
-          }
+          {lesson.lessonNumber}
         </span>
 
         <div>
-          <strong>
-            {lesson.title}
-          </strong>
+          <strong>{lesson.title}</strong>
 
           <small>
             {fullLesson?.completed
@@ -3757,39 +2680,22 @@ const LessonRow = ({
           <div className="subject-lesson-score">
             <button
               className={`subject-score-box ${review.type}`}
-              onClick={() =>
-                onExam(fullLesson)
-              }
+              onClick={() => onExam(fullLesson)}
             >
-              <strong>
-                {
-                  fullLesson.score
-                }
-              </strong>
-
-              <span>
-                /
-                {
-                  fullLesson.total
-                }
-              </span>
+              <strong>{fullLesson.score}</strong>
+              <span>/{fullLesson.total}</span>
             </button>
 
             <span
               className={`subject-score-label ${review.type}`}
             >
-              {
-                percentage
-              }
-              %
+              {percentage}%
             </span>
           </div>
         ) : (
           <button
             className="subject-add-exam-button"
-            onClick={() =>
-              onExam(fullLesson)
-            }
+            onClick={() => onExam(fullLesson)}
           >
             <FaClipboardCheck />
             تسجيل اختبار
@@ -3803,14 +2709,11 @@ const LessonRow = ({
         {reviewDateStatus ? (
           <span
             className={`subject-review-status ${
-              reviewDateStatus.type ===
-              "overdue"
+              reviewDateStatus.type === "overdue"
                 ? "urgent"
-                : reviewDateStatus.type ===
-                    "today"
+                : reviewDateStatus.type === "today"
                   ? "soon"
-                  : reviewDateStatus.type ===
-                      "completed"
+                  : reviewDateStatus.type === "completed"
                     ? "good"
                     : "normal"
             }`}
@@ -3822,51 +2725,37 @@ const LessonRow = ({
                 : ""
             }
           >
-            {reviewDateStatus.type ===
-              "overdue" && (
+            {reviewDateStatus.type === "overdue" && (
               <FaExclamationTriangle />
             )}
 
-            {reviewDateStatus.type ===
-              "today" && (
+            {reviewDateStatus.type === "today" && (
               <FaRedo />
             )}
 
-            {reviewDateStatus.type ===
-              "upcoming" && (
+            {reviewDateStatus.type === "upcoming" && (
               <FaClock />
             )}
 
-            {reviewDateStatus.type ===
-              "completed" && (
+            {reviewDateStatus.type === "completed" && (
               <FaCheckCircle />
             )}
 
-            {
-              reviewDateStatus.label
-            }
+            {reviewDateStatus.label}
           </span>
         ) : review ? (
           <span
             className={`subject-review-status ${review.type}`}
           >
-            {review.type ===
-              "urgent" && (
+            {review.type === "urgent" && (
               <FaExclamationTriangle />
             )}
 
-            {review.type ===
-              "soon" && (
-              <FaRedo />
-            )}
+            {review.type === "soon" && <FaRedo />}
 
-            {review.type ===
-              "normal" && (
-              <FaClock />
-            )}
+            {review.type === "normal" && <FaClock />}
 
-            {review.type ===
-              "good" && (
+            {review.type === "good" && (
               <FaCheckCircle />
             )}
 

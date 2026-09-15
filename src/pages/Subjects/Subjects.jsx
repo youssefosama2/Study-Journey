@@ -273,10 +273,10 @@ const Subjects = () => {
         setLoading(true);
 
         /*
-         * -------------------------------------------------
-         * 1. GET AUTH USER
-         * -------------------------------------------------
-         */
+        * -------------------------------------------------
+        * 1. GET AUTH USER
+        * -------------------------------------------------
+        */
 
         const {
           data: authData,
@@ -290,16 +290,14 @@ const Subjects = () => {
         const user = authData?.user;
 
         if (!user) {
-          throw new Error(
-            "لم يتم العثور على المستخدم"
-          );
+          throw new Error("لم يتم العثور على المستخدم");
         }
 
         /*
-         * -------------------------------------------------
-         * 2. GET STUDENT PROFILE
-         * -------------------------------------------------
-         */
+        * -------------------------------------------------
+        * 2. GET STUDENT PROFILE
+        * -------------------------------------------------
+        */
 
         const {
           data: profileData,
@@ -320,9 +318,7 @@ const Subjects = () => {
         }
 
         if (!profileData) {
-          throw new Error(
-            "لم يتم العثور على بيانات الطالب"
-          );
+          throw new Error("لم يتم العثور على بيانات الطالب");
         }
 
         const currentSection =
@@ -347,22 +343,20 @@ const Subjects = () => {
         setStudentTrack(currentTrack);
 
         /*
-         * =================================================
-         * FIRST + SECOND SECONDARY
-         * =================================================
-         */
+        * =================================================
+        * FIRST + SECOND SECONDARY
+        * =================================================
+        */
 
         if (
-          currentGradeLevel ===
-            "first_secondary" ||
-          currentGradeLevel ===
-            "second_secondary"
+          currentGradeLevel === "first_secondary" ||
+          currentGradeLevel === "second_secondary"
         ) {
           /*
-           * -------------------------------------------------
-           * 3. GET CURRICULUM ACCESS
-           * -------------------------------------------------
-           */
+          * -------------------------------------------------
+          * 3. GET CURRICULUM ACCESS
+          * -------------------------------------------------
+          */
 
           let accessQuery = supabase
             .from("subject_curriculum_access")
@@ -382,14 +376,17 @@ const Subjects = () => {
             );
 
           /*
-           * بكالوريا:
-           *
-           * أولى بكالوريا:
-           * track = NULL لأنها سنة تمهيدية.
-           *
-           * تانية بكالوريا:
-           * track يحتوي على المسار.
-           */
+          * -------------------------------------------------
+          * BACCAULAUREATE
+          * -------------------------------------------------
+          *
+          * أولى بكالوريا:
+          * track = NULL
+          *
+          * تانية بكالوريا:
+          * track = المسار
+          *
+          */
 
           if (
             currentEducationSystem ===
@@ -415,14 +412,36 @@ const Subjects = () => {
           }
 
           /*
-           * النظام العام:
-           * track لازم يكون NULL
-           */
+          * -------------------------------------------------
+          * GENERAL SYSTEM
+          * -------------------------------------------------
+          *
+          * أولى ثانوي عام:
+          * track = NULL
+          *
+          * تانية ثانوي عام:
+          * section = science / literary
+          * وبالتالي نستخدم section كـ track
+          *
+          */
 
-          if (
+          else if (
             currentEducationSystem ===
-            "general"
+              "general" &&
+            currentGradeLevel ===
+              "second_secondary"
           ) {
+            accessQuery =
+              accessQuery.eq(
+                "track",
+                currentSection
+              );
+          } else {
+            /*
+            * أولى ثانوي عام
+            *
+            * مفيش track
+            */
             accessQuery =
               accessQuery.is(
                 "track",
@@ -441,16 +460,14 @@ const Subjects = () => {
           }
 
           /*
-           * -------------------------------------------------
-           * 4. GET SUBJECT IDS
-           * -------------------------------------------------
-           */
+          * -------------------------------------------------
+          * 4. GET SUBJECT IDS
+          * -------------------------------------------------
+          */
 
           const subjectIds = [
             ...new Set(
-              (
-                curriculumAccess || []
-              )
+              (curriculumAccess || [])
                 .map(
                   (item) =>
                     item.subject_id
@@ -465,10 +482,10 @@ const Subjects = () => {
           }
 
           /*
-           * -------------------------------------------------
-           * 5. GET ACTIVE SUBJECTS
-           * -------------------------------------------------
-           */
+          * -------------------------------------------------
+          * 5. GET ACTIVE SUBJECTS
+          * -------------------------------------------------
+          */
 
           const {
             data: subjects,
@@ -507,19 +524,14 @@ const Subjects = () => {
           }
 
           /*
-           * -------------------------------------------------
-           * 6. GET NEW CURRICULUM
-           * -------------------------------------------------
-           *
-           * units
-           *   └── lessons
-           *
-           * ملاحظة:
-           * بعض الـ units تعتبر parent units
-           * وممكن ما يكونش فيها lessons مباشرة.
-           *
-           * لذلك هنحسب الدروس الفعلية فقط.
-           */
+          * -------------------------------------------------
+          * 6. GET NEW CURRICULUM
+          * -------------------------------------------------
+          *
+          * units
+          *   └── lessons
+          *
+          */
 
           const {
             data: units,
@@ -560,71 +572,71 @@ const Subjects = () => {
           }
 
           /*
-           * -------------------------------------------------
-           * 7. BUILD LESSONS BY SUBJECT
-           * -------------------------------------------------
-           */
+          * -------------------------------------------------
+          * 7. BUILD LESSONS BY SUBJECT
+          * -------------------------------------------------
+          */
 
           const lessonsBySubject =
             new Map();
 
-          (
-            units || []
-          ).forEach((unit) => {
-            const subjectId =
-              unit.subject_id;
+          (units || []).forEach(
+            (unit) => {
+              const subjectId =
+                unit.subject_id;
 
-            if (!subjectId) {
-              return;
+              if (!subjectId) {
+                return;
+              }
+
+              if (
+                !lessonsBySubject.has(
+                  subjectId
+                )
+              ) {
+                lessonsBySubject.set(
+                  subjectId,
+                  []
+                );
+              }
+
+              const lessons =
+                Array.isArray(
+                  unit.lessons
+                )
+                  ? unit.lessons
+                  : [];
+
+              lessons
+                .filter(
+                  (lesson) =>
+                    lesson &&
+                    lesson.is_active !==
+                      false
+                )
+                .forEach(
+                  (lesson) => {
+                    lessonsBySubject
+                      .get(
+                        subjectId
+                      )
+                      .push({
+                        ...lesson,
+                        unitId:
+                          unit.id,
+                        unitTitle:
+                          unit.title,
+                      });
+                  }
+                );
             }
-
-            if (
-              !lessonsBySubject.has(
-                subjectId
-              )
-            ) {
-              lessonsBySubject.set(
-                subjectId,
-                []
-              );
-            }
-
-            const lessons =
-              Array.isArray(
-                unit.lessons
-              )
-                ? unit.lessons
-                : [];
-
-            lessons
-              .filter(
-                (lesson) =>
-                  lesson &&
-                  lesson.is_active !==
-                    false
-              )
-              .forEach(
-                (lesson) => {
-                  lessonsBySubject
-                    .get(
-                      subjectId
-                    )
-                    .push({
-                      ...lesson,
-                      unitId:
-                        unit.id,
-                      unitTitle:
-                        unit.title,
-                    });
-                }
-              );
-          });
+          );
 
           /*
-           * -------------------------------------------------
-           * 8. GET ALL CURRICULUM LESSON IDS
-           * -------------------------------------------------
-           */
+          * -------------------------------------------------
+          * 8. GET ALL CURRICULUM LESSON IDS
+          * -------------------------------------------------
+          */
 
           const allLessonIds = [];
 
@@ -643,16 +655,10 @@ const Subjects = () => {
           );
 
           /*
-           * -------------------------------------------------
-           * 9. GET STUDY RECORDS
-           * -------------------------------------------------
-           *
-           * مهم:
-           * المناهج الجديدة تستخدم:
-           *
-           * curriculum_lesson_id
-           * curriculum_unit_id
-           */
+          * -------------------------------------------------
+          * 9. GET STUDY RECORDS
+          * -------------------------------------------------
+          */
 
           let studyRecords = [];
 
@@ -700,10 +706,10 @@ const Subjects = () => {
           }
 
           /*
-           * -------------------------------------------------
-           * 10. LATEST STUDY PER LESSON
-           * -------------------------------------------------
-           */
+          * -------------------------------------------------
+          * 10. LATEST STUDY PER LESSON
+          * -------------------------------------------------
+          */
 
           const latestStudyByLesson =
             new Map();
@@ -731,10 +737,10 @@ const Subjects = () => {
           );
 
           /*
-           * -------------------------------------------------
-           * 11. FORMAT SUBJECTS
-           * -------------------------------------------------
-           */
+          * -------------------------------------------------
+          * 11. FORMAT SUBJECTS
+          * -------------------------------------------------
+          */
 
           const formattedSubjects =
             subjects.map(
@@ -744,19 +750,8 @@ const Subjects = () => {
                     subject.id
                   ) || [];
 
-                /*
-                 * كل lessons الفعلية
-                 */
-
                 const totalLessons =
                   subjectLessons.length;
-
-                /*
-                 * الدروس المكتملة:
-                 * نفس منطق الصفحة الحالي:
-                 *
-                 * study_minutes > 0
-                 */
 
                 const completedLessons =
                   subjectLessons.filter(
@@ -776,10 +771,6 @@ const Subjects = () => {
                     }
                   ).length;
 
-                /*
-                 * PROGRESS
-                 */
-
                 const progress =
                   totalLessons
                     ? Math.round(
@@ -788,10 +779,6 @@ const Subjects = () => {
                           100
                       )
                     : 0;
-
-                /*
-                 * TOTAL STUDY MINUTES
-                 */
 
                 const totalStudyMinutes =
                   subjectLessons.reduce(
@@ -819,18 +806,10 @@ const Subjects = () => {
                     0
                   );
 
-                /*
-                 * ICON
-                 */
-
                 const iconData =
                   getSubjectIcon(
                     subject
                   );
-
-                /*
-                 * STATUS
-                 */
 
                 const statusData =
                   getSubjectStatus(
@@ -843,9 +822,9 @@ const Subjects = () => {
                   slug: subject.slug,
 
                   /*
-                   * أولى وتانية:
-                   * لا نعتمد على sections.
-                   */
+                  * أولى وتانية:
+                  * لا نعتمد على sections.
+                  */
                   sections: [],
 
                   icon: iconData.icon,
@@ -883,18 +862,20 @@ const Subjects = () => {
         }
 
         /*
-         * =================================================
-         * THIRD SECONDARY
-         * =================================================
-         *
-         * الكود التالي هو نفس منطق تالتة الحالي.
-         */
+        * =================================================
+        * THIRD SECONDARY
+        * =================================================
+        *
+        * مهم جدًا:
+        * الجزء ده متساب بنفس منطق تالتة الحالي
+        * بدون أي تعديل في فلترة الشعب.
+        */
 
         /*
-         * -------------------------------------------------
-         * 3. GET ALL ACTIVE SUBJECTS
-         * -------------------------------------------------
-         */
+        * -------------------------------------------------
+        * 3. GET ALL ACTIVE SUBJECTS
+        * -------------------------------------------------
+        */
 
         const {
           data: subjects,
@@ -932,10 +913,10 @@ const Subjects = () => {
           );
 
         /*
-         * -------------------------------------------------
-         * 4. GET SUBJECT SECTIONS
-         * -------------------------------------------------
-         */
+        * -------------------------------------------------
+        * 4. GET SUBJECT SECTIONS
+        * -------------------------------------------------
+        */
 
         const {
           data: subjectSections,
@@ -958,16 +939,14 @@ const Subjects = () => {
         }
 
         /*
-         * -------------------------------------------------
-         * 5. GET SECTIONS
-         * -------------------------------------------------
-         */
+        * -------------------------------------------------
+        * 5. GET SECTIONS
+        * -------------------------------------------------
+        */
 
         const sectionIds = [
           ...new Set(
-            (
-              subjectSections || []
-            )
+            (subjectSections || [])
               .map(
                 (item) =>
                   item.section_id
@@ -1001,10 +980,10 @@ const Subjects = () => {
         }
 
         /*
-         * -------------------------------------------------
-         * 6. MAP SUBJECT SECTIONS
-         * -------------------------------------------------
-         */
+        * -------------------------------------------------
+        * 6. MAP SUBJECT SECTIONS
+        * -------------------------------------------------
+        */
 
         const sectionMap =
           new Map(
@@ -1019,41 +998,40 @@ const Subjects = () => {
         const subjectSectionMap =
           new Map();
 
-        (
-          subjectSections || []
-        ).forEach((item) => {
-          const sectionName =
-            sectionMap.get(
-              item.section_id
-            );
+        (subjectSections || [])
+          .forEach((item) => {
+            const sectionName =
+              sectionMap.get(
+                item.section_id
+              );
 
-          if (!sectionName) {
-            return;
-          }
+            if (!sectionName) {
+              return;
+            }
 
-          if (
-            !subjectSectionMap.has(
-              item.subject_id
-            )
-          ) {
-            subjectSectionMap.set(
-              item.subject_id,
-              []
-            );
-          }
+            if (
+              !subjectSectionMap.has(
+                item.subject_id
+              )
+            ) {
+              subjectSectionMap.set(
+                item.subject_id,
+                []
+              );
+            }
 
-          subjectSectionMap
-            .get(
-              item.subject_id
-            )
-            .push(sectionName);
-        });
+            subjectSectionMap
+              .get(
+                item.subject_id
+              )
+              .push(sectionName);
+          });
 
         /*
-         * -------------------------------------------------
-         * 7. GET OLD UNITS + LESSONS
-         * -------------------------------------------------
-         */
+        * -------------------------------------------------
+        * 7. GET OLD UNITS + LESSONS
+        * -------------------------------------------------
+        */
 
         const {
           data: units,
@@ -1092,60 +1070,60 @@ const Subjects = () => {
         }
 
         /*
-         * -------------------------------------------------
-         * 8. BUILD LESSONS MAP
-         * -------------------------------------------------
-         */
+        * -------------------------------------------------
+        * 8. BUILD LESSONS MAP
+        * -------------------------------------------------
+        */
 
         const lessonsBySubject =
           new Map();
 
-        (
-          units || []
-        ).forEach((unit) => {
-          const subjectId =
-            unit.subject_id;
+        (units || []).forEach(
+          (unit) => {
+            const subjectId =
+              unit.subject_id;
 
-          if (
-            !lessonsBySubject.has(
-              subjectId
-            )
-          ) {
-            lessonsBySubject.set(
-              subjectId,
-              []
-            );
+            if (
+              !lessonsBySubject.has(
+                subjectId
+              )
+            ) {
+              lessonsBySubject.set(
+                subjectId,
+                []
+              );
+            }
+
+            const lessons =
+              Array.isArray(
+                unit.subject_lessons
+              )
+                ? unit.subject_lessons
+                : [];
+
+            lessons
+              .filter(
+                (lesson) =>
+                  lesson.is_active !==
+                  false
+              )
+              .forEach(
+                (lesson) => {
+                  lessonsBySubject
+                    .get(
+                      subjectId
+                    )
+                    .push(lesson);
+                }
+              );
           }
-
-          const lessons =
-            Array.isArray(
-              unit.subject_lessons
-            )
-              ? unit.subject_lessons
-              : [];
-
-          lessons
-            .filter(
-              (lesson) =>
-                lesson.is_active !==
-                false
-            )
-            .forEach(
-              (lesson) => {
-                lessonsBySubject
-                  .get(
-                    subjectId
-                  )
-                  .push(lesson);
-              }
-            );
-        });
+        );
 
         /*
-         * -------------------------------------------------
-         * 9. GET STUDY RECORDS
-         * -------------------------------------------------
-         */
+        * -------------------------------------------------
+        * 9. GET STUDY RECORDS
+        * -------------------------------------------------
+        */
 
         const allLessonIds = [];
 
@@ -1206,10 +1184,10 @@ const Subjects = () => {
         }
 
         /*
-         * -------------------------------------------------
-         * 10. LATEST STUDY PER LESSON
-         * -------------------------------------------------
-         */
+        * -------------------------------------------------
+        * 10. LATEST STUDY PER LESSON
+        * -------------------------------------------------
+        */
 
         const latestStudyByLesson =
           new Map();
@@ -1230,10 +1208,10 @@ const Subjects = () => {
         );
 
         /*
-         * -------------------------------------------------
-         * 11. FORMAT SUBJECTS
-         * -------------------------------------------------
-         */
+        * -------------------------------------------------
+        * 11. FORMAT SUBJECTS
+        * -------------------------------------------------
+        */
 
         const formattedSubjects =
           subjects.map(
@@ -1273,10 +1251,6 @@ const Subjects = () => {
                     )
                   : 0;
 
-              /*
-               * TOTAL STUDY MINUTES
-               */
-
               const totalStudyMinutes =
                 subjectLessons.reduce(
                   (
@@ -1304,8 +1278,8 @@ const Subjects = () => {
                 );
 
               /*
-               * SUBJECT SECTIONS
-               */
+              * SUBJECT SECTIONS
+              */
 
               const sectionsForSubject =
                 subjectSectionMap.get(
@@ -1313,8 +1287,8 @@ const Subjects = () => {
                 ) || [];
 
               /*
-               * ICON
-               */
+              * ICON
+              */
 
               const iconData =
                 getSubjectIcon(
@@ -1322,8 +1296,8 @@ const Subjects = () => {
                 );
 
               /*
-               * STATUS
-               */
+              * STATUS
+              */
 
               const statusData =
                 getSubjectStatus(
@@ -1334,6 +1308,11 @@ const Subjects = () => {
                 id: subject.id,
                 name: subject.name,
                 slug: subject.slug,
+
+                /*
+                * تالتة ثانوي:
+                * بنفضل معتمدين على sections
+                */
                 sections:
                   sectionsForSubject,
 
@@ -1365,10 +1344,10 @@ const Subjects = () => {
           );
 
         /*
-         * -------------------------------------------------
-         * 12. SAVE
-         * -------------------------------------------------
-         */
+        * -------------------------------------------------
+        * 12. SAVE
+        * -------------------------------------------------
+        */
 
         setSubjectsData(
           formattedSubjects
