@@ -43,6 +43,80 @@ const getDefaultAvatar = (name = "Student") => {
 };
 
 // =========================================================
+// عرض الشعبة / المسار بشكل صحيح
+// =========================================================
+
+const getStudentDivisionLabel = ({
+  gradeLevel,
+  educationSystem,
+  section,
+  track,
+}) => {
+  // -------------------------------------------------------
+  // أولى ثانوي
+  // -------------------------------------------------------
+
+  if (gradeLevel === "first_secondary") {
+    return "مشترك";
+  }
+
+  // -------------------------------------------------------
+  // تانية ثانوي - النظام العام
+  // section = science / literary
+  // -------------------------------------------------------
+
+  if (
+    gradeLevel === "second_secondary" &&
+    educationSystem === "general"
+  ) {
+    if (section === "science") {
+      return "علمي";
+    }
+
+    if (section === "literary") {
+      return "أدبي";
+    }
+
+    return "غير محددة";
+  }
+
+  // -------------------------------------------------------
+  // تالتة ثانوي
+  // section يحتوي على الاسم الحقيقي
+  // مثل:
+  // علمي علوم
+  // علمي رياضة
+  // أدبي
+  // -------------------------------------------------------
+
+  if (gradeLevel === "third_secondary") {
+    return section || "غير محددة";
+  }
+
+  // -------------------------------------------------------
+  // البكالوريا المصرية
+  // track يحتوي على المسار
+  // -------------------------------------------------------
+
+  if (educationSystem === "baccalaureate") {
+    const trackLabels = {
+      medicine_life: "الطب وعلوم الحياة",
+      engineering_cs: "الهندسة وعلوم الحاسب",
+      business: "الأعمال",
+      arts: "الآداب والفنون",
+    };
+
+    return trackLabels[track] || track || "غير محدد";
+  }
+
+  // -------------------------------------------------------
+  // fallback
+  // -------------------------------------------------------
+
+  return section || "غير محددة";
+};
+
+// =========================================================
 // NOTIFICATION STORAGE
 // =========================================================
 
@@ -55,6 +129,13 @@ const READ_NOTIFICATIONS_KEY =
 
 const Header = () => {
   const { darkMode, toggleDarkMode } = useTheme();
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // =======================================================
+  // SIDEBAR
+  // =======================================================
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [quickAddOpen, setQuickAddOpen] = useState(false);
@@ -75,12 +156,12 @@ const Header = () => {
     image: getDefaultAvatar("الطالب"),
     notifications: 0,
     section: "",
+    gradeLevel: "",
+    educationSystem: "",
+    track: "",
   });
 
   const [studentLoading, setStudentLoading] = useState(true);
-
-  const location = useLocation();
-  const navigate = useNavigate();
 
   // =========================================================
   // GET READ NOTIFICATIONS
@@ -257,6 +338,9 @@ const Header = () => {
             image: getDefaultAvatar("الطالب"),
             notifications: 0,
             section: "",
+            gradeLevel: "",
+            educationSystem: "",
+            track: "",
           });
 
           return;
@@ -280,6 +364,9 @@ const Header = () => {
               phone,
               avatar_url,
               section,
+              grade_level,
+              education_system,
+              track,
               notifications_enabled
             `
           )
@@ -290,6 +377,10 @@ const Header = () => {
           throw error;
         }
 
+        // -----------------------------------------------
+        // لا يوجد Profile
+        // -----------------------------------------------
+
         if (!data) {
           if (!isMounted) return;
 
@@ -298,6 +389,9 @@ const Header = () => {
             image: getDefaultAvatar("الطالب"),
             notifications: 0,
             section: "",
+            gradeLevel: "",
+            educationSystem: "",
+            track: "",
           });
 
           return;
@@ -321,6 +415,9 @@ const Header = () => {
           image: studentImage,
           notifications: 0,
           section: data.section || "",
+          gradeLevel: data.grade_level || "",
+          educationSystem: data.education_system || "",
+          track: data.track || "",
         });
 
         console.log(
@@ -340,6 +437,9 @@ const Header = () => {
           image: getDefaultAvatar("الطالب"),
           notifications: 0,
           section: "",
+          gradeLevel: "",
+          educationSystem: "",
+          track: "",
         });
       } finally {
         if (isMounted) {
@@ -536,7 +636,6 @@ const Header = () => {
   useEffect(() => {
     fetchNotificationCount();
 
-    // تحديث الرقم عند الرجوع للصفحة
     const handleStorage = () => {
       fetchNotificationCount();
     };
@@ -800,6 +899,19 @@ const Header = () => {
   const PageIcon = pageInfo.icon;
 
   // =========================================================
+  // STUDENT DIVISION
+  // =========================================================
+
+  const studentDivision =
+    getStudentDivisionLabel({
+      gradeLevel: student.gradeLevel,
+      educationSystem:
+        student.educationSystem,
+      section: student.section,
+      track: student.track,
+    });
+
+  // =========================================================
   // SIDEBAR MENU
   // =========================================================
 
@@ -941,7 +1053,7 @@ const Header = () => {
 
     const result = await Swal.fire({
       title: "تسجيل الخروج",
-      text: "هل تريدين تسجيل الخروج من حسابك؟",
+      text: "هل تريد تسجيل الخروج من حسابك؟",
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "تسجيل الخروج",
@@ -1290,8 +1402,8 @@ const Header = () => {
 
             <span>
               طالب
-              {student.section
-                ? ` • ${student.section}`
+              {studentDivision
+                ? ` • ${studentDivision}`
                 : ""}
             </span>
 

@@ -29,11 +29,60 @@ import "./Profile.css";
 // الشعب
 // =====================================================
 
-const divisions = [
-  "علمي علوم",
-  "علمي رياضة",
-  "أدبي",
-];
+// =====================================================
+// عرض الشعبة / المسار حسب نظام الطالب
+// =====================================================
+
+const getStudentDivisionLabel = ({
+  gradeLevel,
+  educationSystem,
+  section,
+  track,
+}) => {
+  // أولى ثانوي
+  if (gradeLevel === "first_secondary") {
+    return "مشترك";
+  }
+
+  // تانية ثانوي - النظام العام
+  if (
+    gradeLevel === "second_secondary" &&
+    educationSystem === "general"
+  ) {
+    if (section === "science") {
+      return "علمي";
+    }
+
+    if (section === "literary") {
+      return "أدبي";
+    }
+
+    return "غير محددة";
+  }
+
+  // تالتة ثانوي
+  if (gradeLevel === "third_secondary") {
+    return section || "غير محددة";
+  }
+
+  // البكالوريا المصرية
+  if (educationSystem === "baccalaureate") {
+    const trackLabels = {
+      medicine_life: "الطب وعلوم الحياة",
+      engineering_cs: "الهندسة وعلوم الحاسب",
+      business: "الأعمال",
+      arts: "الآداب والفنون",
+    };
+
+    return (
+      trackLabels[track] ||
+      track ||
+      "غير محدد"
+    );
+  }
+
+  return section || "غير محددة";
+};
 
 // =====================================================
 // الصورة الافتراضية
@@ -351,7 +400,6 @@ const Profile = () => {
   const [editData, setEditData] = useState({
     full_name: "",
     phone: "",
-    section: "",
   });
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
@@ -874,6 +922,9 @@ const Profile = () => {
           phone,
           avatar_url,
           section,
+          grade_level,
+          education_system,
+          track,
           notifications_enabled,
           created_at,
           updated_at
@@ -918,12 +969,8 @@ const Profile = () => {
       setStudent(data);
 
       setEditData({
-        full_name:
-          data.full_name || "",
-        phone:
-          data.phone || "",
-        section:
-          data.section || "",
+        full_name: data.full_name || "",
+        phone: data.phone || "",
       });
 
       setNotificationsEnabled(
@@ -1244,9 +1291,6 @@ const Profile = () => {
         .replace(/\s+/g, "")
         .trim();
 
-    const section =
-      editData.section;
-
     if (!fullName) {
       await Swal.fire({
         icon: "warning",
@@ -1310,24 +1354,6 @@ const Profile = () => {
       return;
     }
 
-    if (!section) {
-      await Swal.fire({
-        icon: "warning",
-        title: "الشعبة مطلوبة",
-        text:
-          "من فضلك اختر الشعبة.",
-        confirmButtonText: "حسنًا",
-        confirmButtonColor: "#3158dc",
-        scrollbarPadding: false,
-        heightAuto: false,
-        customClass: {
-          container:
-            "profile-swal-container",
-        },
-      });
-
-      return;
-    }
 
     setSaving(true);
 
@@ -1340,9 +1366,7 @@ const Profile = () => {
         .update({
           full_name: fullName,
           phone: normalizedPhone,
-          section,
-          updated_at:
-            new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         })
         .eq(
           "user_id",
@@ -1371,13 +1395,9 @@ const Profile = () => {
       setStudent(data);
 
       setEditData({
-        full_name:
-          data.full_name || "",
-        phone:
-          data.phone || "",
-        section:
-          data.section || "",
-      });
+        full_name: student.full_name || "",
+        phone: student.phone || "",
+      }); 
 
       setNotificationsEnabled(
         data.notifications_enabled ??
@@ -1437,12 +1457,8 @@ const Profile = () => {
     }
 
     setEditData({
-      full_name:
-        student.full_name || "",
-      phone:
-        student.phone || "",
-      section:
-        student.section || "",
+      full_name: student.full_name || "",
+      phone: student.phone || "",
     });
 
     setIsEditing(false);
@@ -1946,9 +1962,12 @@ const Profile = () => {
     student.phone ||
     "غير مضاف";
 
-  const studentSection =
-    student.section ||
-    "غير محددة";
+  const studentDivision = getStudentDivisionLabel({
+    gradeLevel: student.grade_level,
+    educationSystem: student.education_system,
+    section: student.section,
+    track: student.track,
+  });
 
   const studentCode =
     student.student_code ||
@@ -2037,9 +2056,11 @@ const Profile = () => {
                 </span>
 
                 <span>
-                  الشعبة:
+                  {student.education_system === "baccalaureate"
+                    ? "المسار:"
+                    : "الشعبة:"}
                   <strong>
-                    {studentSection}
+                    {studentDivision}
                   </strong>
                 </span>
 
@@ -2429,7 +2450,7 @@ const Profile = () => {
                   </strong>
 
                   <span>
-                    تعديل الاسم ورقم الهاتف والشعبة
+                    تعديل الاسم ورقم الهاتف 
                   </span>
 
                 </div>
@@ -2660,45 +2681,6 @@ const Profile = () => {
                   placeholder="01xxxxxxxxx"
                   disabled={saving}
                 />
-
-              </div>
-
-              {/* Section */}
-
-              <div className="form-group">
-
-                <label htmlFor="profile-section">
-                  الشعبة
-                </label>
-
-                <select
-                  id="profile-section"
-                  name="section"
-                  value={
-                    editData.section
-                  }
-                  onChange={
-                    handleEditChange
-                  }
-                  disabled={saving}
-                >
-
-                  <option value="">
-                    اختر الشعبة
-                  </option>
-
-                  {divisions.map(
-                    (division) => (
-                      <option
-                        key={division}
-                        value={division}
-                      >
-                        {division}
-                      </option>
-                    )
-                  )}
-
-                </select>
 
               </div>
 
