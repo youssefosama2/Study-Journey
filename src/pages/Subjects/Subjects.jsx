@@ -1692,13 +1692,7 @@ const Subjects = () => {
       return;
     }
 
-    const identifier =
-      subject.slug ||
-      subject.id;
-
-    navigate(
-      `/subjects/${identifier}`
-    );
+  navigate(`/subjects/${subject.id}`);
   };
 
   /*

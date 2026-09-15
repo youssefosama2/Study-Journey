@@ -315,7 +315,7 @@ const SubjectDetails = () => {
             icon_class,
             slug
           `)
-          .eq("slug", subjectId)
+          .eq("id", subjectId)
           .eq("is_active", true)
           .maybeSingle();
 
@@ -474,10 +474,11 @@ const SubjectDetails = () => {
 
         let lessonIds = [];
 
-        const {
-          data: unitsData,
-          error: unitsError,
-        } = await supabase
+        /* =====================================================
+          LOAD CURRICULUM UNITS
+        ===================================================== */
+
+        let unitsQuery = supabase
           .from("units")
           .select(`
             id,
@@ -499,6 +500,114 @@ const SubjectDetails = () => {
           .order("sort_order", {
             ascending: true,
           });
+
+        /* =====================================================
+          أولى / تانية ثانوي
+
+          لازم الوحدة نفسها تكون مرتبطة
+          بمنهج الطالب الحالي
+        ===================================================== */
+
+        if (firstSecondCurriculum) {
+          const { data: unitAccessData, error: unitAccessError } =
+            await supabase
+              .from("unit_curriculum_access")
+              .select(`
+                unit_id,
+                grade_level,
+                education_system,
+                track
+              `)
+              .eq("grade_level", gradeLevel)
+              .eq("education_system", educationSystem);
+
+          if (unitAccessError) {
+            throw unitAccessError;
+          }
+
+          /*
+            نحدد الـ track المناسب
+          */
+
+          let filteredUnitAccess = unitAccessData || [];
+
+          if (educationSystem === "general") {
+            filteredUnitAccess =
+              filteredUnitAccess.filter(
+                (item) => item.track === null
+              );
+          }
+
+          if (educationSystem === "baccalaureate") {
+            /*
+              أولى ثانوي بكالوريا:
+              مفيش تخصص لسه
+            */
+
+            if (
+              gradeLevel === "first_secondary" ||
+              !currentTrack
+            ) {
+              filteredUnitAccess =
+                filteredUnitAccess.filter(
+                  (item) => item.track === null
+                );
+            } else {
+              filteredUnitAccess =
+                filteredUnitAccess.filter(
+                  (item) =>
+                    item.track === currentTrack
+                );
+            }
+          }
+
+          /*
+            IDs الوحدات المسموح بها
+          */
+
+          const allowedUnitIds = [
+            ...new Set(
+              filteredUnitAccess.map(
+                (item) => item.unit_id
+              )
+            ),
+          ];
+
+          /*
+            لو مفيش وحدات مرتبطة بالمنهج الحالي
+            نرجع بمنهج فارغ بدل ما نعرض منهج غلط.
+          */
+
+          if (allowedUnitIds.length === 0) {
+            unitsQuery = null;
+          } else {
+            unitsQuery = unitsQuery.in(
+              "id",
+              allowedUnitIds
+            );
+          }
+        }
+
+        /* =====================================================
+          تالتة ثانوي
+
+          تفضل بالطريقة القديمة:
+          subject_sections هو المسؤول عن الوصول
+        ===================================================== */
+
+        const {
+          data: unitsData,
+          error: unitsError,
+        } = unitsQuery
+          ? await unitsQuery
+          : {
+              data: [],
+              error: null,
+            };
+
+        if (unitsError) {
+          throw unitsError;
+        }
 
         if (unitsError) {
           throw unitsError;
@@ -534,7 +643,7 @@ const SubjectDetails = () => {
             (unit) =>
               !unit.parent_unit_id
           )
-          .map((unit) => {
+          .map((unit, unitIndex) => {
             /* ===============================================
                CHILD UNITS
             =============================================== */
@@ -555,11 +664,11 @@ const SubjectDetails = () => {
                     b.sort_order || 0
                   )
               )
-              .map((child) => ({
+              .map((child, childIndex) => ({
                 id: child.id,
 
                 unitNumber:
-                  child.sort_order,
+                  childIndex + 1,
 
                 title: child.title,
 
@@ -625,7 +734,7 @@ const SubjectDetails = () => {
               id: unit.id,
 
               unitNumber:
-                unit.sort_order,
+                unitIndex + 1,
 
               title: unit.title,
 
