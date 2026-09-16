@@ -25,24 +25,6 @@ const AdminRoute = ({ children }) => {
           error: sessionError,
         } = await supabase.auth.getSession();
 
-        console.log(
-          "========================================="
-        );
-        console.log("ADMIN ROUTE CHECK");
-        console.log(
-          "========================================="
-        );
-
-        console.log(
-          "SESSION USER ID:",
-          currentSession?.user?.id
-        );
-
-        console.log(
-          "SESSION EMAIL:",
-          currentSession?.user?.email
-        );
-
         if (sessionError) {
           console.error(
             "SESSION ERROR:",
@@ -63,8 +45,6 @@ const AdminRoute = ({ children }) => {
         // =========================================
 
         if (!currentSession) {
-          console.log("NO SESSION");
-
           if (mounted) {
             setSession(null);
             setIsAdmin(false);
@@ -87,15 +67,6 @@ const AdminRoute = ({ children }) => {
           error: adminError,
         } = await supabase.rpc("is_admin");
 
-        console.log(
-          "IS ADMIN RESULT:",
-          adminResult
-        );
-
-        console.log(
-          "IS ADMIN ERROR:",
-          adminError
-        );
 
         // =========================================
         // RPC ERROR

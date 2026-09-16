@@ -140,11 +140,6 @@ const useAchievementNotifications = () => {
           return;
         }
 
-        console.log(
-          "Removing existing realtime channel:",
-          channelName
-        );
-
         await Promise.all(
           channels.map((channel) =>
             removeChannelSafely(channel)
@@ -391,10 +386,6 @@ const useAchievementNotifications = () => {
           return;
         }
 
-        console.log(
-          "Achievement notification channel:",
-          status
-        );
       });
 
       achievementChannelRef.current =
@@ -523,10 +514,6 @@ const useAchievementNotifications = () => {
           return;
         }
 
-        console.log(
-          "Level notification channel:",
-          status
-        );
       });
 
       pointsChannelRef.current = pointsChannel;
@@ -565,10 +552,6 @@ const useAchievementNotifications = () => {
       data,
     } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log(
-          "Achievement notification auth event:",
-          event
-        );
 
         // ---------------------------------------------------
         // SIGNED OUT
@@ -613,9 +596,6 @@ const useAchievementNotifications = () => {
     // -------------------------------------------------------
 
     return () => {
-      console.log(
-        "Cleaning achievement notification system..."
-      );
 
       // -----------------------------------------------------
       // إلغاء أي initialization معلقة

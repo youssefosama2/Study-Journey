@@ -833,45 +833,6 @@ const SubjectDetails = () => {
           );
 
         /* =====================================================
-          DEBUG
-        ===================================================== */
-
-        console.log(
-          "SubjectDetails subject:",
-          subjectData
-        );
-
-        console.log(
-          "SubjectDetails grade:",
-          gradeLevel
-        );
-
-        console.log(
-          "SubjectDetails system:",
-          educationSystem
-        );
-
-        console.log(
-          "SubjectDetails section:",
-          profileData.section
-        );
-
-        console.log(
-          "SubjectDetails track:",
-          currentTrack
-        );
-
-        console.log(
-          "SubjectDetails units:",
-          formattedUnits
-        );
-
-        console.log(
-          "SubjectDetails lessonIds:",
-          lessonIds
-        );
-
-        /* =====================================================
           STUDY RECORDS
         ===================================================== */
 

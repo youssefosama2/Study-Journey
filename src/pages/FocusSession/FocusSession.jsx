@@ -1137,11 +1137,6 @@ const FocusSession = () => {
           "active",
       };
 
-      console.log(
-        "Creating focus session:",
-        insertPayload
-      );
-
       const {
         data,
         error,
@@ -1482,7 +1477,6 @@ const FocusSession = () => {
           );
         }
       }
-      console.log("Focus session completed:", data);
       await new Promise(
         (resolve) =>
           setTimeout(

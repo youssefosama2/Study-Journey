@@ -260,11 +260,6 @@ const Header = () => {
           return;
         }
 
-        console.log(
-          "HEADER ADMIN STATUS:",
-          data
-        );
-
         if (isMounted) {
           setIsAdmin(data === true);
           setAdminChecking(false);
@@ -420,10 +415,6 @@ const Header = () => {
           track: data.track || "",
         });
 
-        console.log(
-          "HEADER STUDENT PROFILE:",
-          data
-        );
       } catch (error) {
         console.error(
           "HEADER FETCH PROFILE ERROR:",
@@ -610,10 +601,6 @@ const Header = () => {
           notifications: unreadCount,
         }));
 
-        console.log(
-          "HEADER REAL NOTIFICATION COUNT:",
-          unreadCount
-        );
       } catch (error) {
         console.error(
           "HEADER NOTIFICATION COUNT ERROR:",

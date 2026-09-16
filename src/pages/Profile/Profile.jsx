@@ -899,11 +899,6 @@ const Profile = () => {
         return;
       }
 
-      console.log(
-        "CURRENT USER:",
-        user
-      );
-
       // =================================================
       // Profile
       // =================================================
@@ -935,16 +930,6 @@ const Profile = () => {
           user.id
         )
         .maybeSingle();
-
-      console.log(
-        "STUDENT PROFILE:",
-        data
-      );
-
-      console.log(
-        "PROFILE ERROR:",
-        error
-      );
 
       if (error) {
         throw error;
@@ -1167,40 +1152,6 @@ const Profile = () => {
         levelsResult.data || []
       );
 
-      console.log(
-        "PROFILE POINTS:",
-        pointsResult.data
-      );
-
-      console.log(
-        "PROFILE TASKS:",
-        tasksResult.data
-      );
-
-      console.log(
-        "PROFILE FOCUS:",
-        focusResult.data
-      );
-
-      console.log(
-        "PROFILE STUDY:",
-        studyResult.data
-      );
-
-      console.log(
-        "PROFILE USER ACHIEVEMENTS:",
-        userAchievementsResult.data
-      );
-
-      console.log(
-        "PROFILE ACHIEVEMENT DEFINITIONS:",
-        definitionsResult.data
-      );
-
-      console.log(
-        "PROFILE ACHIEVEMENT LEVELS:",
-        levelsResult.data
-      );
     } catch (error) {
       console.error(
         "FETCH PROFILE ERROR:",

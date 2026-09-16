@@ -2176,3 +2176,1046 @@
     align-items: flex-start;
   }
 }
+/* =========================================
+   Challenge Result
+========================================= */
+
+.challenge-result {
+  width: 100%;
+  min-height: 62px;
+
+  margin-top: 16px;
+  padding: 10px 14px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  border-radius: 15px;
+
+  position: relative;
+  overflow: hidden;
+
+  text-align: right;
+
+  animation: challengeResultShow 0.35s ease;
+}
+
+.challenge-result svg {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+
+  padding: 10px;
+
+  box-sizing: border-box;
+
+  border-radius: 11px;
+
+  flex-shrink: 0;
+}
+
+.challenge-result strong {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+
+/* =========================================
+   🏆 أنت الفائز
+========================================= */
+
+.challenge-result.challenge-winner {
+  background: linear-gradient(
+    135deg,
+    #fff8df,
+    #fff1bd
+  );
+
+  border: 1px solid #f3d36b;
+
+  color: #a16207;
+
+  box-shadow:
+    0 5px 16px rgba(245, 158, 11, 0.12);
+}
+
+.challenge-result.challenge-winner svg {
+  background: rgba(245, 158, 11, 0.16);
+  color: #d97706;
+}
+
+
+/* =========================================
+   🤝 تعادل
+========================================= */
+
+.challenge-result.challenge-tie {
+  background: linear-gradient(
+    135deg,
+    #eef6ff,
+    #e0efff
+  );
+
+  border: 1px solid #b8d8ff;
+
+  color: #2563eb;
+
+  box-shadow:
+    0 5px 16px rgba(59, 130, 246, 0.1);
+}
+
+.challenge-result.challenge-tie svg {
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+}
+
+
+/* =========================================
+   👑 فائز آخر
+========================================= */
+
+.challenge-result.challenge-other-winner {
+  background: linear-gradient(
+    135deg,
+    #f5efff,
+    #ede4ff
+  );
+
+  border: 1px solid #d5c0ff;
+
+  color: #7c3aed;
+
+  box-shadow:
+    0 5px 16px rgba(139, 92, 246, 0.1);
+}
+
+.challenge-result.challenge-other-winner svg {
+  background: rgba(139, 92, 246, 0.12);
+  color: #8b5cf6;
+}
+
+
+/* =========================================
+   ❌ انتهى بدون فائز
+========================================= */
+
+.challenge-result.challenge-no-winner {
+  background: linear-gradient(
+    135deg,
+    #f8fafc,
+    #eef2f7
+  );
+
+  border: 1px solid #d9e0e8;
+
+  color: #64748b;
+
+  box-shadow:
+    0 4px 12px rgba(100, 116, 139, 0.06);
+}
+
+.challenge-result.challenge-no-winner svg {
+  background: rgba(100, 116, 139, 0.1);
+  color: #64748b;
+}
+
+
+/* =========================================
+   Dark Mode
+========================================= */
+
+.dark-mode .challenge-result.challenge-winner {
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.16),
+    rgba(245, 158, 11, 0.07)
+  );
+
+  border-color: rgba(245, 158, 11, 0.28);
+
+  color: #fbbf24;
+}
+
+.dark-mode .challenge-result.challenge-winner svg {
+  background: rgba(245, 158, 11, 0.13);
+  color: #fbbf24;
+}
+
+
+.dark-mode .challenge-result.challenge-tie {
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.15),
+    rgba(59, 130, 246, 0.06)
+  );
+
+  border-color: rgba(96, 165, 250, 0.25);
+
+  color: #60a5fa;
+}
+
+.dark-mode .challenge-result.challenge-tie svg {
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+}
+
+
+.dark-mode .challenge-result.challenge-other-winner {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.15),
+    rgba(139, 92, 246, 0.06)
+  );
+
+  border-color: rgba(167, 139, 250, 0.25);
+
+  color: #a78bfa;
+}
+
+.dark-mode .challenge-result.challenge-other-winner svg {
+  background: rgba(139, 92, 246, 0.12);
+  color: #a78bfa;
+}
+
+
+.dark-mode .challenge-result.challenge-no-winner {
+  background: rgba(100, 116, 139, 0.1);
+
+  border-color: rgba(148, 163, 184, 0.14);
+
+  color: #94a3b8;
+}
+
+.dark-mode .challenge-result.challenge-no-winner svg {
+  background: rgba(148, 163, 184, 0.08);
+  color: #94a3b8;
+}
+
+
+/* =========================================
+   Animation
+========================================= */
+
+@keyframes challengeResultShow {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================
+   Mobile
+========================================= */
+
+@media (max-width: 576px) {
+  .challenge-result {
+    min-height: 56px;
+    padding: 9px 11px;
+    gap: 10px;
+    border-radius: 13px;
+  }
+
+  .challenge-result svg {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    padding: 9px;
+    border-radius: 10px;
+  }
+
+  .challenge-result strong {
+    font-size: 13px;
+  }
+}
+/* =========================================
+   Challenge Members Progress
+========================================= */
+
+.challenge-members-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  margin-top: 16px;
+  padding-top: 14px;
+
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.challenge-member-progress {
+  padding: 10px 11px;
+
+  border-radius: 12px;
+
+  background: rgba(148, 163, 184, 0.05);
+
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.challenge-member-progress.current-user {
+  background: rgba(108, 99, 255, 0.07);
+
+  border-color: rgba(108, 99, 255, 0.16);
+}
+
+.challenge-member-progress-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 7px;
+}
+
+.challenge-member-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  min-width: 0;
+}
+
+.challenge-member-avatar {
+  width: 30px;
+  height: 30px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  border: 2px solid #fff;
+
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.08);
+}
+
+.challenge-member-name {
+  font-size: 12px;
+  font-weight: 700;
+
+  color: #475569;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.challenge-member-progress.current-user
+  .challenge-member-name {
+  color: #6c63ff;
+}
+
+.challenge-member-progress-top strong {
+  font-size: 12px;
+  font-weight: 800;
+
+  color: #64748b;
+}
+
+.challenge-member-progress-bar {
+  width: 100%;
+  height: 6px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background: #e8edf3;
+}
+
+.challenge-member-progress-bar span {
+  display: block;
+
+  height: 100%;
+
+  border-radius: inherit;
+
+  background: linear-gradient(
+    90deg,
+    #6c63ff,
+    #8b83ff
+  );
+
+  transition: width 0.5s ease;
+}
+
+.challenge-member-progress.current-user
+  .challenge-member-progress-bar span {
+  background: linear-gradient(
+    90deg,
+    #6c63ff,
+    #918aff
+  );
+}
+
+.challenge-member-progress-value {
+  margin-top: 5px;
+
+  font-size: 11px;
+
+  color: #94a3b8;
+
+  text-align: left;
+}
+
+
+/* =========================================
+   Dark Mode
+========================================= */
+
+.dark-mode .challenge-members-progress {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark-mode .challenge-member-progress {
+  background: rgba(255, 255, 255, 0.035);
+
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+.dark-mode .challenge-member-progress.current-user {
+  background: rgba(108, 99, 255, 0.1);
+
+  border-color: rgba(108, 99, 255, 0.2);
+}
+
+.dark-mode .challenge-member-avatar {
+  border-color: #1e293b;
+}
+
+.dark-mode .challenge-member-name {
+  color: #cbd5e1;
+}
+
+.dark-mode
+  .challenge-member-progress.current-user
+  .challenge-member-name {
+  color: #a5a0ff;
+}
+
+.dark-mode .challenge-member-progress-top strong {
+  color: #94a3b8;
+}
+
+.dark-mode .challenge-member-progress-bar {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dark-mode .challenge-member-progress-value {
+  color: #64748b;
+}
+
+
+/* =========================================
+   Mobile
+========================================= */
+
+@media (max-width: 576px) {
+  .challenge-members-progress {
+    gap: 8px;
+
+    margin-top: 13px;
+    padding-top: 12px;
+  }
+
+  .challenge-member-progress {
+    padding: 9px;
+  }
+
+  .challenge-member-avatar {
+    width: 27px;
+    height: 27px;
+  }
+
+  .challenge-member-name {
+    font-size: 11px;
+  }
+
+  .challenge-member-progress-top strong {
+    font-size: 11px;
+  }
+}
+/* =========================================================
+   CHALLENGE RESULT MODAL
+   ========================================================= */
+
+.challenge-result-modal {
+  width: calc(100% - 35px);
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+
+  margin: 24px 14px 10px;
+
+  padding: 18px 22px;
+
+  border-radius: 18px;
+  border: 1px solid transparent;
+
+  position: relative;
+  overflow: hidden;
+
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.6;
+
+  text-align: center;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+
+  animation: challengeResultModalIn 0.35s ease both;
+}
+
+
+/* =========================================================
+   الخط العلوي
+   ========================================================= */
+
+.challenge-result-modal::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 2px;
+
+  opacity: 0.85;
+}
+
+
+/* =========================================================
+   النص
+   ========================================================= */
+
+.challenge-result-modal span {
+  display: block;
+
+  position: relative;
+  z-index: 1;
+
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   الأيقونة
+   ========================================================= */
+
+.challenge-result-modal svg {
+  width: 22px;
+  height: 22px;
+
+  flex-shrink: 0;
+
+  transition:
+    transform 0.25s ease,
+    filter 0.25s ease;
+}
+
+.challenge-result-modal:hover svg {
+  transform: scale(1.12);
+}
+
+
+/* =========================================================
+   🏆 أنت الفائز
+   ========================================================= */
+
+.challenge-result-modal.result-winner {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(34, 197, 94, 0.14),
+      rgba(16, 185, 129, 0.07)
+    );
+
+  border-color: rgba(34, 197, 94, 0.30);
+
+  color: #15803d;
+
+  box-shadow:
+    0 8px 25px rgba(34, 197, 94, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.challenge-result-modal.result-winner::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #22c55e,
+    transparent
+  );
+}
+
+.challenge-result-modal.result-winner svg {
+  color: #eab308;
+
+  filter:
+    drop-shadow(
+      0 3px 7px rgba(234, 179, 8, 0.30)
+    );
+}
+
+.challenge-result-modal.result-winner:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 30px rgba(34, 197, 94, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+
+/* =========================================================
+   🤝 التعادل
+   ========================================================= */
+
+.challenge-result-modal.result-tie {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(245, 158, 11, 0.15),
+      rgba(251, 191, 36, 0.07)
+    );
+
+  border-color: rgba(245, 158, 11, 0.30);
+
+  color: #b45309;
+
+  box-shadow:
+    0 8px 25px rgba(245, 158, 11, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.challenge-result-modal.result-tie::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #f59e0b,
+    transparent
+  );
+}
+
+.challenge-result-modal.result-tie svg {
+  color: #f59e0b;
+
+  filter:
+    drop-shadow(
+      0 3px 7px rgba(245, 158, 11, 0.25)
+    );
+}
+
+.challenge-result-modal.result-tie:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 30px rgba(245, 158, 11, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+
+/* =========================================================
+   👑 فائز آخر
+   ========================================================= */
+
+.challenge-result-modal.result-other-winner {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(139, 92, 246, 0.14),
+      rgba(99, 102, 241, 0.07)
+    );
+
+  border-color: rgba(139, 92, 246, 0.30);
+
+  color: #6d28d9;
+
+  box-shadow:
+    0 8px 25px rgba(139, 92, 246, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.challenge-result-modal.result-other-winner::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #8b5cf6,
+    transparent
+  );
+}
+
+.challenge-result-modal.result-other-winner svg {
+  color: #8b5cf6;
+
+  filter:
+    drop-shadow(
+      0 3px 7px rgba(139, 92, 246, 0.25)
+    );
+}
+
+.challenge-result-modal.result-other-winner:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 30px rgba(139, 92, 246, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+
+/* =========================================================
+   ❌ انتهى بدون فائز
+   ========================================================= */
+
+.challenge-result-modal.result-no-winner {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(100, 116, 139, 0.13),
+      rgba(71, 85, 105, 0.06)
+    );
+
+  border-color: rgba(100, 116, 139, 0.25);
+
+  color: #475569;
+
+  box-shadow:
+    0 8px 25px rgba(71, 85, 105, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.challenge-result-modal.result-no-winner::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #64748b,
+    transparent
+  );
+}
+
+.challenge-result-modal.result-no-winner svg {
+  color: #64748b;
+
+  filter:
+    drop-shadow(
+      0 3px 6px rgba(100, 116, 139, 0.20)
+    );
+}
+
+.challenge-result-modal.result-no-winner:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 30px rgba(71, 85, 105, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+
+/* =========================================================
+   Animation
+   ========================================================= */
+
+@keyframes challengeResultModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* =========================================================
+   🌙 DARK MODE
+   ========================================================= */
+
+.dark-mode .challenge-result-modal.result-winner {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(34, 197, 94, 0.16),
+      rgba(16, 185, 129, 0.07)
+    );
+
+  border-color: rgba(74, 222, 128, 0.28);
+
+  color: #86efac;
+
+  box-shadow:
+    0 8px 28px rgba(34, 197, 94, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.dark-mode .challenge-result-modal.result-winner::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #4ade80,
+    transparent
+  );
+}
+
+
+.dark-mode .challenge-result-modal.result-tie {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(245, 158, 11, 0.16),
+      rgba(251, 191, 36, 0.07)
+    );
+
+  border-color: rgba(251, 191, 36, 0.28);
+
+  color: #fcd34d;
+
+  box-shadow:
+    0 8px 28px rgba(245, 158, 11, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.dark-mode .challenge-result-modal.result-tie::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #fbbf24,
+    transparent
+  );
+}
+
+
+.dark-mode .challenge-result-modal.result-other-winner {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(139, 92, 246, 0.17),
+      rgba(99, 102, 241, 0.08)
+    );
+
+  border-color: rgba(167, 139, 250, 0.30);
+
+  color: #c4b5fd;
+
+  box-shadow:
+    0 8px 28px rgba(139, 92, 246, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.dark-mode .challenge-result-modal.result-other-winner::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #a78bfa,
+    transparent
+  );
+}
+
+
+.dark-mode .challenge-result-modal.result-no-winner {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(100, 116, 139, 0.16),
+      rgba(71, 85, 105, 0.08)
+    );
+
+  border-color: rgba(148, 163, 184, 0.22);
+
+  color: #cbd5e1;
+
+  box-shadow:
+    0 8px 28px rgba(71, 85, 105, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.dark-mode .challenge-result-modal.result-no-winner::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #94a3b8,
+    transparent
+  );
+}
+
+
+/* =========================================================
+   📱 TABLET
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .challenge-result-modal {
+    width: calc(100% - 28px);
+
+    margin: 20px 14px 0;
+
+    padding: 16px 18px;
+
+    gap: 11px;
+
+    border-radius: 16px;
+
+    font-size: 14px;
+  }
+
+  .challenge-result-modal svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+
+/* =========================================================
+   📱 MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .challenge-result-modal {
+    width: calc(100% - 28px);
+
+    margin: 18px 14px 0;
+
+    padding: 14px 15px;
+
+    gap: 9px;
+
+    border-radius: 14px;
+
+    font-size: 13px;
+  }
+
+  .challenge-result-modal svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .challenge-result-modal span {
+    line-height: 1.6;
+  }
+}
+/* =========================================================
+   Pagination
+========================================================= */
+
+.friends-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 24px;
+  padding: 4px 0;
+  direction: rtl;
+}
+
+.pagination-pages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.pagination-btn,
+.pagination-page {
+  min-width: 40px;
+  height: 40px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  background: var(--card-bg, #ffffff);
+  color: var(--text-color, #374151);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.pagination-btn {
+  padding: 0 14px;
+}
+
+.pagination-btn:hover:not(:disabled),
+.pagination-page:hover:not(.active) {
+  border-color: #6c63ff;
+  color: #6c63ff;
+  transform: translateY(-1px);
+}
+
+.pagination-page.active {
+  background: #6c63ff;
+  border-color: #6c63ff;
+  color: #ffffff;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pagination-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dark-mode .pagination-btn,
+.dark-mode .pagination-page {
+  background: var(--card-bg, #1f2937);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #e5e7eb;
+}
+
+.dark-mode .pagination-btn:hover:not(:disabled),
+.dark-mode .pagination-page:hover:not(.active) {
+  border-color: #8b83ff;
+  color: #8b83ff;
+}
+
+.dark-mode .pagination-page.active {
+  background: #6c63ff;
+  border-color: #6c63ff;
+  color: #ffffff;
+}
+
+@media (max-width: 600px) {
+  .friends-pagination {
+    gap: 6px;
+    margin-top: 20px;
+  }
+
+  .pagination-btn {
+    min-width: 70px;
+    height: 38px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .pagination-page {
+    min-width: 36px;
+    height: 38px;
+    font-size: 12px;
+  }
+
+  .pagination-pages {
+    gap: 4px;
+  }
+}

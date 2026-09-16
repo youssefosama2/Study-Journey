@@ -33,9 +33,6 @@ const ResetPassword = () => {
           error,
         } = await supabase.auth.getSession();
 
-        console.log("RESET PASSWORD SESSION:", session);
-        console.log("RESET PASSWORD SESSION ERROR:", error);
-
         if (error || !session) {
           await Swal.fire({
             icon: "error",
@@ -136,10 +133,6 @@ const ResetPassword = () => {
 
         throw error;
       }
-
-      console.log(
-        "PASSWORD UPDATED SUCCESSFULLY"
-      );
 
       // =================================================
       // تسجيل الخروج بعد تغيير الباسورد

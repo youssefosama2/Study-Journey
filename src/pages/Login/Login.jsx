@@ -167,10 +167,6 @@ const Login = () => {
     setLoading(true);
 
     try {
-      console.log("=================================");
-      console.log("START LOGIN");
-      console.log("=================================");
-
       const email = formData.email
         .trim()
         .toLowerCase();
@@ -186,9 +182,6 @@ const Login = () => {
           email,
           password: formData.password,
         });
-
-      console.log("AUTH DATA:", authData);
-      console.log("AUTH ERROR:", authError);
 
       // =================================================
       // خطأ Auth
@@ -245,16 +238,6 @@ const Login = () => {
       } =
         await supabase.auth.getSession();
 
-      console.log(
-        "SESSION AFTER LOGIN:",
-        sessionData
-      );
-
-      console.log(
-        "SESSION ERROR:",
-        sessionError
-      );
-
       if (sessionError) {
         console.error(
           "SESSION ERROR:",
@@ -296,16 +279,6 @@ const Login = () => {
         );
       }
 
-      console.log(
-        "AUTHENTICATED USER:",
-        user
-      );
-
-      console.log(
-        "AUTHENTICATED USER ID:",
-        user.id
-      );
-
       // =================================================
       // التأكد مرة ثانية من المستخدم من Supabase
       // =================================================
@@ -314,16 +287,6 @@ const Login = () => {
         error: userError,
       } =
         await supabase.auth.getUser();
-
-      console.log(
-        "GET USER DATA:",
-        userData
-      );
-
-      console.log(
-        "GET USER ERROR:",
-        userError
-      );
 
       if (userError) {
         console.error(
@@ -343,16 +306,6 @@ const Login = () => {
       // نستخدم المستخدم الذي رجع من Supabase
       const authenticatedUser =
         userData.user;
-
-      console.log(
-        "FINAL AUTH USER:",
-        authenticatedUser
-      );
-
-      console.log(
-        "FINAL AUTH USER ID:",
-        authenticatedUser.id
-      );
 
       // =================================================
       // جلب بيانات الطالب
@@ -378,16 +331,6 @@ const Login = () => {
             authenticatedUser.id
           )
           .maybeSingle();
-
-      console.log(
-        "PROFILE DATA:",
-        profileData
-      );
-
-      console.log(
-        "PROFILE ERROR:",
-        profileError
-      );
 
       // =================================================
       // خطأ في جلب Profile
@@ -455,21 +398,11 @@ const Login = () => {
       } =
         await supabase.auth.getSession();
 
-      console.log(
-        "FINAL SESSION BEFORE NAVIGATION:",
-        finalSessionData?.session
-      );
-
       if (!finalSessionData?.session) {
         throw new Error(
           "جلسة تسجيل الدخول غير متاحة قبل الانتقال"
         );
       }
-
-      console.log(
-        "LOGIN SUCCESS:",
-        profileData
-      );
 
       // =================================================
       // رسالة النجاح

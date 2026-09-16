@@ -220,9 +220,6 @@ const Plan = () => {
     const sessionUser = sessionData?.session?.user;
     if (sessionUser?.id) {
       setUser(sessionUser);
-      console.log("PLAN SESSION:", sessionData.session);
-      console.log("PLAN USER:", sessionUser);
-      console.log("PLAN USER ID:", sessionUser.id);
       return sessionUser;
     }
     const { data: userData, error: userError } = await supabase.auth.getUser();
@@ -692,10 +689,6 @@ const Plan = () => {
       }
       const formattedNotes = (notesData || []).map(formatNote);
       setNotes(formattedNotes);
-      console.log("PLAN:", currentPlan);
-      console.log("SESSIONS:", formattedSessions);
-      console.log("TASKS:", formattedTasks);
-      console.log("NOTES:", formattedNotes);
     } catch (err) {
       console.error("loadDayData error:", err);
       setError(err?.message || "حدث خطأ أثناء تحميل الخطة.");

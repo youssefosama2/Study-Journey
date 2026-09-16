@@ -175,8 +175,6 @@ function Subscription() {
         return;
       }
 
-      console.log("REFERRAL USER ID:", user.id);
-
       // =================================================
       // 1. Student Profile
       // =================================================
@@ -189,11 +187,6 @@ function Subscription() {
         .select("referral_code")
         .eq("user_id", user.id)
         .maybeSingle();
-
-      console.log("REFERRAL PROFILE:", {
-        profile,
-        profileError,
-      });
 
       if (profileError) {
         throw profileError;
@@ -217,11 +210,6 @@ function Subscription() {
         `)
         .eq("user_id", user.id)
         .maybeSingle();
-
-      console.log("REFERRAL STATS:", {
-        stats,
-        statsError,
-      });
 
       if (statsError) {
         throw statsError;
@@ -248,11 +236,6 @@ function Subscription() {
         .order("created_at", {
           ascending: false,
         });
-
-      console.log("REFERRAL LIST:", {
-        referrals,
-        referralsError,
-      });
 
       if (referralsError) {
         throw referralsError;
@@ -285,11 +268,6 @@ function Subscription() {
             avatar_url
           `)
           .in("user_id", referredUserIds);
-
-        console.log("REFERRED PROFILES:", {
-          referredProfiles,
-          referredProfilesError,
-        });
 
         if (referredProfilesError) {
           throw referredProfilesError;

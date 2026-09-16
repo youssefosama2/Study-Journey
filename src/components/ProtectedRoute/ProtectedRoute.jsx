@@ -131,9 +131,6 @@ function ProtectedRoute({ children }) {
         // ==========================================
 
         if (!subscription) {
-          console.log(
-            "NO ACTIVE SUBSCRIPTION"
-          );
 
           if (mounted) {
             setHasSubscription(false);
@@ -147,10 +144,6 @@ function ProtectedRoute({ children }) {
         // 7. يوجد اشتراك ساري
         // ==========================================
 
-        console.log(
-          "ACTIVE SUBSCRIPTION:",
-          subscription
-        );
 
         if (mounted) {
           setHasSubscription(true);
@@ -178,33 +171,6 @@ function ProtectedRoute({ children }) {
             (1000 * 60 * 60 * 24)
         );
 
-        console.log(
-          "================================"
-        );
-
-        console.log(
-          "SUBSCRIPTION WARNING CHECK"
-        );
-
-        console.log(
-          "TODAY:",
-          today
-        );
-
-        console.log(
-          "END DATE:",
-          subscription.end_date
-        );
-
-        console.log(
-          "REMAINING DAYS:",
-          remainingDays
-        );
-
-        console.log(
-          "================================"
-        );
-
         // ==========================================
         // 9. التحذير
         // ==========================================
@@ -222,10 +188,6 @@ function ProtectedRoute({ children }) {
               warningKey
             );
 
-          console.log(
-            "WARNING ALREADY SHOWN:",
-            alreadyShown
-          );
 
           // لو ظهر قبل كده في نفس فتح التطبيق
           // لا يظهر مرة أخرى

@@ -259,7 +259,6 @@ const AdminSubscriptions = () => {
       if (error) {
         throw error;
       }
-      console.log("Activated subscription:", data);
       await Swal.fire({
         icon: "success",
         title: "تم تفعيل الاشتراك",
