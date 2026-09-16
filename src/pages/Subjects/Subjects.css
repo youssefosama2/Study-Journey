@@ -670,29 +670,13 @@
   background-color: rgba(125, 156, 255, 0.15);
 }
 /* =========================================================
-   MOBILE
+   MOBILE - STUDENT SECTION INFO
 ========================================================= */
 @media (max-width: 576px) {
   .subjects-page .subjects-section-info {
-    padding: 14px 16px;
-    gap: 10px;
-    border-radius: 12px;
+    display: none;
   }
-  .subjects-page .subjects-section-info::before {
-    width: 34px;
-    height: 34px;
-    flex-basis: 34px;
-    background-size: 20px;
-  }
-  .subjects-page .subjects-section-info span {
-    font-size: 13px;
-  }
-  .subjects-page .subjects-section-info strong {
-    min-height: 34px;
-    padding: 6px 12px;
-    font-size: 13px;
-  }
-}
+}  
 /* =========================================================
    RESPONSIVE
 ========================================================= */
